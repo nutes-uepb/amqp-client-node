@@ -5,14 +5,14 @@ export interface IEventbusInterface {
     isConnected: boolean
 
     connect(host: string, port: number, username: string, password: string,
-            options?: IOptions): Promise<boolean | Error>
+            options?: IOptions): Promise<boolean>
 
-    close(): Promise<boolean | Error>
+    close(): Promise<boolean>
 
-    publish(exchangeName: string, exchangeType: string, message: any ): Promise<boolean | Error>
+    publish(exchangeName: string, exchangeType: string, message: any ): Promise<boolean>
 
     subscribe(exchangeName: string, queueName: string, routing_key: string,
-              callback: IEventHandler<any>): Promise<boolean | Error>
+              callback: IEventHandler<any>): Promise<boolean>
 
     receiveFromYourself(value: boolean): boolean
 

@@ -130,9 +130,9 @@ export class EventBus extends EventEmitter implements IEventbusInterface {
     }
 
     public connect(host: string, port: number, username: string, password: string,
-                   options?: IOptions): Promise<boolean | Error>{
+                   options?: IOptions): Promise<boolean>{
 
-        return new Promise<boolean | Error>(async (resolve, reject) => {
+        return new Promise<boolean>(async (resolve, reject) => {
             try {
                 await this.pubconnection.tryConnect(host, port, username, password, options)
                 await this.subconnection.tryConnect(host, port, username, password, options)
@@ -148,13 +148,13 @@ export class EventBus extends EventEmitter implements IEventbusInterface {
                 else
                     return resolve(false)
             }catch (err) {
-                return reject(new Error(err))
+                return reject(err)
             }
         })
     }
 
-    public close(): Promise<boolean | Error> {
-        return new Promise<boolean | Error>(async (resolve, reject) => {
+    public close(): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
             try {
                 await this.pubconnection.closeConnection()
                 await this.subconnection.closeConnection()
@@ -164,29 +164,29 @@ export class EventBus extends EventEmitter implements IEventbusInterface {
                 else
                     return resolve(false)
             } catch (err) {
-                return reject(new Error(err))
+                return reject(err)
             }
         })
     }
 
-    public publish(exchangeName: string, topicKey: string, message: any ):  Promise<boolean | Error>{
+    public publish(exchangeName: string, topicKey: string, message: any ):  Promise<boolean>{
 
-        return new Promise<boolean | Error>(async (resolve, reject) => {
+        return new Promise<boolean>(async (resolve, reject) => {
             this.pubconnection.sendMessage(exchangeName, topicKey, message).then(result => {
                 return resolve(result)
             }).catch(err => {
-                return reject(new Error(err))
+                return reject(err)
             })
         })
     }
 
     public subscribe(exchangeName: string, queueName: string, routing_key: string,
-                     callback: IEventHandler<any> ): Promise<boolean | Error>{
-        return new Promise<boolean | Error>(async (resolve, reject) => {
+                     callback: IEventHandler<any> ): Promise<boolean>{
+        return new Promise<boolean>(async (resolve, reject) => {
             this.subconnection.receiveMessage(exchangeName, queueName, routing_key, callback).then(result => {
                 return resolve(result)
             }).catch(err => {
-                return reject(new Error(err))
+                return reject(err)
             })
         })
     }
