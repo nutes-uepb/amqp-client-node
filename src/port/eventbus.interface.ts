@@ -9,12 +9,12 @@ export interface IEventbusInterface {
 
     close(): Promise<boolean>
 
-    publish(exchangeName: string, exchangeType: string, message: any ): Promise<boolean>
+    pub(exchangeName: string, exchangeType: string, message: any ): Promise<boolean>
 
-    subscribe(exchangeName: string, queueName: string, routing_key: string,
-              callback: IEventHandler<any>): Promise<boolean>
+    sub(exchangeName: string, queueName: string, routing_key: string,
+        callback: (message: any) => void): Promise<boolean>
 
     receiveFromYourself(value: boolean): boolean
 
-    loggerConnection(enabled: boolean, level?: string): boolean
+    logger(enabled: boolean, level?: string): boolean
 }

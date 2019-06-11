@@ -212,7 +212,8 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
         return this._receiveFromYourself
     }
 
-    public logger(enabled: boolean, level?: string): boolean{
-        return this._logger.changeLoggerConfiguration(enabled, level)
+    public logger(enabled: boolean, level?: string): void{
+        this._logger.changeLoggerConfiguration(enabled, level)
+        return
     }
 }

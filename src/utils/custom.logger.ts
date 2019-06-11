@@ -70,7 +70,7 @@ export class CustomLogger implements ILogger {
         this._logger.silly(message)
     }
 
-    public changeLoggerConfiguration(enabled: boolean, level?: string): boolean{
+    public changeLoggerConfiguration(enabled: boolean, level?: string): void{
 
         this._options.silent = enabled
 
@@ -80,7 +80,7 @@ export class CustomLogger implements ILogger {
         this._logger.clear()
         this._logger.add(new transports.Console(this._options))
 
-        return 1 === this._logger.transports.length
+        return
     }
 }
 
@@ -113,5 +113,5 @@ export interface ILogger {
 
     addTransport(transport: any): Logger
 
-    changeLoggerConfiguration(enabled: boolean, level?: string): boolean
+    changeLoggerConfiguration(enabled: boolean, level?: string): void
 }

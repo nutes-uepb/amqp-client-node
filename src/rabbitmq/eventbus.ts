@@ -169,7 +169,7 @@ export class EventBus extends EventEmitter implements IEventbusInterface {
         })
     }
 
-    public publish(exchangeName: string, topicKey: string, message: any ):  Promise<boolean>{
+    public pub(exchangeName: string, topicKey: string, message: any ):  Promise<boolean>{
 
         return new Promise<boolean>(async (resolve, reject) => {
             this.pubconnection.sendMessage(exchangeName, topicKey, message).then(result => {
@@ -180,10 +180,15 @@ export class EventBus extends EventEmitter implements IEventbusInterface {
         })
     }
 
-    public subscribe(exchangeName: string, queueName: string, routing_key: string,
-                     callback: IEventHandler<any> ): Promise<boolean>{
+    public sub(exchangeName: string, queueName: string, routing_key: string,
+               callback: (message: any) => void ): Promise<boolean>{
+
+        const eventCallback: IEventHandler<any> = {
+            handle: callback
+        }
+
         return new Promise<boolean>(async (resolve, reject) => {
-            this.subconnection.receiveMessage(exchangeName, queueName, routing_key, callback).then(result => {
+            this.subconnection.receiveMessage(exchangeName, queueName, routing_key, eventCallback).then(result => {
                 return resolve(result)
             }).catch(err => {
                 return reject(err)
@@ -196,9 +201,11 @@ export class EventBus extends EventEmitter implements IEventbusInterface {
         return this.subconnection.receiveFromYourself
     }
 
-    public loggerConnection(enabled: boolean, level?: string): boolean{
+    public logger(enabled: boolean, level?: string): boolean{
         try {
-            return this.pubconnection.logger(enabled, level) && this.subconnection.logger(enabled, level)
+            this.pubconnection.logger(enabled, level)
+            this.subconnection.logger(enabled, level)
+            return true
         }catch (e) {
             return false
         }
