@@ -4,10 +4,7 @@ import { IEventHandler } from './event.handler.interface'
 export interface IEventbusInterface {
     isConnected: boolean
 
-    connect(host: string, port: number, username: string, password: string,
-            options?: IOptions): Promise<boolean>
-
-    close(): Promise<boolean>
+    dispose(): Promise<boolean>
 
     pub(exchangeName: string, exchangeType: string, message: any ): Promise<boolean>
 
