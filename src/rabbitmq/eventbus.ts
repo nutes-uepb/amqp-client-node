@@ -154,8 +154,8 @@ export class EventBus extends EventEmitter implements IEventbusInterface {
 
     public logger(enabled: boolean, level?: string): boolean{
         try {
-            this.pubconnection.logger(enabled, level)
-            this.subconnection.logger(enabled, level)
+            this.pubconnection.logger(!enabled, level)
+            this.subconnection.logger(!enabled, level)
             return true
         }catch (e) {
             return false

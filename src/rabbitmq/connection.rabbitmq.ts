@@ -106,7 +106,7 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
         })
     }
 
-    public closeConnection(): Promise<boolean | undefined> {
+    public closeConnection(): Promise<boolean> {
 
         return new Promise<boolean|undefined>( async (resolve, reject) => {
             if (this.isConnected) {
@@ -179,12 +179,16 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
                             this._logger.info(`Bus event message received with success!`)
                             const routingKey: string = message.fields.routingKey
 
-                            const event_handler: IEventHandler<any> | undefined =
-                                this.event_handlers.get(routingKey)
+                            for (const entry of this.event_handlers.keys()) {
+                                if (this.regExpr(entry, routingKey)){
+                                    const event_handler: IEventHandler<any> | undefined = this.event_handlers.get(entry)
 
-                            if (event_handler) {
-                                event_handler.handle(message.getContent())
+                                    if (event_handler) {
+                                        event_handler.handle(message.getContent())
+                                    }
+                                }
                             }
+
                         }, { noAck: false }).then((result: StartConsumerResult) => {
                             this._logger.info('Queue consumer' + this.queue.name + 'successfully created! ')
                         })
@@ -214,5 +218,20 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
     public logger(enabled: boolean, level?: string): void{
         this._logger.changeLoggerConfiguration(enabled, level)
         return
+    }
+
+    private regExpr(pattern: string, expression: string): boolean {
+        try {
+            pattern = pattern.replace(/(\*)/g, '[a-zA-Z0-9_]*')
+            pattern = pattern.replace(/(\.\#)/g, '.*')
+            pattern = pattern.replace(/(\#)/g, '.*')
+
+            // pattern += '+$'
+
+            const regex = new RegExp( pattern )
+            return regex.test(expression)
+        }catch (e) {
+            console.log(e)
+        }
     }
 }
