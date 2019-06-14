@@ -64,14 +64,20 @@ export class EventBus extends EventEmitter implements IEventbusInterface {
 
     }
 
-    get isConnected(): boolean {
-        if (this.pubActived && this.subActived)
-            return this.pubconnection.isConnected && this.subconnection.isConnected
-        if (this.pubActived)
-            return this.pubconnection.isConnected
-        if (this.subActived)
-            return this.subconnection.isConnected
-        return false
+    get getPubConnection(){
+        return this.pubconnection
+    }
+
+    get getSubConnection(){
+        return this.subconnection
+    }
+
+    get isPubConnected(): boolean {
+        return this.pubconnection.isConnected
+    }
+
+    get isSubConnected(): boolean {
+        return this.subconnection.isConnected
     }
 
     public dispose(): Promise<boolean> {
@@ -80,7 +86,7 @@ export class EventBus extends EventEmitter implements IEventbusInterface {
                 await this.pubconnection.closeConnection()
                 await this.subconnection.closeConnection()
 
-                if (!this.isConnected){
+                if (!this.isPubConnected && !this.isSubConnected){
                     this.pubActived = false
                     this.pubActived = false
                     return resolve(true)
@@ -94,13 +100,15 @@ export class EventBus extends EventEmitter implements IEventbusInterface {
     }
 
     public pub(exchangeName: string, topicKey: string, message: any ):  Promise<boolean>{
-        this.pubActived = true
         return new Promise<boolean>(async (resolve, reject) => {
-            await this.pubconnection.tryConnect(this.host, this.port, this.username, this.password, this.options)
-            this.pubEventInitialization()
-            await this.pubconnection.conn.initialized
+            if (!this.pubActived){
+                this.pubActived = true
+                await this.pubconnection.tryConnect(this.host, this.port, this.username, this.password, this.options)
+                this.pubEventInitialization()
+                await this.pubconnection.conn.initialized
+            }
 
-            if (this.isConnected){
+            if (this.isPubConnected){
                 this.pubconnection.sendMessage(exchangeName, topicKey, message).then(result => {
                     return resolve(result)
                 }).catch(err => {
@@ -114,17 +122,20 @@ export class EventBus extends EventEmitter implements IEventbusInterface {
 
     public sub(exchangeName: string, queueName: string, routing_key: string,
                callback: (message: any) => void ): Promise<boolean>{
-        this.subActived = true
         const eventCallback: IEventHandler<any> = {
             handle: callback
         }
 
         return new Promise<boolean>(async (resolve, reject) => {
-            await this.subconnection.tryConnect(this.host, this.port, this.username, this.password, this.options)
-            this.subEventInitialization()
-            await this.subconnection.conn.initialized
 
-            if (this.isConnected){
+            if (!this.subActived){
+                this.subActived = true
+                await this.subconnection.tryConnect(this.host, this.port, this.username, this.password, this.options)
+                this.subEventInitialization()
+                await this.subconnection.conn.initialized
+            }
+
+            if (this.isSubConnected){
                 this.subconnection.receiveMessage(exchangeName, queueName, routing_key, eventCallback).then(result => {
                     return resolve(result)
                 }).catch(err => {

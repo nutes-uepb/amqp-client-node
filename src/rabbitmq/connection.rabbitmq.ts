@@ -24,6 +24,8 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
 
     private _connection?: Connection
 
+    private queue!: Queue
+
     private _receiveFromYourself: boolean = false
 
     private readonly _logger: ILogger = new CustomLogger()
@@ -119,7 +121,7 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
     }
 
     public sendMessage(exchangeName: string, topicKey: string, message: any): Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
+        return new Promise<boolean>(async (resolve, reject) => {
             try {
                 if (this.isConnected) {
 
@@ -128,17 +130,21 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
 
                     const exchange = this._connection.declareExchange(exchangeName, 'topic', { durable: true })
 
-                    const msg: Message = new Message(message)
-                    msg.properties.appId = ConnectionRabbitMQ.idConnection
+                    if (await exchange.initialized) {
+                        const msg: Message = new Message(message)
+                        msg.properties.appId = ConnectionRabbitMQ.idConnection
 
-                    exchange.send(msg, topicKey)
+                        exchange.send(msg, topicKey)
+
+                        await exchange.close()
+                    }
 
                     this._logger.info('Bus event message sent with success!')
 
                     return resolve(true)
                 }
                 return resolve(false)
-            }catch (err) {
+            } catch (err) {
                 return reject(err)
             }
         })
@@ -151,31 +157,24 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
                 if (this.isConnected) {
                     const exchange = this._connection.declareExchange(exchangeName, 'topic', { durable: true })
 
-                    await exchange.initialized.then(() => {
+                    this.queue = await this._connection.declareQueue(queueName, { durable: true })
+
+                    if (await exchange.initialized) {
                         this.event_handlers.set(topicKey, callback)
                         this._logger.info('Callback message ' + topicKey + ' registered!')
-                    }).catch(err => {
-                        console.log('here')
-                    })
+                        this.queue.bind(exchange, topicKey)
 
-                    // if (await exchange.initialized) {
-                    //     this.event_handlers.set(topicKey, callback)
-                    //     this._logger.info('Callback message ' + topicKey + ' registered!')
-                    // }
-
-                    const queue = this._connection.declareQueue(queueName, { exclusive: true })
-
-                    queue.bind(exchange, topicKey)
+                    }
 
                     if (!this.consumersInitialized.get(queueName)){
                         this.consumersInitialized.set(queueName, true)
                         this._logger.info('Queue creation ' + queueName + ' realized with success!')
 
-                        queue.activateConsumer((message: Message) => {
+                        await this.queue.activateConsumer((message: Message) => {
                             message.ack() // acknowledge that the message has been received (and processed)
 
                             if (message.properties.appId === ConnectionRabbitMQ.idConnection &&
-                                this._receiveFromYourself === false) return
+                                !this._receiveFromYourself) return
 
                             this._logger.info(`Bus event message received with success!`)
                             const routingKey: string = message.fields.routingKey
@@ -187,7 +186,7 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
                                 event_handler.handle(message.getContent())
                             }
                         }, { noAck: false }).then((result: StartConsumerResult) => {
-                            this._logger.info('Queue consumer' + queue.name + 'successfully created! ')
+                            this._logger.info('Queue consumer' + this.queue.name + 'successfully created! ')
                         })
                             .catch(err => {
                                 return reject(err)

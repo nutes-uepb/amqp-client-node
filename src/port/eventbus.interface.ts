@@ -2,7 +2,9 @@ import { IOptions } from './configuration.inteface'
 import { IEventHandler } from './event.handler.interface'
 
 export interface IEventbusInterface {
-    isConnected: boolean
+    isSubConnected: boolean
+
+    isPubConnected: boolean
 
     dispose(): Promise<boolean>
 
