@@ -1,12 +1,12 @@
-import { EventBus } from '../rabbitmq/connection/eventbus'
-import { IWorkQueues } from './port/work.queues.interface'
-import { IEventHandler } from '../rabbitmq/port/event.handler.interface'
+import { EventBus } from '../../rabbitmq/connection/eventbus'
+import { IEventHandler } from '../../rabbitmq/port/event.handler.interface'
+import { ITopic } from '../port/topic.interface'
 
-export class WorkQueues extends EventBus implements IWorkQueues{
+export class Topic extends EventBus{ // implements ITopic{
 
-    private readonly typeConnection = 'work_queues'
+    private readonly typeConnection = 'topic'
 
-    public pub(eventName: string, queueName: string, message: any): Promise<boolean> {
+    public pub(exchangeName: string, topicKey: string, message: any ):  Promise<boolean>{
         return new Promise<boolean>(async (resolve, reject) => {
             if (!this.pubActived){
                 this.pubActived = true
@@ -16,8 +16,8 @@ export class WorkQueues extends EventBus implements IWorkQueues{
             }
 
             if (this.isPubConnected){
-                this.pubconnection.sendMessage(this.typeConnection, undefined,
-                    undefined, queueName, message, eventName).then(result => {
+                this.pubconnection.sendMessage(this.typeConnection, exchangeName, topicKey,
+                    undefined, message).then(result => {
                     return resolve(result)
                 }).catch(err => {
                     return reject(err)
@@ -28,7 +28,8 @@ export class WorkQueues extends EventBus implements IWorkQueues{
         })
     }
 
-    public sub(eventName: string, queueName: string, callback: (message: any) => void): Promise<boolean> {
+    public sub(exchangeName: string, queueName: string, routing_key: string,
+               callback: (message: any) => void ): Promise<boolean>{
         const eventCallback: IEventHandler<any> = {
             handle: callback
         }
@@ -43,8 +44,8 @@ export class WorkQueues extends EventBus implements IWorkQueues{
             }
 
             if (this.isSubConnected){
-                this.subconnection.receiveMessage(this.typeConnection, undefined,
-                    undefined, queueName, eventCallback, eventName).then(result => {
+                this.subconnection.receiveMessage(this.typeConnection, exchangeName, routing_key,
+                    queueName, eventCallback).then(result => {
                     return resolve(result)
                 }).catch(err => {
                     return reject(err)

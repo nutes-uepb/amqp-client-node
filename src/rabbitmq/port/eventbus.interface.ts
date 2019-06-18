@@ -16,7 +16,7 @@ export interface IEventbusInterface {
 
     sub(...any: any): Promise<boolean>
 
-    rpcServer(): Promise<boolean>
+    rpcServer(...any:any): Promise<boolean>
 
-    rpcClient(resourceName: string, ...any:any): Promise<boolean>
+    rpcClient(...any:any): Promise<boolean>
 }

@@ -7,7 +7,8 @@ import { IEventHandler } from '../port/event.handler.interface'
 import { CustomLogger, ILogger } from '../../utils/custom.logger'
 import StartConsumerResult = Queue.StartConsumerResult
 import { IMessage } from '../port/message.interface'
-import { IResourceHandler } from '../port/resource.handler.interface'
+import { IClientRequest, IResourceHandler } from '../port/resource.handler.interface'
+import { throws } from 'assert'
 
 /**
  * Implementation of the interface that provides conn with RabbitMQ.
@@ -211,6 +212,126 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
             try {
                 this.resource_handlers.set(resourceName, resource)
                 this._logger.info('Resource ' + resourceName + ' registered!')
+                return resolve(true)
+            }catch (err) {
+                return reject(err)
+            }
+        })
+    }
+
+    public registerClientWorkQueues(callback: (message: any) => void, queueName: string, resource: IClientRequest): Promise<boolean> {
+
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+                const queue = this._connection.declareQueue(queueName, {durable: false});
+
+                queue.rpc(resource).then(msg => {
+                    callback(msg.getContent())
+                }).catch(e => {
+                    // console.log(e)
+                })
+
+                this._logger.info('Client registered in ' + queueName + ' queue!' )
+                return resolve(true)
+            }catch (err) {
+                return reject(err)
+            }
+        })
+    }
+
+    public registerClientFanout(callback: (message: any) => void, exchangeName: string, resource: IClientRequest): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+                const exchange = this._connection.declareExchange(exchangeName, 'fanout', {durable: false});
+
+                exchange.rpc(resource).then(msg => {
+                    callback(msg.getContent())
+                })
+
+                this._logger.info('Client registered in ' + exchangeName + ' exchange!' )
+                return resolve(true)
+            }catch (err) {
+                return reject(err)
+            }
+        })
+    }
+
+
+    public registerServerWorkQueues(queueName: string): Promise<boolean> {
+
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+
+                const queue = this._connection.declareQueue(queueName, {durable: false});
+
+                if (!this.consumersInitialized.get(queueName)) {
+                    this.consumersInitialized.set(queueName, true)
+                    this._logger.info('Queue creation ' + queueName + ' realized with success!')
+
+                    await queue.activateConsumer((message) => {
+                        message.ack() // acknowledge that the message has been received (and processed)
+
+                        const clientRequest : IClientRequest = message.getContent()
+
+                        const resource_handler: IResourceHandler | undefined = this.resource_handlers.get(clientRequest.resourceName)
+
+                        if (resource_handler) {
+                            try {
+                                return resource_handler.handle.apply('',clientRequest.handle)
+                            }catch (err) {
+                                this._logger.error('Consumer function returned error' )
+                            }
+                        }
+
+                    }, { noAck: false }).then((result: StartConsumerResult) => {
+                        this._logger.info('Server registered in ' + queueName + ' queue!' )
+                    })
+                        .catch(err => {
+                            throw err
+                        })
+                }
+
+                return resolve(true)
+            }catch (err) {
+                return reject(err)
+            }
+        })
+    }
+
+    public registerServerFanout(exchangeName: string): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+
+                const exchange = await this._connection.declareExchange(exchangeName, 'fanout', {durable: false});
+                this._logger.info('Exchange creation ' + exchange.name + ' realized with success!')
+
+                const queue = await this._connection.declareQueue('', {durable: false});
+                this._logger.info('Queue creation ' + queue.name + ' realized with success!')
+
+                await queue.bind(exchange)
+
+                await queue.activateConsumer((message) => {
+                    message.ack() // acknowledge that the message has been received (and processed)
+
+                    const clientRequest : IClientRequest = message.getContent()
+
+                    const resource_handler: IResourceHandler | undefined = this.resource_handlers.get(clientRequest.resourceName)
+
+                    if (resource_handler) {
+                        try {
+                            return resource_handler.handle.apply('',clientRequest.handle)
+                        }catch (err) {
+                            console.log(err)
+                        }
+                    }
+
+                }, { noAck: false }).then((result: StartConsumerResult) => {
+                    this._logger.info('Server registered in ' + exchangeName + ' exchange!' )
+                })
+                    .catch(err => {
+                        throw err
+                    })
+
                 return resolve(true)
             }catch (err) {
                 return reject(err)

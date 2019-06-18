@@ -99,7 +99,7 @@ export abstract class EventBus extends EventEmitter implements IEventbusInterfac
                 await this.subconnection.closeConnection()
                 await this.resourceConnection.closeConnection()
 
-                if (!this.isPubConnected && !this.isSubConnected){
+                if (!this.isPubConnected && !this.isSubConnected && !this.isResourceConnected){
                     this.pubActived = false
                     this.pubActived = false
                     this.resourceActived = false
@@ -122,6 +122,7 @@ export abstract class EventBus extends EventEmitter implements IEventbusInterfac
         try {
             this.pubconnection.logger(!enabled, level)
             this.subconnection.logger(!enabled, level)
+            this.resourceConnection.logger(!enabled, level)
             return true
         }catch (e) {
             return false
@@ -142,7 +143,7 @@ export abstract class EventBus extends EventEmitter implements IEventbusInterfac
                 handle: resource
             }
 
-            if (this.resourceActived){
+            if (this.isResourceConnected){
                 this.resourceConnection.registerResource(resourceName, resourceHandler).then(result => {
                     return resolve(result)
                 }).catch(err => {
@@ -158,7 +159,7 @@ export abstract class EventBus extends EventEmitter implements IEventbusInterfac
 
     public abstract sub(...any: any): Promise<boolean>
 
-    public abstract rpcServer()
+    public abstract rpcServer(...any: any)
 
-    public abstract rpcClient(resourceName: string, ...any:any)
+    public abstract rpcClient(...any: any)
 }

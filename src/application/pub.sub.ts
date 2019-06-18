@@ -1,9 +1,9 @@
 import { EventBus } from '../rabbitmq/connection/eventbus'
 import { IOptions } from '../rabbitmq/port/configuration.inteface'
-import { Topic } from '../communication/topic'
-import { Direct } from '../communication/direct'
-import { Fanout } from '../communication/fanout'
-import { WorkQueues } from '../communication/work.queues'
+import { Topic } from '../communication/mode/topic'
+import { Direct } from '../communication/mode/direct'
+import { Fanout } from '../communication/mode/fanout'
+import { WorkQueues } from '../communication/mode/work.queues'
 
 export class PubSub<E extends EventBus>{
 
