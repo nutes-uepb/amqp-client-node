@@ -2,7 +2,7 @@ import { EventBus } from '../rabbitmq/connection/eventbus'
 import { IFanout } from './port/fanout.interface'
 import { IEventHandler } from '../rabbitmq/port/event.handler.interface'
 
-export class Fanout extends EventBus implements IFanout{
+export class Fanout extends EventBus{ //  implements IFanout{
 
     private readonly typeConnection = 'fanout'
 
@@ -53,5 +53,13 @@ export class Fanout extends EventBus implements IFanout{
                 return resolve(false)
             }
         })
+    }
+
+    public rpcClient(resourceName: string, ...any: any): Promise<boolean> {
+        return undefined
+    }
+
+    public rpcServer(): Promise<boolean> {
+        return undefined
     }
 }

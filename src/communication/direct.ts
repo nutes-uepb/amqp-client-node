@@ -2,7 +2,7 @@ import { EventBus } from '../rabbitmq/connection/eventbus'
 import { IDirect } from './port/direct.interface'
 import { IEventHandler } from '../rabbitmq/port/event.handler.interface'
 
-export class Direct extends EventBus implements IDirect{
+export class Direct extends EventBus{ //  implements IDirect{
 
     private readonly typeConnection = 'direct'
 
@@ -54,5 +54,13 @@ export class Direct extends EventBus implements IDirect{
                 return resolve(false)
             }
         })
+    }
+
+    public rpcClient(resourceName: string, ...any: any): Promise<boolean> {
+        return undefined
+    }
+
+    public rpcServer(): Promise<boolean> {
+        return undefined
     }
 }

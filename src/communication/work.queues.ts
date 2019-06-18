@@ -54,4 +54,12 @@ export class WorkQueues extends EventBus implements IWorkQueues{
             }
         })
     }
+
+    public rpcClient(resourceName: string, ...any: any): Promise<boolean> {
+        return undefined
+    }
+
+    public rpcServer(): Promise<boolean> {
+        return undefined
+    }
 }

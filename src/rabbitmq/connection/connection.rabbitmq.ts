@@ -7,6 +7,7 @@ import { IEventHandler } from '../port/event.handler.interface'
 import { CustomLogger, ILogger } from '../../utils/custom.logger'
 import StartConsumerResult = Queue.StartConsumerResult
 import { IMessage } from '../port/message.interface'
+import { IResourceHandler } from '../port/resource.handler.interface'
 
 /**
  * Implementation of the interface that provides conn with RabbitMQ.
@@ -22,6 +23,8 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
     private routing_key_handlers: Map<string, IEventHandler<any>> = new Map<string, IEventHandler<any>>()
 
     private event_handlers: Map<string, IEventHandler<any>> = new Map<string, IEventHandler<any>>()
+
+    private resource_handlers: Map<string, IResourceHandler> = new Map<string, IResourceHandler>()
 
     private consumersInitialized: Map<string, boolean> = new Map<string, boolean>()
 
@@ -198,6 +201,18 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
 
                 return resolve(false)
             } catch (err) {
+                return reject(err)
+            }
+        })
+    }
+    public registerResource(resourceName: string, resource: IResourceHandler): Promise<boolean> {
+
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+                this.resource_handlers.set(resourceName, resource)
+                this._logger.info('Resource ' + resourceName + ' registered!')
+                return resolve(true)
+            }catch (err) {
                 return reject(err)
             }
         })

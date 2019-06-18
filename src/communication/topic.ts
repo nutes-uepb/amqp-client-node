@@ -2,7 +2,7 @@ import { EventBus } from '../rabbitmq/connection/eventbus'
 import { IEventHandler } from '../rabbitmq/port/event.handler.interface'
 import { ITopic } from './port/topic.interface'
 
-export class Topic extends EventBus implements ITopic{
+export class Topic extends EventBus{ // implements ITopic{
 
     private readonly typeConnection = 'topic'
 
@@ -54,5 +54,13 @@ export class Topic extends EventBus implements ITopic{
                 return resolve(false)
             }
         })
+    }
+
+    public rpcClient(resourceName: string, ...any: any): Promise<boolean> {
+        return undefined
+    }
+
+    public rpcServer(): Promise<boolean> {
+        return undefined
     }
 }
