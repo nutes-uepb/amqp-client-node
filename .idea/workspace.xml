@@ -2,17 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="25cb9888-dba4-4926-9796-b6e7eb10ea06" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/communication/topic.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/port/configuration.inteface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabbitmq/port/configuration.inteface.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/port/connection.event.bus.interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabbitmq/port/connection.event.bus.interface.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/port/connection.factory.interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabbitmq/port/connection.factory.interface.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/port/event.handler.interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabbitmq/port/event.handler.interface.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/port/eventbus.interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabbitmq/port/eventbus.interface.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rabbitmq/connection.factory.rabbitmq.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabbitmq/connection/connection.factory.rabbitmq.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rabbitmq/connection.rabbitmq.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabbitmq/connection/connection.rabbitmq.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rabbitmq/eventbus.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabbitmq/connection/eventbus.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/rabbitmq/connection/connection.rabbitmq.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabbitmq/connection/connection.rabbitmq.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/rabbitmq/port/event.handler.interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabbitmq/port/event.handler.interface.ts" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -28,34 +19,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rabbitmq/connection/eventbus.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
+            <state relative-caret-position="-512">
               <caret line="36" column="76" selection-start-line="36" selection-start-column="76" selection-end-line="36" selection-end-column="76" />
-              <folding>
-                <element signature="n#!!block;n#isSubConnected#0;n#EventBus#0" />
-                <element signature="n#!!block;n#receiveFromYourself#0;n#EventBus#0" />
-                <element signature="n#!!block;n#logger#0;n#EventBus#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/application/pub.sub.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="570">
-              <caret line="38" column="29" selection-start-line="38" selection-start-column="19" selection-end-line="38" selection-end-column="29" />
-              <folding>
-                <element signature="e#0#58#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/communication/topic.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="46" column="43" selection-start-line="46" selection-start-column="43" selection-end-line="46" selection-end-column="43" />
             </state>
           </provider>
         </entry>
@@ -63,7 +28,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/communication/direct.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-45">
+            <state relative-caret-position="60">
               <caret line="6" column="45" selection-start-line="6" selection-start-column="39" selection-end-line="6" selection-end-column="45" />
               <folding>
                 <element signature="e#0#58#0" expanded="true" />
@@ -72,11 +37,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rabbitmq/connection/connection.rabbitmq.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="201">
-              <caret line="300" selection-start-line="300" selection-end-line="300" />
+            <state relative-caret-position="399">
+              <caret line="123" column="103" selection-start-line="123" selection-start-column="96" selection-end-line="123" selection-end-column="103" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/rabbitmq/port/message.interface.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="15">
+              <caret line="1" column="10" selection-start-line="1" selection-start-column="10" selection-end-line="1" selection-end-column="10" />
             </state>
           </provider>
         </entry>
@@ -84,7 +58,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/node_modules/amqp-ts/lib/amqp-ts.d.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
+            <state relative-caret-position="675">
               <caret line="48" column="71" selection-start-line="48" selection-start-column="71" selection-end-line="48" selection-end-column="71" />
             </state>
           </provider>
@@ -93,11 +67,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/communication/work.queues.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="4" column="56" selection-start-line="4" selection-start-column="56" selection-end-line="4" selection-end-column="56" />
+            <state relative-caret-position="270">
+              <caret line="18" column="41" selection-start-line="18" selection-start-column="41" selection-end-line="18" selection-end-column="41" />
               <folding>
                 <element signature="e#0#58#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/rabbitmq/port/event.handler.interface.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="30">
+              <caret line="2" column="4" selection-start-line="2" selection-start-column="4" selection-end-line="2" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -114,17 +97,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/node_modules/amqp-ts/src/amqp-ts.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="310">
+            <state relative-caret-position="10710">
               <caret line="719" column="10" selection-start-line="719" selection-start-column="6" selection-end-line="719" selection-end-column="10" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/communication/fanout.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="690">
-              <caret line="46" column="20" selection-start-line="46" selection-start-column="20" selection-end-line="46" selection-end-column="20" />
+            <state relative-caret-position="120">
+              <caret line="8" column="63" selection-start-line="8" selection-start-column="56" selection-end-line="8" selection-end-column="63" />
               <folding>
                 <element signature="e#0#58#0" expanded="true" />
               </folding>
@@ -144,6 +127,7 @@
       <find>callback</find>
       <find>Queue</find>
       <find>successfully created!</find>
+      <find>eventName</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -180,11 +164,13 @@
         <option value="$PROJECT_DIR$/src/communication/port/work.queues.interface.ts" />
         <option value="$PROJECT_DIR$/src/rabbitmq/port/connection.event.bus.interface.ts" />
         <option value="$PROJECT_DIR$/src/communication/port/fanout.interface.ts" />
-        <option value="$PROJECT_DIR$/src/communication/fanout.ts" />
         <option value="$PROJECT_DIR$/src/communication/topic.ts" />
-        <option value="$PROJECT_DIR$/src/communication/work.queues.ts" />
         <option value="$PROJECT_DIR$/src/application/pub.sub.ts" />
         <option value="$PROJECT_DIR$/src/communication/direct.ts" />
+        <option value="$PROJECT_DIR$/src/rabbitmq/port/event.handler.interface.ts" />
+        <option value="$PROJECT_DIR$/src/communication/fanout.ts" />
+        <option value="$PROJECT_DIR$/src/communication/work.queues.ts" />
+        <option value="$PROJECT_DIR$/src/rabbitmq/port/message.interface.ts" />
         <option value="$PROJECT_DIR$/src/rabbitmq/connection/connection.rabbitmq.ts" />
       </list>
     </option>
@@ -200,7 +186,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -238,16 +223,24 @@
               <item name="rabbitmq" type="462c0819:PsiDirectoryNode" />
               <item name="connection" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pubsub" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="rabbitmq" type="462c0819:PsiDirectoryNode" />
+              <item name="port" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/rabbitmq/port" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -255,15 +248,16 @@
     <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/rabbitmq/port" />
+      <recent name="$PROJECT_DIR$/src" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/rabbitmq/connection" />
       <recent name="$PROJECT_DIR$/src/rabbitmq" />
       <recent name="$PROJECT_DIR$/src/communication" />
       <recent name="$PROJECT_DIR$/src/app" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src" />
-      <recent name="$PROJECT_DIR$" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -293,20 +287,19 @@
       <workItem from="1560520978505" duration="22786000" />
       <workItem from="1560780738757" duration="9493000" />
       <workItem from="1560791559537" duration="22832000" />
+      <workItem from="1560865441147" duration="1284000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="80636000" />
+    <option name="totallyTimeSpent" value="81920000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="32" y="-11" width="1889" height="1092" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.3556867" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.3556867" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Inspection Results" weight="0.32925585" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32925585" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -317,8 +310,9 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="TypeScript" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" visible="true" weight="0.29867482" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.29153925" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
+      <window_info anchor="bottom" id="Inspection Results" order="12" weight="0.32925585" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -382,22 +376,9 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/port/type.connection.enum.ts" />
-    <entry file="file://$PROJECT_DIR$/src/rabbitmq/port/pub.sub.interface.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="17" selection-start-column="17" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rabbitmq/port/pub.sub.interface.ts" />
     <entry file="file://$PROJECT_DIR$/src/rabbitmq/port/connection.factory.interface.ts">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/rabbitmq/port/event.handler.interface.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="17" selection-start-column="17" selection-end-column="17" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/rabbitmq/port/eventbus.interface.ts">
       <provider selected="true" editor-type-id="text-editor">
@@ -461,27 +442,37 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/amqp-ts/lib/amqp-ts.d.ts">
+    <entry file="file://$PROJECT_DIR$/src/application/pub.sub.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="48" column="71" selection-start-line="48" selection-start-column="71" selection-end-line="48" selection-end-column="71" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/amqp-ts/src/amqp-ts.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="310">
-          <caret line="719" column="10" selection-start-line="719" selection-start-column="6" selection-end-line="719" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/communication/fanout.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="690">
-          <caret line="46" column="20" selection-start-line="46" selection-start-column="20" selection-end-line="46" selection-end-column="20" />
+        <state relative-caret-position="495">
+          <caret line="38" column="29" selection-start-line="38" selection-start-column="19" selection-end-line="38" selection-end-column="29" />
           <folding>
             <element signature="e#0#58#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/communication/topic.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="660">
+          <caret line="46" column="43" selection-start-line="46" selection-start-column="43" selection-end-line="46" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/communication/direct.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="6" column="45" selection-start-line="6" selection-start-column="39" selection-end-line="6" selection-end-column="45" />
+          <folding>
+            <element signature="e#0#58#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/amqp-ts/lib/amqp-ts.d.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="675">
+          <caret line="48" column="71" selection-start-line="48" selection-start-column="71" selection-end-line="48" selection-end-column="71" />
         </state>
       </provider>
     </entry>
@@ -492,59 +483,58 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/communication/work.queues.ts">
+    <entry file="file://$PROJECT_DIR$/node_modules/amqp-ts/src/amqp-ts.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="56" selection-start-line="4" selection-start-column="56" selection-end-line="4" selection-end-column="56" />
-          <folding>
-            <element signature="e#0#58#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/communication/topic.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="46" column="43" selection-start-line="46" selection-start-column="43" selection-end-line="46" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/application/pub.sub.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="570">
-          <caret line="38" column="29" selection-start-line="38" selection-start-column="19" selection-end-line="38" selection-end-column="29" />
-          <folding>
-            <element signature="e#0#58#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="10710">
+          <caret line="719" column="10" selection-start-line="719" selection-start-column="6" selection-end-line="719" selection-end-column="10" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/rabbitmq/connection/eventbus.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
+        <state relative-caret-position="-512">
           <caret line="36" column="76" selection-start-line="36" selection-start-column="76" selection-end-line="36" selection-end-column="76" />
-          <folding>
-            <element signature="n#!!block;n#isSubConnected#0;n#EventBus#0" />
-            <element signature="n#!!block;n#receiveFromYourself#0;n#EventBus#0" />
-            <element signature="n#!!block;n#logger#0;n#EventBus#0" />
-          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/communication/direct.ts">
+    <entry file="file://$PROJECT_DIR$/src/rabbitmq/port/event.handler.interface.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-45">
-          <caret line="6" column="45" selection-start-line="6" selection-start-column="39" selection-end-line="6" selection-end-column="45" />
+        <state relative-caret-position="30">
+          <caret line="2" column="4" selection-start-line="2" selection-start-column="4" selection-end-line="2" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/communication/work.queues.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="18" column="41" selection-start-line="18" selection-start-column="41" selection-end-line="18" selection-end-column="41" />
           <folding>
             <element signature="e#0#58#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/rabbitmq/port/message.interface.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="10" selection-start-line="1" selection-start-column="10" selection-end-line="1" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/rabbitmq/connection/connection.rabbitmq.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="201">
-          <caret line="300" selection-start-line="300" selection-end-line="300" />
+        <state relative-caret-position="399">
+          <caret line="123" column="103" selection-start-line="123" selection-start-column="96" selection-end-line="123" selection-end-column="103" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/communication/fanout.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="63" selection-start-line="8" selection-start-column="56" selection-end-line="8" selection-end-column="63" />
+          <folding>
+            <element signature="e#0#58#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

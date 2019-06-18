@@ -6,6 +6,7 @@ import {IOptions} from '../port/configuration.inteface'
 import { IEventHandler } from '../port/event.handler.interface'
 import { CustomLogger, ILogger } from '../../utils/custom.logger'
 import StartConsumerResult = Queue.StartConsumerResult
+import { IMessage } from '../port/message.interface'
 
 /**
  * Implementation of the interface that provides conn with RabbitMQ.
@@ -120,31 +121,35 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
         })
     }
 
-    public sendMessage(type: string, exchangeName: string, topicKey: string, queueName: string, message: any, eventName?: string): Promise<boolean> {
+    public sendMessage(type: string, exchangeName: string, topicKey: string, queueName: string, message:  any, eventName?: string): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
             try {
                 if (this.isConnected) {
 
+                    const msg: IMessage = {
+                        eventName,
+                        timestamp: new Date().toISOString(),
+                        body: message
+                    }
+
                     if (!ConnectionRabbitMQ.idConnection)
                         ConnectionRabbitMQ.idConnection = 'id-' + Math.random().toString(36).substr(2, 16)
 
-                    const msg: Message = new Message(message)
-                    msg.properties.appId = ConnectionRabbitMQ.idConnection
+                    const rabbitMessage: Message = new Message(msg)
+                    rabbitMessage.properties.appId = ConnectionRabbitMQ.idConnection
 
                     if (type === 'work_queues'){
-                        msg.properties.eventName = eventName
                         let queue = await this._connection.declareQueue(queueName, { durable: true })
-                        queue.send(msg)
+                        queue.send(rabbitMessage)
                         this._logger.info('Bus event message sent with success!')
                     }
 
 
                     else if (type === 'fanout') {
-                        msg.properties.eventName = eventName
                         const exchange = this._connection.declareExchange(exchangeName, 'fanout', { durable: true })
 
                         if (await exchange.initialized) {
-                            exchange.send(msg)
+                            exchange.send(rabbitMessage)
                             this._logger.info('Bus event message sent with success!')
                             await exchange.close()
                         }
@@ -154,7 +159,7 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
                         const exchange = this._connection.declareExchange(exchangeName, type, { durable: true })
 
                         if (await exchange.initialized) {
-                            exchange.send(msg, topicKey)
+                            exchange.send(rabbitMessage, topicKey)
                             this._logger.info('Bus event message sent with success!')
                             await exchange.close()
                         }
@@ -275,7 +280,7 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
 
             this._logger.info(`Bus event message received with success!`)
 
-            const event_handler: IEventHandler<any> | undefined = this.event_handlers.get(message.properties.eventName)
+            const event_handler: IEventHandler<any> | undefined = this.event_handlers.get(message.getContent().eventName)
 
             if (event_handler) {
                 event_handler.handle(message.getContent())
