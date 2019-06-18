@@ -7,19 +7,19 @@ import { IEventHandler } from '../port/event.handler.interface'
 
 import { EventEmitter } from 'events'
 
-export class EventBus extends EventEmitter implements IEventbusInterface {
+export abstract class EventBus extends EventEmitter implements IEventbusInterface {
 
-    private pubconnection: ConnectionRabbitMQ = new ConnectionRabbitMQ()
-    private subconnection: ConnectionRabbitMQ = new ConnectionRabbitMQ()
+    protected pubconnection: ConnectionRabbitMQ = new ConnectionRabbitMQ()
+    protected subconnection: ConnectionRabbitMQ = new ConnectionRabbitMQ()
 
-    private host: string
-    private port: number
-    private username: string
-    private password: string
-    private options?: IOptions
+    protected host: string
+    protected port: number
+    protected username: string
+    protected password: string
+    protected options?: IOptions
 
-    private pubActived: boolean = false
-    private subActived: boolean = false
+    protected pubActived: boolean = false
+    protected subActived: boolean = false
 
     constructor(host: string, port: number, username: string, password: string, options?: IOptions){
         super()
@@ -32,34 +32,24 @@ export class EventBus extends EventEmitter implements IEventbusInterface {
 
     }
 
-    private pubEventInitialization(): void{
+    protected pubEventInitialization(): void{
 
         this.pubconnection.conn.on('error_connection', (err) => {this.emit('error_pub', err)})
-
         this.pubconnection.conn.on('close_connection', (err) => {this.emit('disconnected_pub', err)})
-
         this.pubconnection.conn.on('open_connection', (err) => {this.emit('connected_pub', err)})
-
         this.pubconnection.conn.on('lost_connection', (err) => {this.emit('lost_connection_pub', err)})
-
         this.pubconnection.conn.on('trying_connect', (err) => {this.emit('trying_connection_pub', err)})
-
         this.pubconnection.conn.on('re_established_connection', (err) => {this.emit('reconnected_pub', err)})
 
     }
 
-    private subEventInitialization(): void{
+    protected subEventInitialization(): void{
 
         this.subconnection.conn.on('error_connection', (err) => {this.emit('error_sub', err)})
-
         this.subconnection.conn.on('close_connection', (err) => {this.emit('disconnected_sub', err)})
-
         this.subconnection.conn.on('open_connection', (err) => {this.emit('connected_sub', err)})
-
         this.subconnection.conn.on('lost_connection', (err) => {this.emit('lost_connection_sub', err)})
-
         this.subconnection.conn.on('trying_connect', (err) => {this.emit('trying_connection_sub', err)})
-
         this.subconnection.conn.on('re_established_connection', (err) => {this.emit('reconnected_sub', err)})
 
     }
@@ -99,54 +89,6 @@ export class EventBus extends EventEmitter implements IEventbusInterface {
         })
     }
 
-    public pub(exchangeName: string, topicKey: string, message: any ):  Promise<boolean>{
-        return new Promise<boolean>(async (resolve, reject) => {
-            if (!this.pubActived){
-                this.pubActived = true
-                await this.pubconnection.tryConnect(this.host, this.port, this.username, this.password, this.options)
-                this.pubEventInitialization()
-                await this.pubconnection.conn.initialized
-            }
-
-            if (this.isPubConnected){
-                this.pubconnection.sendMessage(exchangeName, topicKey, message).then(result => {
-                    return resolve(result)
-                }).catch(err => {
-                    return reject(err)
-                })
-            }else {
-                return resolve(false)
-            }
-        })
-    }
-
-    public sub(exchangeName: string, queueName: string, routing_key: string,
-               callback: (message: any) => void ): Promise<boolean>{
-        const eventCallback: IEventHandler<any> = {
-            handle: callback
-        }
-
-        return new Promise<boolean>(async (resolve, reject) => {
-
-            if (!this.subActived){
-                this.subActived = true
-                await this.subconnection.tryConnect(this.host, this.port, this.username, this.password, this.options)
-                this.subEventInitialization()
-                await this.subconnection.conn.initialized
-            }
-
-            if (this.isSubConnected){
-                this.subconnection.receiveMessage(exchangeName, queueName, routing_key, eventCallback).then(result => {
-                    return resolve(result)
-                }).catch(err => {
-                    return reject(err)
-                })
-            }else {
-                return resolve(false)
-            }
-        })
-    }
-
     public receiveFromYourself(value: boolean): boolean {
         this.subconnection.receiveFromYourself = value
         return this.subconnection.receiveFromYourself
@@ -161,4 +103,5 @@ export class EventBus extends EventEmitter implements IEventbusInterface {
             return false
         }
     }
+
 }
