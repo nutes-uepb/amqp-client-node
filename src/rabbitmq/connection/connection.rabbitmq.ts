@@ -256,6 +256,22 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
         })
     }
 
+    public registerClientDirectOrTopic(callback: (message: any) => void, exchangeName: string, routingKey: string, resource: IClientRequest): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+                const exchange = this._connection.declareExchange(exchangeName, 'direct', {durable: false});
+
+                exchange.rpc(resource, routingKey).then(msg => {
+                    callback(msg.getContent())
+                })
+
+                this._logger.info('Client registered in ' + exchangeName + ' exchange!' )
+                return resolve(true)
+            }catch (err) {
+                return reject(err)
+            }
+        })
+    }
 
     public registerServerWorkQueues(queueName: string): Promise<boolean> {
 
@@ -331,6 +347,56 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
                     .catch(err => {
                         throw err
                     })
+
+                return resolve(true)
+            }catch (err) {
+                return reject(err)
+            }
+        })
+    }
+
+    public registerServerDirectOrTopic(type: string, exchangeName: string, routingKey: string, queueName: string): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+
+                const exchange = await this._connection.declareExchange(exchangeName, type, {durable: true});
+                this._logger.info('Exchange creation ' + exchange.name + ' realized with success!')
+
+                const queue = await this._connection.declareQueue(queueName, {durable: true});
+                this._logger.info('Queue creation ' + queue.name + ' realized with success!')
+
+                await queue.bind(exchange)
+
+                if (await exchange.initialized) {
+                    this._logger.info('RoutingKey ' + routingKey + ' registered!')
+                    queue.bind(exchange, routingKey)
+                }
+
+                if (!this.consumersInitialized.get(queueName)) {
+                    this.consumersInitialized.set(queueName, true)
+
+                    await queue.activateConsumer((message) => {
+                        message.ack() // acknowledge that the message has been received (and processed)
+
+                        const clientRequest : IClientRequest = message.getContent()
+
+                        const resource_handler: IResourceHandler | undefined = this.resource_handlers.get(clientRequest.resourceName)
+
+                        if (resource_handler) {
+                            try {
+                                return resource_handler.handle.apply('',clientRequest.handle)
+                            }catch (err) {
+                                console.log(err)
+                            }
+                        }
+
+                    }, { noAck: false }).then((result: StartConsumerResult) => {
+                        this._logger.info('Server registered in ' + exchangeName + ' exchange!' )
+                    })
+                        .catch(err => {
+                            throw err
+                        })
+                }
 
                 return resolve(true)
             }catch (err) {
