@@ -1,4 +1,5 @@
 export interface IResourceHandler {
+    resourceName: string,
     handle(...any: any): any
 }
 

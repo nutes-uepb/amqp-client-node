@@ -1,5 +1,5 @@
-import { Connection } from 'amqp-ts'
 import * as amqp from 'amqp-ts'
+import { Connection } from 'amqp-ts'
 import { IConnectionFactory } from '../port/connection.factory.interface'
 
 import { IConfiguration, IOptions } from '../port/configuration.inteface'
@@ -25,7 +25,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
 
     private configuration: IConfiguration
 
-    constructor(host: string, port: number, username: string, password: string, options?: IOptions){
+    constructor(host: string, port: number, username: string, password: string, options?: IOptions) {
         this.configuration = defaultValues
         this.configuration.host = host
         this.configuration.port = port
@@ -55,7 +55,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
                     .replace('username', process.env.RABBITMQ_USERNAME || this.configuration.username)
                     .replace('password', process.env.RABBITMQ_PASSWORD || this.configuration.password)
                 ,
-                {ca: fs.readFileSync(this.configuration.options.ssl.ca)},
+                { ca: fs.readFileSync(this.configuration.options.ssl.ca) },
                 { retries: this.configuration.options.retries, interval: this.configuration.options.interval })
 
             return Promise.resolve(conn)

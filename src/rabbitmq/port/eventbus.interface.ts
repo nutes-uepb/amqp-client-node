@@ -1,6 +1,3 @@
-import { IOptions } from './configuration.inteface'
-import { IEventHandler } from './event.handler.interface'
-
 export interface IEventbusInterface {
     isSubConnected: boolean
 

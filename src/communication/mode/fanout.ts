@@ -2,63 +2,79 @@ import { EventBus } from '../../rabbitmq/connection/eventbus'
 import { IEventHandler } from '../../rabbitmq/port/event.handler.interface'
 import { IClientRequest } from '../../rabbitmq/port/resource.handler.interface'
 
-export class Fanout extends EventBus{
+export class Fanout extends EventBus {
 
-    public pub(eventName: string, exchangeName: string, message: any): Promise<boolean> {
+    public pub(eventName: string,
+               exchangeName: string,
+               message: any): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
-            if (!this.pubActived){
+            if (!this.pubActived) {
                 this.pubActived = true
-                await this.pubconnection.tryConnect(this.host, this.port, this.username, this.password, this.options)
+                await this.pubconnection
+                    .tryConnect(this.host, this.port, this.username, this.password, this.options)
                 this.pubEventInitialization()
                 await this.pubconnection.conn.initialized
             }
 
-            if (this.isPubConnected){
-                this.pubconnection.sendMessageFanout(eventName, exchangeName, message).then(result => {
+            if (this.isPubConnected) {
+                this.pubconnection
+                    .sendMessageFanout(eventName, exchangeName, message)
+                    .then(result => {
                     return resolve(result)
-                }).catch(err => {
+                })
+                    .catch(err => {
                     return reject(err)
                 })
-            }else {
+            } else {
                 return resolve(false)
             }
         })
     }
 
-    public sub(eventName: string, exchangeName: string, callback: (message: any) => void): Promise<boolean> {
+    public sub(eventName: string,
+               exchangeName: string,
+               callback: (message: any) => void): Promise<boolean> {
         const eventCallback: IEventHandler<any> = {
             handle: callback
         }
 
         return new Promise<boolean>(async (resolve, reject) => {
 
-            if (!this.subActived){
+            if (!this.subActived) {
                 this.subActived = true
-                await this.subconnection.tryConnect(this.host, this.port, this.username, this.password, this.options)
+                await this.subconnection
+                    .tryConnect(this.host, this.port, this.username, this.password, this.options)
                 this.subEventInitialization()
                 await this.subconnection.conn.initialized
             }
 
-            if (this.isSubConnected){
-                this.subconnection.receiveMessageFanout(eventName, exchangeName, eventCallback).then(result => {
+            if (this.isSubConnected) {
+                this.subconnection
+                    .receiveMessageFanout(eventName, exchangeName, eventCallback)
+                    .then(result => {
                     return resolve(result)
-                }).catch(err => {
+                })
+                    .catch(err => {
                     return reject(err)
                 })
-            }else {
+            } else {
                 return resolve(false)
             }
         })
     }
 
-    public rpcClient(callback: (message: any) => void, exchangeName: string, resourceName: string, ...any: any): Promise<boolean> {
+    public rpcClient(exchangeName: string,
+                     callback: (message: any) => void,
+                     resourceName: string,
+                     ...any: any): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
 
-            if (!this.resourceActived){
-                this.resourceActived = true
-                await this.resourceConnection.tryConnect(this.host, this.port, this.username, this.password, this.options)
-                this.resourceEventInitialization()
-                await this.resourceConnection.conn.initialized
+            if (!this.clientActived) {
+                this.clientActived = true
+                await this.clientConnection
+                    .tryConnect(this.host, this.port, this.username, this.password, this.options)
+                this.clientEventInitialization()
+                await this.clientConnection.conn.initialized
             }
 
             const clientRequest: IClientRequest = {
@@ -66,35 +82,43 @@ export class Fanout extends EventBus{
                 handle: any
             }
 
-            if (this.isResourceConnected){
-                this.resourceConnection.registerClientFanout(callback, exchangeName, clientRequest).then(result => {
+            if (this.isClientConnected) {
+                this.clientConnection
+                    .registerClientFanout(callback, exchangeName, clientRequest)
+                    .then(result => {
                     return resolve(result)
-                }).catch(err => {
+                })
+                    .catch(err => {
                     return reject(err)
                 })
-            }else {
+            } else {
                 return resolve(false)
             }
         })
     }
 
-    public rpcServer(exchangeName: string): Promise<boolean> {
+    public rpcServer(queueName: string,
+                     exchangeName: string): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
 
-            if (!this.resourceActived){
-                this.resourceActived = true
-                await this.resourceConnection.tryConnect(this.host, this.port, this.username, this.password, this.options)
-                this.resourceEventInitialization()
-                await this.resourceConnection.conn.initialized
+            if (!this.serverActived) {
+                this.serverActived = true
+                await this.serverConnection
+                    .tryConnect(this.host, this.port, this.username, this.password, this.options)
+                this.serverEventInitialization()
+                await this.serverConnection.conn.initialized
             }
 
-            if (this.isResourceConnected){
-                this.resourceConnection.registerServerFanout(exchangeName).then(result => {
+            if (this.isServerConnected) {
+                this.serverConnection
+                    .registerServerFanout(queueName, exchangeName)
+                    .then(result => {
                     return resolve(result)
-                }).catch(err => {
+                })
+                    .catch(err => {
                     return reject(err)
                 })
-            }else {
+            } else {
                 return resolve(false)
             }
         })

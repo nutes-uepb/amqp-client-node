@@ -1,6 +1,5 @@
-import {IOptions} from './configuration.inteface'
+import { IOptions } from './configuration.inteface'
 import { Connection } from 'amqp-ts'
-import { IEventHandler } from './event.handler.interface'
 
 export interface IConnectionEventBus {
     isConnected: boolean
