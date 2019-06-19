@@ -11,7 +11,7 @@ export interface IConnectionEventBus {
 
     closeConnection(): Promise<boolean>
 
-    sendMessage(type: string, exchangeName: string, topicKey: string, queueName: string, message: any, eventName?: string): Promise<boolean>
+    // sendMessage(type: string, exchangeName: string, topicKey: string, queueName: string, message: any, eventName?: string): Promise<boolean>
 
-    receiveMessage(type: string, exchangeName: string, topicKey: string, queueName: string, callback: IEventHandler<any>, eventName: string): Promise<boolean>
+    // receiveMessage(type: string, exchangeName: string, topicKey: string, queueName: string, callback: IEventHandler<any>, eventName: string): Promise<boolean>
 }

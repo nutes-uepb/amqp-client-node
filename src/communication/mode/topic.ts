@@ -1,9 +1,8 @@
 import { EventBus } from '../../rabbitmq/connection/eventbus'
 import { IEventHandler } from '../../rabbitmq/port/event.handler.interface'
-import { ITopic } from '../port/topic.interface'
 import { IClientRequest } from '../../rabbitmq/port/resource.handler.interface'
 
-export class Topic extends EventBus{ // implements ITopic{
+export class Topic extends EventBus{
 
     private readonly typeConnection = 'topic'
 
@@ -17,8 +16,7 @@ export class Topic extends EventBus{ // implements ITopic{
             }
 
             if (this.isPubConnected){
-                this.pubconnection.sendMessage(this.typeConnection, exchangeName, routingKey,
-                    undefined, message).then(result => {
+                this.pubconnection.sendMessageTopicOrDirec(this.typeConnection, exchangeName, routingKey, message).then(result => {
                     return resolve(result)
                 }).catch(err => {
                     return reject(err)
@@ -45,7 +43,7 @@ export class Topic extends EventBus{ // implements ITopic{
             }
 
             if (this.isSubConnected){
-                this.subconnection.receiveMessage(this.typeConnection, exchangeName, routingKey,
+                this.subconnection.receiveMessageTopicOrDirect(this.typeConnection, exchangeName, routingKey,
                     queueName, eventCallback).then(result => {
                     return resolve(result)
                 }).catch(err => {

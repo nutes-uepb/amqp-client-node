@@ -1,11 +1,8 @@
 import { EventBus } from '../../rabbitmq/connection/eventbus'
-import { IWorkQueues } from '../port/work.queues.interface'
 import { IEventHandler } from '../../rabbitmq/port/event.handler.interface'
-import { IClientRequest, IResourceHandler } from '../../rabbitmq/port/resource.handler.interface'
+import { IClientRequest } from '../../rabbitmq/port/resource.handler.interface'
 
-export class WorkQueues extends EventBus implements IWorkQueues{
-
-    private readonly typeConnection = 'work_queues'
+export class WorkQueues extends EventBus{
 
     public pub(eventName: string, queueName: string, message: any): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
@@ -17,8 +14,7 @@ export class WorkQueues extends EventBus implements IWorkQueues{
             }
 
             if (this.isPubConnected){
-                this.pubconnection.sendMessage(this.typeConnection, undefined,
-                    undefined, queueName, message, eventName).then(result => {
+                this.pubconnection.sendMessageWorkQueues(eventName, queueName, message).then(result => {
                     return resolve(result)
                 }).catch(err => {
                     return reject(err)
@@ -44,8 +40,7 @@ export class WorkQueues extends EventBus implements IWorkQueues{
             }
 
             if (this.isSubConnected){
-                this.subconnection.receiveMessage(this.typeConnection, undefined,
-                    undefined, queueName, eventCallback, eventName).then(result => {
+                this.subconnection.receiveMessageWorkQueues(eventName, queueName, eventCallback).then(result => {
                     return resolve(result)
                 }).catch(err => {
                     return reject(err)

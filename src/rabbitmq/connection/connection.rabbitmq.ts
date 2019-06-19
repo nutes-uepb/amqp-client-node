@@ -1,14 +1,13 @@
 import { Connection, Message, Queue } from 'amqp-ts'
 import { IConnectionEventBus } from '../port/connection.event.bus.interface'
-import { ConnectionFactoryRabbitMQ } from './connection.factory.rabbitmq'
-
 import {IOptions} from '../port/configuration.inteface'
 import { IEventHandler } from '../port/event.handler.interface'
-import { CustomLogger, ILogger } from '../../utils/custom.logger'
-import StartConsumerResult = Queue.StartConsumerResult
 import { IMessage } from '../port/message.interface'
 import { IClientRequest, IResourceHandler } from '../port/resource.handler.interface'
-import { throws } from 'assert'
+
+import { ConnectionFactoryRabbitMQ } from './connection.factory.rabbitmq'
+import { CustomLogger, ILogger } from '../../utils/custom.logger'
+import StartConsumerResult = Queue.StartConsumerResult
 
 /**
  * Implementation of the interface that provides conn with RabbitMQ.
@@ -57,7 +56,11 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
      * @param password
      * @param options
      */
-    public tryConnect(host: string, port: number, username: string, password: string, options ?: IOptions): Promise<Connection> {
+    public tryConnect(host: string,
+                      port: number,
+                      username: string,
+                      password: string,
+                      options ?: IOptions): Promise<Connection> {
         return new Promise<Connection>((resolve, reject) => {
             if (this.isConnected) return resolve(this._connection)
 
@@ -125,50 +128,69 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
         })
     }
 
-    public sendMessage(type: string, exchangeName: string, topicKey: string, queueName: string, message:  any, eventName?: string): Promise<boolean> {
+
+    public sendMessageWorkQueues(eventName: string,
+                                 queueName: string,
+                                 message:  any): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
             try {
                 if (this.isConnected) {
+                    let msg = await this.createMessage(eventName, message)
 
-                    const msg: IMessage = {
-                        eventName,
-                        timestamp: new Date().toISOString(),
-                        body: message
-                    }
+                    let queue = await this._connection.declareQueue(queueName, { durable: true })
+                    queue.send(msg)
+                    this._logger.info('Bus event message sent with success!')
 
-                    if (!ConnectionRabbitMQ.idConnection)
-                        ConnectionRabbitMQ.idConnection = 'id-' + Math.random().toString(36).substr(2, 16)
+                    return resolve(true)
+                }
+                return resolve(false)
+            } catch (err) {
+                return reject(err)
+            }
+        })
+    }
 
-                    const rabbitMessage: Message = new Message(msg)
-                    rabbitMessage.properties.appId = ConnectionRabbitMQ.idConnection
+    public sendMessageFanout(eventName: string,
+                             exchangeName: string,
+                             message:  any): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+                if (this.isConnected) {
+                    let msg = await this.createMessage(eventName, message)
 
-                    if (type === 'work_queues'){
-                        let queue = await this._connection.declareQueue(queueName, { durable: true })
-                        queue.send(rabbitMessage)
+                    const exchange = this._connection.declareExchange(exchangeName, 'fanout', { durable: true })
+
+                    if (await exchange.initialized) {
+                        exchange.send(msg)
                         this._logger.info('Bus event message sent with success!')
+                        await exchange.close()
                     }
 
+                return resolve(true)
+                }
+                return resolve(false)
+            } catch (err) {
+                return reject(err)
+            }
+        })
+    }
 
-                    else if (type === 'fanout') {
-                        const exchange = this._connection.declareExchange(exchangeName, 'fanout', { durable: true })
+    public sendMessageTopicOrDirec(type: string,
+                                   exchangeName: string,
+                                   topicKey: string,
+                                   message:  any): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+                if (this.isConnected) {
+                    let msg = await this.createMessage(message)
 
-                        if (await exchange.initialized) {
-                            exchange.send(rabbitMessage)
-                            this._logger.info('Bus event message sent with success!')
-                            await exchange.close()
-                        }
+                    const exchange = this._connection.declareExchange(exchangeName, type, { durable: true })
+
+                    if (await exchange.initialized) {
+                        exchange.send(msg, topicKey)
+                        this._logger.info('Bus event message sent with success!')
+                        await exchange.close()
                     }
-
-                    else if (type === 'topic' || type === 'direct') {
-                        const exchange = this._connection.declareExchange(exchangeName, type, { durable: true })
-
-                        if (await exchange.initialized) {
-                            exchange.send(rabbitMessage, topicKey)
-                            this._logger.info('Bus event message sent with success!')
-                            await exchange.close()
-                        }
-                    }
-
 
                     return resolve(true)
                 }
@@ -179,22 +201,108 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
         })
     }
 
-    public receiveMessage(type: string, exchangeName: string, topicKey: string, queueName: string,
-                          callback: IEventHandler<any>, eventName?: string): Promise<boolean> {
+
+    public receiveMessageWorkQueues(eventName: string,
+                                    queueName: string,
+                                    callback: IEventHandler<any>): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+                if (this.isConnected) {
+                    let queue = await this._connection.declareQueue(queueName, { durable: true })
+                    this.event_handlers.set(eventName, callback)
+                    this._logger.info('Callback message ' + eventName + ' registered!')
+
+                    if (!this.consumersInitialized.get(queueName)) {
+                        this.consumersInitialized.set(queueName, true)
+                        this._logger.info('Queue creation ' + queueName + ' realized with success!')
+
+                        await this.activateConsumerFanWork(queue)
+                    }
+                }
+
+                return resolve(false)
+            } catch (err) {
+                return reject(err)
+            }
+        })
+    }
+
+    public receiveMessageFanout(eventName: string,
+                                exchangeName: string,
+                                callback: IEventHandler<any>): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+                if (this.isConnected) {
+                    const exchange = this._connection.declareExchange(exchangeName, 'fanout', { durable: true })
+
+                    let queue = await this._connection.declareQueue('', { durable: true })
+
+                    if (await exchange.initialized) {
+                        this.event_handlers.set(eventName, callback)
+                        this._logger.info('Callback message ' + eventName + ' registered!')
+                        queue.bind(exchange)
+                    }
+
+                    this._logger.info('Queue creation ' + queue.name + ' realized with success!')
+
+                    await this.activateConsumerFanWork(queue)
+                }
+
+                return resolve(false)
+            } catch (err) {
+                return reject(err)
+            }
+        })
+    }
+
+    public receiveMessageTopicOrDirect(type: string,
+                                       exchangeName: string,
+                                       topicKey: string,
+                                       queueName: string,
+                                       callback: IEventHandler<any>): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
             try {
                 if (this.isConnected) {
 
-                    if (type === 'work_queues'){
-                        await this.subscribeWorkQueues(eventName, queueName, callback)
+                    const exchange = this._connection.declareExchange(exchangeName, type, { durable: true })
+
+                    let queue = await this._connection.declareQueue(queueName, { durable: true })
+
+                    if (await exchange.initialized) {
+                        this.routing_key_handlers.set(topicKey, callback)
+                        this._logger.info('Callback message ' + topicKey + ' registered!')
+                        queue.bind(exchange, topicKey)
                     }
 
-                    else if (type === 'fanout'){
-                        await this.subscribeFanout(eventName, exchangeName, callback)
-                    }
+                    if (!this.consumersInitialized.get(queueName)){
+                        this.consumersInitialized.set(queueName, true)
+                        this._logger.info('Queue creation ' + queueName + ' realized with success!')
 
-                    else if (type === 'topic' || type === 'direct') {
-                        await this.subscribeTopicOrDirect(type, exchangeName, topicKey, queueName, callback)
+                        await queue.activateConsumer((message: Message) => {
+                            message.ack() // acknowledge that the message has been received (and processed)
+
+                            if (message.properties.appId === ConnectionRabbitMQ.idConnection &&
+                                !this._receiveFromYourself) return
+
+                            this._logger.info(`Bus event message received with success!`)
+                            const routingKey: string = message.fields.routingKey
+
+                            for (const entry of this.routing_key_handlers.keys()) {
+                                if (this.regExpr(entry, routingKey)){
+                                    const event_handler: IEventHandler<any> | undefined = this.routing_key_handlers.get(entry)
+
+                                    if (event_handler) {
+                                        event_handler.handle(message.getContent())
+                                    }
+                                }
+                            }
+
+                        }, { noAck: false }).then((result: StartConsumerResult) => {
+                            this._logger.info('Queue consumer ' + queue.name + ' successfully created! ')
+                        })
+                            .catch(err => {
+                                throw err
+                            })
                     }
 
                     return resolve(true)
@@ -206,7 +314,9 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
             }
         })
     }
-    public registerResource(resourceName: string, resource: IResourceHandler): Promise<boolean> {
+
+    public registerResource(resourceName: string,
+                            resource: IResourceHandler): Promise<boolean> {
 
         return new Promise<boolean>(async (resolve, reject) => {
             try {
@@ -219,7 +329,9 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
         })
     }
 
-    public registerClientWorkQueues(callback: (message: any) => void, queueName: string, resource: IClientRequest): Promise<boolean> {
+    public registerClientWorkQueues(callback: (message: any) => void,
+                                    queueName: string,
+                                    resource: IClientRequest): Promise<boolean> {
 
         return new Promise<boolean>(async (resolve, reject) => {
             try {
@@ -239,7 +351,9 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
         })
     }
 
-    public registerClientFanout(callback: (message: any) => void, exchangeName: string, resource: IClientRequest): Promise<boolean> {
+    public registerClientFanout(callback: (message: any) => void,
+                                exchangeName: string,
+                                resource: IClientRequest): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
             try {
                 const exchange = this._connection.declareExchange(exchangeName, 'fanout', {durable: false});
@@ -256,7 +370,10 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
         })
     }
 
-    public registerClientDirectOrTopic(callback: (message: any) => void, exchangeName: string, routingKey: string, resource: IClientRequest): Promise<boolean> {
+    public registerClientDirectOrTopic(callback: (message: any) => void,
+                                       exchangeName: string,
+                                       routingKey: string,
+                                       resource: IClientRequest): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
             try {
                 const exchange = this._connection.declareExchange(exchangeName, 'direct', {durable: false});
@@ -355,7 +472,10 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
         })
     }
 
-    public registerServerDirectOrTopic(type: string, exchangeName: string, routingKey: string, queueName: string): Promise<boolean> {
+    public registerServerDirectOrTopic(type: string,
+                                       exchangeName: string,
+                                       routingKey: string,
+                                       queueName: string): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
             try {
 
@@ -413,64 +533,36 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
         return this._receiveFromYourself
     }
 
-    public logger(enabled: boolean, level?: string): void{
+    public logger(enabled: boolean,
+                  level?: string): void{
         this._logger.changeLoggerConfiguration(enabled, level)
         return
     }
 
-    private regExpr(pattern: string, expression: string): boolean {
-        try {
-            pattern = pattern.replace(/(\*)/g, '[a-zA-Z0-9_]*')
-            pattern = pattern.replace(/(\.\#)/g, '.*')
-            pattern = pattern.replace(/(\#)/g, '.*')
+    private createMessage(message:  any,
+                          eventName?: string): Promise<Message> {
+        return new Promise<Message>(async (resolve, reject) => {
+            try {
+                const msg: IMessage = {
+                    timestamp: new Date().toISOString(),
+                    body: message
+                }
 
-            // pattern += '+$'
+                if (eventName)
+                    msg.eventName = eventName
 
-            const regex = new RegExp( pattern )
-            return regex.test(expression)
-        }catch (e) {
-            console.log(e)
-        }
-    }
+                if (!ConnectionRabbitMQ.idConnection)
+                    ConnectionRabbitMQ.idConnection = 'id-' + Math.random().toString(36).substr(2, 16)
 
-    private async subscribeWorkQueues(eventName: string, queueName: string, callback: IEventHandler<any>): Promise<void>  {
-        let queue = await this._connection.declareQueue(queueName, { durable: true })
-        this.event_handlers.set(eventName, callback)
-        this._logger.info('Callback message ' + eventName + ' registered!')
+                const rabbitMessage: Message = new Message(msg)
+                rabbitMessage.properties.appId = ConnectionRabbitMQ.idConnection
 
-        if (!this.consumersInitialized.get(queueName)) {
-            this.consumersInitialized.set(queueName, true)
-            this._logger.info('Queue creation ' + queueName + ' realized with success!')
+                return resolve(rabbitMessage)
 
-            try{
-                await this.activateConsumerFanWork(queue)
-            }catch (err) {
-                throw err
+            } catch (err) {
+                return reject(err)
             }
-
-        }
-    }
-
-    private async subscribeFanout(eventName: string, exchangeName: string, callback: IEventHandler<any>): Promise<void>  {
-
-        const exchange = this._connection.declareExchange(exchangeName, 'fanout', { durable: true })
-
-        let queue = await this._connection.declareQueue('', { durable: true })
-
-        if (await exchange.initialized) {
-            this.event_handlers.set(eventName, callback)
-            this._logger.info('Callback message ' + eventName + ' registered!')
-            queue.bind(exchange)
-        }
-
-        this._logger.info('Queue creation ' + queue.name + ' realized with success!')
-
-        try{
-            await this.activateConsumerFanWork(queue)
-        }catch (err) {
-            throw err
-        }
-
+        })
     }
 
     private async activateConsumerFanWork(queue: Queue): Promise<void> {
@@ -495,49 +587,20 @@ export class ConnectionRabbitMQ implements IConnectionEventBus {
             })
     }
 
-    private async subscribeTopicOrDirect(type: string, exchangeName: string, topicKey: string, queueName: string,
-                                         callback: IEventHandler<any>): Promise<void>  {
+    private regExpr(pattern: string,
+                    expression: string): boolean {
+        try {
+            pattern = pattern.replace(/(\*)/g, '[a-zA-Z0-9_]*')
+            pattern = pattern.replace(/(\.\#)/g, '.*')
+            pattern = pattern.replace(/(\#)/g, '.*')
 
-        const exchange = this._connection.declareExchange(exchangeName, type, { durable: true })
+            // pattern += '+$'
 
-        let queue = await this._connection.declareQueue(queueName, { durable: true })
-
-        if (await exchange.initialized) {
-            this.routing_key_handlers.set(topicKey, callback)
-            this._logger.info('Callback message ' + topicKey + ' registered!')
-            queue.bind(exchange, topicKey)
-        }
-
-        if (!this.consumersInitialized.get(queueName)){
-            this.consumersInitialized.set(queueName, true)
-            this._logger.info('Queue creation ' + queueName + ' realized with success!')
-
-            await queue.activateConsumer((message: Message) => {
-                message.ack() // acknowledge that the message has been received (and processed)
-
-                if (message.properties.appId === ConnectionRabbitMQ.idConnection &&
-                    !this._receiveFromYourself) return
-
-                this._logger.info(`Bus event message received with success!`)
-                const routingKey: string = message.fields.routingKey
-
-                for (const entry of this.routing_key_handlers.keys()) {
-                    if (this.regExpr(entry, routingKey)){
-                        const event_handler: IEventHandler<any> | undefined = this.routing_key_handlers.get(entry)
-
-                        if (event_handler) {
-                            event_handler.handle(message.getContent())
-                        }
-                    }
-                }
-
-            }, { noAck: false }).then((result: StartConsumerResult) => {
-                this._logger.info('Queue consumer ' + queue.name + ' successfully created! ')
-            })
-                .catch(err => {
-                    throw err
-                })
+            const regex = new RegExp( pattern )
+            return regex.test(expression)
+        }catch (e) {
+            console.log(e)
         }
     }
 
-    }
+}

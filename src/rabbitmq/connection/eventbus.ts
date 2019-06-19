@@ -1,12 +1,10 @@
-
 import { IOptions } from '../port/configuration.inteface'
+import { IEventbusInterface } from '../port/eventbus.interface'
+import { IResourceHandler } from '../port/resource.handler.interface'
 
 import { ConnectionRabbitMQ } from './connection.rabbitmq'
-import { IEventbusInterface } from '../port/eventbus.interface'
-import { IEventHandler } from '../port/event.handler.interface'
 
 import { EventEmitter } from 'events'
-import { IResourceHandler } from '../port/resource.handler.interface'
 
 export abstract class EventBus extends EventEmitter implements IEventbusInterface {
 
@@ -132,12 +130,6 @@ export abstract class EventBus extends EventEmitter implements IEventbusInterfac
     public subscribeResource(resourceName: string, resource: (...any: any) => any): Promise<boolean>{
 
         return new Promise<boolean>(async (resolve, reject) => {
-            if (!this.resourceActived){
-                this.resourceActived = true
-                await this.resourceConnection.tryConnect(this.host, this.port, this.username, this.password, this.options)
-                this.resourceEventInitialization()
-                await this.resourceConnection.conn.initialized
-            }
 
             let resourceHandler: IResourceHandler = {
                 handle: resource

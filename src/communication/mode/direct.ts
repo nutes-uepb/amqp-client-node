@@ -1,9 +1,8 @@
 import { EventBus } from '../../rabbitmq/connection/eventbus'
-import { IDirect } from '../port/direct.interface'
 import { IEventHandler } from '../../rabbitmq/port/event.handler.interface'
 import { IClientRequest } from '../../rabbitmq/port/resource.handler.interface'
 
-export class Direct extends EventBus{ //  implements IDirect{
+export class Direct extends EventBus{
 
     private readonly typeConnection = 'direct'
 
@@ -17,8 +16,8 @@ export class Direct extends EventBus{ //  implements IDirect{
             }
 
             if (this.isPubConnected){
-                this.pubconnection.sendMessage(this.typeConnection, exchangeName, routingKey,
-                    undefined, message).then(result => {
+                this.pubconnection.sendMessageTopicOrDirec(this.typeConnection, exchangeName, routingKey,
+                    message).then(result => {
                     return resolve(result)
                 }).catch(err => {
                     return reject(err)
@@ -45,7 +44,7 @@ export class Direct extends EventBus{ //  implements IDirect{
             }
 
             if (this.isSubConnected){
-                this.subconnection.receiveMessage(this.typeConnection, exchangeName, routingKey,
+                this.subconnection.receiveMessageTopicOrDirect(this.typeConnection, exchangeName, routingKey,
                     queueName, eventCallback).then(result => {
                     return resolve(result)
                 }).catch(err => {

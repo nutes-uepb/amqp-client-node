@@ -1,11 +1,8 @@
 import { EventBus } from '../../rabbitmq/connection/eventbus'
-import { IFanout } from '../port/fanout.interface'
 import { IEventHandler } from '../../rabbitmq/port/event.handler.interface'
 import { IClientRequest } from '../../rabbitmq/port/resource.handler.interface'
 
-export class Fanout extends EventBus{ //  implements IFanout{
-
-    private readonly typeConnection = 'fanout'
+export class Fanout extends EventBus{
 
     public pub(eventName: string, exchangeName: string, message: any): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
@@ -17,8 +14,7 @@ export class Fanout extends EventBus{ //  implements IFanout{
             }
 
             if (this.isPubConnected){
-                this.pubconnection.sendMessage(this.typeConnection, exchangeName, undefined,
-                    undefined, message, eventName).then(result => {
+                this.pubconnection.sendMessageFanout(eventName, exchangeName, message).then(result => {
                     return resolve(result)
                 }).catch(err => {
                     return reject(err)
@@ -44,8 +40,7 @@ export class Fanout extends EventBus{ //  implements IFanout{
             }
 
             if (this.isSubConnected){
-                this.subconnection.receiveMessage(this.typeConnection, exchangeName, undefined,
-                    undefined, eventCallback, eventName).then(result => {
+                this.subconnection.receiveMessageFanout(eventName, exchangeName, eventCallback).then(result => {
                     return resolve(result)
                 }).catch(err => {
                     return reject(err)

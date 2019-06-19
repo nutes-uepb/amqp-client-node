@@ -7,8 +7,6 @@ import { WorkQueues } from '../communication/mode/work.queues'
 
 export class PubSub<E extends EventBus>{
 
-    private rabbitBus: EventBus
-
     protected host: string
     protected port: number
     protected username: string
@@ -22,10 +20,6 @@ export class PubSub<E extends EventBus>{
         this.password = password
         this.options = options
     }
-
-    // public createInstance<T extends EventBus>(c: new (host, port, username, password, options) => T): T {
-    //     return new Topic(this.host, this.port, this.username, this.password, undefined)
-    // }
 
     public createDirectInstance(): Direct {
         return new Direct(this.host, this.port, this.username, this.password, this.options )
