@@ -64,7 +64,6 @@ export class Topic extends EventBus {
     }
 
     public rpcClient(exchangeName: string,
-                     routingKey: string,
                      callback: (message: any) => void,
                      resourceName: string,
                      ...any: any): Promise<boolean> {
@@ -72,10 +71,15 @@ export class Topic extends EventBus {
 
             if (!this.clientActived) {
                 this.clientActived = true
-                await this.clientConnection
-                    .tryConnect(this.host, this.port, this.username, this.password, this.options)
-                this.clientEventInitialization()
-                await this.clientConnection.conn.initialized
+                try{
+                    await this.clientConnection
+                        .tryConnect(this.host, this.port, this.username, this.password, this.options)
+                    this.clientEventInitialization()
+                    await this.clientConnection.conn.initialized
+                }catch (err) {
+                    this.clientActived = false
+                    return reject(err)
+                }
             }
 
             const clientRequest: IClientRequest = {
@@ -85,13 +89,13 @@ export class Topic extends EventBus {
 
             if (this.isClientConnected) {
                 this.clientConnection
-                    .registerClientDirectOrTopic(this.typeConnection,callback, exchangeName, routingKey, clientRequest)
+                    .registerClientDirectOrTopic(this.typeConnection,callback, exchangeName, clientRequest)
                     .then(result => {
-                    return resolve(result)
-                })
+                        return resolve(result)
+                    })
                     .catch(err => {
-                    return reject(err)
-                })
+                        return reject(err)
+                    })
             } else {
                 return resolve(false)
             }

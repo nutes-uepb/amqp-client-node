@@ -1,6 +1,6 @@
 import { ConnectionRabbitMQ } from '../connection.rabbitmq'
 import { IClientRequest, IResourceHandler } from '../../port/resource.handler.interface'
-import { Queue } from 'amqp-ts'
+import { Message, Queue } from 'amqp-ts'
 import StartConsumerResult = Queue.StartConsumerResult
 
 export class ServerRegisterRabbitmq extends ConnectionRabbitMQ {

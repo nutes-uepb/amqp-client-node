@@ -30,7 +30,7 @@ export class ClientRegisterRabbitmq extends ConnectionRabbitMQ {
             try {
                 const exchange = this._connection.declareExchange(exchangeName, 'fanout', { durable: true });
 
-                exchange.rpc(resource).then(msg => {
+                exchange.rpc(resource, '', msg => {
                     callback(msg.getContent())
                 })
 
@@ -45,16 +45,15 @@ export class ClientRegisterRabbitmq extends ConnectionRabbitMQ {
     public registerClientDirectOrTopic(type: string,
                                        callback: (message: any) => void,
                                        exchangeName: string,
-                                       routingKey: string,
                                        resource: IClientRequest): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
             try {
                 const exchange = this._connection.declareExchange(exchangeName, type, { durable: true });
 
-                exchange.rpc(resource, routingKey).then(msg => {
+                exchange.rpc(resource, '', msg => {
                     callback(msg.getContent())
                 }).catch(e => {
-                    // console.log(e)
+                    console.log(e)
                     this._logger.error('WWithout server response!')
                 })
 
