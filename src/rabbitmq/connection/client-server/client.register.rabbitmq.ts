@@ -43,22 +43,27 @@ export class ClientRegisterRabbitmq extends ConnectionRabbitMQ {
     }
 
     public registerClientDirectOrTopic(type: string,
-                                       callback: (message: any) => void,
                                        exchangeName: string,
-                                       resource: IClientRequest): Promise<boolean> {
-        return new Promise<boolean>(async (resolve, reject) => {
+                                       resource: IClientRequest,
+                                       callback?: (err,message: any) => void): Promise<any> {
+        return new Promise<any>(async (resolve, reject) => {
             try {
                 const exchange = this._connection.declareExchange(exchangeName, type, { durable: true });
 
                 exchange.rpc(resource, '', msg => {
-                    callback(msg.getContent())
+                    let mensage = msg.getContent()
+
+                    if (callback !== undefined)
+                        callback(undefined, mensage)
+                }).then(msg => {
+                    let mensage = msg.getContent()
+                    resolve(mensage)
                 }).catch(e => {
                     console.log(e)
                     this._logger.error('WWithout server response!')
                 })
 
                 this._logger.info('Client registered in ' + exchangeName + ' exchange!')
-                return resolve(true)
             } catch (err) {
                 return reject(err)
             }

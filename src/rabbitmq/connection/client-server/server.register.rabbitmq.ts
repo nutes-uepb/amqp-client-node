@@ -160,7 +160,7 @@ export class ServerRegisterRabbitmq extends ConnectionRabbitMQ {
                         for (let resource of resources_handler) {
                             if (resource.resourceName === clientRequest.resourceName){
                                 try {
-                                    return resource.handle.apply('', clientRequest.handle)
+                                    return resource.handle.apply('', clientRequest.handle[0])
                                 } catch (err) {
                                     this._logger.error('Consumer function returned error')
                                 }

@@ -64,11 +64,65 @@ export class Topic extends EventBus {
     }
 
     public rpcClient(exchangeName: string,
-                     callback: (message: any) => void,
                      resourceName: string,
-                     ...any: any): Promise<boolean> {
-        return new Promise<boolean>(async (resolve, reject) => {
+                     ...any: any): Promise<any>;
 
+    public rpcClient(exchangeName: string,
+                     resourceName: string,
+                     callback: (message: any) => void,
+                     ...any: any): void;
+
+    public rpcClient(exchangeName: string,
+                     resourceName: string,
+                     ...any: any): any {
+
+        if (any[0] instanceof Function){
+            const parameters = any.splice(1)
+            return this.rpcClientCallback(exchangeName, resourceName, any[0], parameters)
+        }else {
+            return this.rpcClientPromise(exchangeName, resourceName, any)
+        }
+    }
+
+    private async rpcClientCallback(exchangeName: string,
+                                    resourceName: string,
+                                    callback: (err, message: any) => void,
+                                    ...any: any): Promise<void> {
+
+        if (!this.clientActived) {
+            this.clientActived = true
+            try {
+                await this.clientConnection
+                    .tryConnect(this.host, this.port, this.username, this.password, this.options)
+                this.clientEventInitialization()
+                await this.clientConnection.conn.initialized
+            } catch (err) {
+                this.clientActived = false
+                return callback(err, undefined)
+            }
+        }
+
+        const clientRequest: IClientRequest = {
+            resourceName,
+            handle: any
+        }
+
+        if (this.isClientConnected) {
+            this.clientConnection
+                .registerClientDirectOrTopic(this.typeConnection, exchangeName, clientRequest, callback)
+                .catch(err => {
+                    return callback(err, undefined)
+                })
+        } else {
+            return callback(new Error('Connection not stabilized'), undefined)
+        }
+
+    }
+
+    private rpcClientPromise(exchangeName: string,
+                             resourceName: string,
+                             ...any: any): Promise<any> {
+        return new Promise<any>(async (resolve, reject) => {
             if (!this.clientActived) {
                 this.clientActived = true
                 try{
@@ -89,7 +143,7 @@ export class Topic extends EventBus {
 
             if (this.isClientConnected) {
                 this.clientConnection
-                    .registerClientDirectOrTopic(this.typeConnection,callback, exchangeName, clientRequest)
+                    .registerClientDirectOrTopic(this.typeConnection, exchangeName, clientRequest)
                     .then(result => {
                         return resolve(result)
                     })
@@ -101,6 +155,7 @@ export class Topic extends EventBus {
             }
         })
     }
+
 
     public rpcServer(queueName: string,
                      exchangeName: string,
