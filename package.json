@@ -19,9 +19,6 @@
     "url": "https://github.com/nutes-uepb/pubsub/issues"
   },
   "homepage": "https://github.com/nutes-uepb/pubsub#readme",
-  "devDependencies": {
-    "amqp-ts": "git+https://github.com/lucas-barbosa-oliveira/amqp-ts.git#develop/event-emitter"
-  },
   "dependencies": {
     "@types/node": "^11.13.9",
     "@types/bluebird": "^3.5.26",

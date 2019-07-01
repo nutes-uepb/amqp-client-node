@@ -63,28 +63,33 @@ export class Topic extends EventBus {
         })
     }
 
-    public rpcClient(exchangeName: string,
+    public rpcClient(timeout: number,
+                     exchangeName: string,
                      resourceName: string,
                      ...any: any): Promise<any>;
 
-    public rpcClient(exchangeName: string,
+    public rpcClient(timeout: number,
+                     exchangeName: string,
                      resourceName: string,
                      callback: (message: any) => void,
                      ...any: any): void;
 
-    public rpcClient(exchangeName: string,
+    public rpcClient(timeout: number,
+                     exchangeName: string,
                      resourceName: string,
                      ...any: any): any {
 
         if (any[0] instanceof Function){
             const parameters = any.splice(1)
-            return this.rpcClientCallback(exchangeName, resourceName, any[0], parameters)
+            this.rpcClientCallback(timeout, exchangeName, resourceName, any[0], parameters)
+            return
         }else {
-            return this.rpcClientPromise(exchangeName, resourceName, any)
+            return this.rpcClientPromise(timeout, exchangeName, resourceName, any)
         }
     }
 
-    private async rpcClientCallback(exchangeName: string,
+    private async rpcClientCallback(timeout: number,
+                                    exchangeName: string,
                                     resourceName: string,
                                     callback: (err, message: any) => void,
                                     ...any: any): Promise<void> {
@@ -109,9 +114,11 @@ export class Topic extends EventBus {
 
         if (this.isClientConnected) {
             this.clientConnection
-                .registerClientDirectOrTopic(this.typeConnection, exchangeName, clientRequest, callback)
-                .catch(err => {
-                    return callback(err, undefined)
+                .registerClientDirectOrTopic(this.typeConnection, timeout, exchangeName, clientRequest, callback)
+                .then((result) => {
+                    callback(undefined, result)
+                }).catch(err => {
+                    callback(err, undefined)
                 })
         } else {
             return callback(new Error('Connection not stabilized'), undefined)
@@ -119,7 +126,8 @@ export class Topic extends EventBus {
 
     }
 
-    private rpcClientPromise(exchangeName: string,
+    private rpcClientPromise(timeout: number,
+                             exchangeName: string,
                              resourceName: string,
                              ...any: any): Promise<any> {
         return new Promise<any>(async (resolve, reject) => {
@@ -143,7 +151,7 @@ export class Topic extends EventBus {
 
             if (this.isClientConnected) {
                 this.clientConnection
-                    .registerClientDirectOrTopic(this.typeConnection, exchangeName, clientRequest)
+                    .registerClientDirectOrTopic(this.typeConnection, timeout, exchangeName, clientRequest)
                     .then(result => {
                         return resolve(result)
                     })

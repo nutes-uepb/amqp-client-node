@@ -1,5 +1,6 @@
 import { ConnectionRabbitMQ } from '../connection.rabbitmq'
 import { IClientRequest } from '../../port/resource.handler.interface'
+import { TimeoutError } from 'bluebird'
 
 export class ClientRegisterRabbitmq extends ConnectionRabbitMQ {
 
@@ -43,6 +44,7 @@ export class ClientRegisterRabbitmq extends ConnectionRabbitMQ {
     }
 
     public registerClientDirectOrTopic(type: string,
+                                       timeout: number,
                                        exchangeName: string,
                                        resource: IClientRequest,
                                        callback?: (err,message: any) => void): Promise<any> {
@@ -50,14 +52,25 @@ export class ClientRegisterRabbitmq extends ConnectionRabbitMQ {
             try {
                 const exchange = this._connection.declareExchange(exchangeName, type, { durable: true });
 
-                exchange.rpc(resource, '', msg => {
+                let time
+
+                new Promise<any>( (resolve) => {
+                    time = setTimeout(resolve, timeout || 0)
+                }).then(() => {
+                    reject(new Error('rpc timed out'))
+                })
+
+                exchange.rpc(resource, '', (err,msg) => {
+                    clearTimeout(time)
+
                     let mensage = msg.getContent()
 
-                    if (callback !== undefined)
-                        callback(undefined, mensage)
-                }).then(msg => {
-                    let mensage = msg.getContent()
-                    resolve(mensage)
+                    if(err){
+                        return reject(err)
+                    }
+
+                    return resolve(mensage)
+
                 }).catch(e => {
                     console.log(e)
                     this._logger.error('WWithout server response!')

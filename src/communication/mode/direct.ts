@@ -68,7 +68,8 @@ export class Direct extends EventBus {
         })
     }
 
-    public rpcClient(exchangeName: string,
+    public rpcClient(timeout: number,
+                     exchangeName: string,
                      callback: (message: any) => void,
                      resourceName: string,
                      ...any: any): Promise<boolean> {
@@ -89,7 +90,7 @@ export class Direct extends EventBus {
 
             if (this.isClientConnected) {
                 this.clientConnection
-                    .registerClientDirectOrTopic(this.typeConnection, exchangeName, clientRequest, callback)
+                    .registerClientDirectOrTopic(this.typeConnection, timeout, exchangeName, clientRequest, callback)
                     .then(result => {
                     return resolve(result)
                 })

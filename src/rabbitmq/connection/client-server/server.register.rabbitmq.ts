@@ -166,7 +166,7 @@ export class ServerRegisterRabbitmq extends ConnectionRabbitMQ {
                                 }
                             }
                         }
-                        return null
+                        return {}
                     }, { noAck: false }).then((result: StartConsumerResult) => {
                         this._logger.info('Server registered in ' + exchangeName + ' exchange!')
                     })
