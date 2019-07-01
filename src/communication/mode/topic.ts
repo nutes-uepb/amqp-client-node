@@ -1,6 +1,7 @@
 import { EventBus } from '../../rabbitmq/connection/eventbus'
 import { IEventHandler } from '../../rabbitmq/port/event.handler.interface'
 import { IClientRequest } from '../../rabbitmq/port/resource.handler.interface'
+import { RegisterResource } from './register.resource'
 
 export class Topic extends EventBus {
 
@@ -167,8 +168,8 @@ export class Topic extends EventBus {
 
     public rpcServer(queueName: string,
                      exchangeName: string,
-                     routingKey: string): Promise<boolean> {
-        return new Promise<boolean>(async (resolve, reject) => {
+                     routingKey: string): Promise<RegisterResource> {
+        return new Promise<RegisterResource >(async (resolve, reject) => {
 
             if (!this.serverActived) {
                 this.serverActived = true
@@ -182,13 +183,13 @@ export class Topic extends EventBus {
                 this.serverConnection
                     .registerServerDirectOrTopic(this.typeConnection, exchangeName, routingKey, queueName)
                     .then(result => {
-                    return resolve(result)
+                    return resolve(new RegisterResource(this.serverConnection, queueName))
                 })
                     .catch(err => {
                     return reject(err)
                 })
             } else {
-                return resolve(false)
+                return reject (new Error('Connection not stabilized'))
             }
         })
     }

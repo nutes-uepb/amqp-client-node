@@ -34,6 +34,28 @@ export class ServerRegisterRabbitmq extends ConnectionRabbitMQ {
         })
     }
 
+    public unregisterResource(queueName: string, resourceName: string ): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            let resources_handler: IResourceHandler[] | undefined = this.resource_handlers.get(queueName)
+
+            if (!resources_handler) {
+                return resolve(false)
+            }else {
+                for (let index in resources_handler){
+                    if (resources_handler[index].resourceName === resourceName) {
+                        resources_handler.splice(Number(index),1)
+                        this.resource_handlers.set(queueName,resources_handler)
+                        return resolve(true)
+                    }
+                }
+            }
+        })
+    }
+
+    public getResource(): Map<string,any> {
+        return this.resource_handlers;
+    }
+
     public registerServerWorkQueues(queueName: string): Promise<boolean> {
 
         return new Promise<boolean>(async (resolve, reject) => {
