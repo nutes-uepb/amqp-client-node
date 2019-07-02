@@ -1,9 +1,9 @@
 import { EventBus } from '../rabbitmq/connection/eventbus'
 import { IOptions } from '../rabbitmq/port/configuration.inteface'
-import { Topic } from '../communication/mode/topic'
-import { Direct } from '../communication/mode/direct'
-import { Fanout } from '../communication/mode/fanout'
-import { WorkQueues } from '../communication/mode/work.queues'
+import { Topic, topic } from '../communication/mode/topic'
+import { Direct, direct } from '../communication/mode/direct'
+import { Fanout, fanout } from '../communication/mode/fanout'
+import { WorkQueues, workQueues } from '../communication/mode/work.queues'
 
 export class PubSub<E extends EventBus> {
 
@@ -22,18 +22,22 @@ export class PubSub<E extends EventBus> {
     }
 
     public createDirectInstance(): Direct {
-        return new Direct(this.host, this.port, this.username, this.password, this.options)
+        direct.setConfigurations(this.host, this.port, this.username, this.password, this.options)
+        return direct
     }
 
     public createTopicInstance(): Topic {
-        return new Topic(this.host, this.port, this.username, this.password, this.options)
+        topic.setConfigurations(this.host, this.port, this.username, this.password, this.options)
+        return topic
     }
 
     public createWorkerInstance(): WorkQueues {
-        return new WorkQueues(this.host, this.port, this.username, this.password, this.options)
+        workQueues.setConfigurations(this.host, this.port, this.username, this.password, this.options)
+        return workQueues
     }
 
     public createFanoutInstance(): Fanout {
-        return new Fanout(this.host, this.port, this.username, this.password, this.options)
+        fanout.setConfigurations(this.host, this.port, this.username, this.password, this.options)
+        return fanout
     }
 }

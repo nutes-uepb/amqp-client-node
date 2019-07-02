@@ -1,6 +1,6 @@
 import { ConnectionRabbitMQ } from '../connection.rabbitmq'
 import { IClientRequest, IResourceHandler } from '../../port/resource.handler.interface'
-import { Message, Queue } from 'amqp-ts'
+import { Message, Queue } from '../../infrastructure/amqp-ts'
 import StartConsumerResult = Queue.StartConsumerResult
 
 export class ServerRegisterRabbitmq extends ConnectionRabbitMQ {
@@ -161,11 +161,10 @@ export class ServerRegisterRabbitmq extends ConnectionRabbitMQ {
                 const queue = await this._connection.declareQueue(queueName, { durable: true });
                 this._logger.info('Queue creation ' + queue.name + ' realized with success!')
 
-                await queue.bind(exchange)
-
                 if (await exchange.initialized) {
                     this._logger.info('RoutingKey ' + routingKey + ' registered!')
-                    queue.bind(exchange, routingKey)
+                    console.log(routingKey)
+                    await queue.bind(exchange, routingKey)
                 }
 
                 if (!this.consumersInitialized.get(queueName)) {
@@ -179,12 +178,16 @@ export class ServerRegisterRabbitmq extends ConnectionRabbitMQ {
                         const resources_handler: IResourceHandler[] | undefined =
                             this.resource_handlers.get(queueName)
 
-                        for (let resource of resources_handler) {
-                            if (resource.resourceName === clientRequest.resourceName){
-                                try {
-                                    return resource.handle.apply('', clientRequest.handle[0])
-                                } catch (err) {
-                                    this._logger.error('Consumer function returned error')
+                        console.log(message.fields.routingKey)
+
+                        if(resources_handler) {
+                            for (let resource of resources_handler) {
+                                if (resource.resourceName === clientRequest.resourceName){
+                                    try {
+                                        return resource.handle.apply('', clientRequest.handle)
+                                    } catch (err) {
+                                        this._logger.error('Consumer function returned error')
+                                    }
                                 }
                             }
                         }
@@ -196,12 +199,10 @@ export class ServerRegisterRabbitmq extends ConnectionRabbitMQ {
                             console.log(err)
                         })
                 }
-
                 return resolve(true)
             } catch (err) {
                 return reject(err)
             }
         })
     }
-
 }

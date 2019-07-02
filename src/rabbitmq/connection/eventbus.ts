@@ -26,10 +26,10 @@ export abstract class EventBus extends EventEmitter implements IEventbusInterfac
     protected clientActived: boolean = false
     protected serverActived: boolean = false
 
-    constructor(host: string,
-                port: number,
-                username: string,
-                password: string,
+    constructor(host?: string,
+                port?: number,
+                username?: string,
+                password?: string,
                 options?: IOptions) {
         super()
 
@@ -164,6 +164,18 @@ export abstract class EventBus extends EventEmitter implements IEventbusInterfac
         return this.serverConnection.isConnected
     }
 
+    public setConfigurations(host: string,
+                             port: number,
+                             username: string,
+                             password: string,
+                             options: IOptions): void{
+        this.host = host
+        this.port = port
+        this.username = username
+        this.password = password
+        this.options = options
+    }
+
     public dispose(): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
             try {
@@ -204,30 +216,6 @@ export abstract class EventBus extends EventEmitter implements IEventbusInterfac
         }
     }
 
-    public registerResource(queueName: string,
-                            resourceName: string,
-                            resource: (...any: any) => any): Promise<boolean> {
-
-        return new Promise<boolean>(async (resolve, reject) => {
-
-            let resourceHandler: IResourceHandler = {
-                resourceName,
-                handle: resource
-            }
-
-            try {
-                this.serverConnection.registerResource(queueName,
-                    resourceHandler).then(result => {
-                    return resolve(result)
-                }).catch(err => {
-                    return reject(err)
-                })
-            } catch (e) {
-                return resolve(false)
-            }
-        })
-    }
-
     public abstract pub(...any: any): Promise<boolean>
 
     public abstract sub(...any: any): Promise<boolean>
@@ -235,4 +223,6 @@ export abstract class EventBus extends EventEmitter implements IEventbusInterfac
     public abstract rpcServer(...any: any)
 
     public abstract rpcClient(...any: any)
+
+
 }

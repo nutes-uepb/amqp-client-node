@@ -1,5 +1,5 @@
 import { IOptions } from './configuration.inteface'
-import { Connection } from 'amqp-ts'
+import { Connection } from '../infrastructure/amqp-ts'
 
 export interface IConnectionEventBus {
     isConnected: boolean
@@ -10,7 +10,4 @@ export interface IConnectionEventBus {
 
     closeConnection(): Promise<boolean>
 
-    // sendMessage(type: string, exchangeName: string, topicKey: string, queueName: string, message: any, eventName?: string): Promise<boolean>
-
-    // receiveMessage(type: string, exchangeName: string, topicKey: string, queueName: string, callback: IEventHandler<any>, eventName: string): Promise<boolean>
 }

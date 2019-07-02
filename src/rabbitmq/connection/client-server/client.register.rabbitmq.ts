@@ -1,6 +1,5 @@
 import { ConnectionRabbitMQ } from '../connection.rabbitmq'
 import { IClientRequest } from '../../port/resource.handler.interface'
-import { TimeoutError } from 'bluebird'
 
 export class ClientRegisterRabbitmq extends ConnectionRabbitMQ {
 
@@ -60,7 +59,7 @@ export class ClientRegisterRabbitmq extends ConnectionRabbitMQ {
                     reject(new Error('rpc timed out'))
                 })
 
-                exchange.rpc(resource, '', (err,msg) => {
+                exchange.rpc(resource, resource.resourceName, (err,msg) => {
                     clearTimeout(time)
 
                     let mensage = msg.getContent()

@@ -1,5 +1,5 @@
 import { ConnectionRabbitMQ } from '../connection.rabbitmq'
-import { Message } from 'amqp-ts'
+import { Message } from '../../infrastructure/amqp-ts'
 import { IMessage } from '../../port/message.interface'
 
 export class MessageSenderRabbitmq extends ConnectionRabbitMQ{

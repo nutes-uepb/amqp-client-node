@@ -131,3 +131,5 @@ export class Direct extends EventBus {
         })
     }
 }
+
+export const direct = new Direct()

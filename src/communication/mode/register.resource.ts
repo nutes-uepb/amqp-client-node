@@ -50,7 +50,7 @@ export class RegisterResource {
 
     public getAllResource (): object{
 
-        let resources = this.connection.getResource().get(this.queueName)
+        let resources = this.connection.getResource()
 
         if (resources)
             return resources

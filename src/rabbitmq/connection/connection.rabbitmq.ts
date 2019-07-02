@@ -1,4 +1,4 @@
-import { Connection, Queue } from 'amqp-ts'
+import { Connection, Queue } from '../infrastructure/amqp-ts'
 import { IConnectionEventBus } from '../port/connection.event.bus.interface'
 import { IOptions } from '../port/configuration.inteface'
 

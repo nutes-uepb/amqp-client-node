@@ -2,6 +2,7 @@ import { EventBus } from '../../rabbitmq/connection/eventbus'
 import { IEventHandler } from '../../rabbitmq/port/event.handler.interface'
 import { IClientRequest } from '../../rabbitmq/port/resource.handler.interface'
 import { RegisterResource } from './register.resource'
+import { Direct } from './direct'
 
 export class Topic extends EventBus {
 
@@ -64,36 +65,37 @@ export class Topic extends EventBus {
         })
     }
 
-    public rpcClient(timeout: number,
-                     exchangeName: string,
+    public rpcClient(exchangeName: string,
                      resourceName: string,
-                     ...any: any): Promise<any>;
+                     parameters: any[],
+                     timeout: number): Promise<any>;
 
-    public rpcClient(timeout: number,
-                     exchangeName: string,
+    public rpcClient(exchangeName: string,
                      resourceName: string,
-                     callback: (message: any) => void,
-                     ...any: any): void;
+                     parameters: any[],
+                     timeout: number,
+                     callback: (err, message: any) => void): void;
 
-    public rpcClient(timeout: number,
-                     exchangeName: string,
+    public rpcClient(exchangeName: string,
                      resourceName: string,
-                     ...any: any): any {
+                     parameters: any[],
+                     timeout: number,
+                     callback?: (err, message: any) => void): any {
 
-        if (any[0] instanceof Function){
-            const parameters = any.splice(1)
-            this.rpcClientCallback(timeout, exchangeName, resourceName, any[0], parameters)
+        if (callback){
+            this.rpcClientCallback(exchangeName, resourceName, parameters, timeout, callback)
             return
         }else {
-            return this.rpcClientPromise(timeout, exchangeName, resourceName, any)
+            return this.rpcClientPromise(exchangeName, resourceName, parameters, timeout)
         }
     }
 
-    private async rpcClientCallback(timeout: number,
+    private async rpcClientCallback(
                                     exchangeName: string,
                                     resourceName: string,
-                                    callback: (err, message: any) => void,
-                                    ...any: any): Promise<void> {
+                                    parameters: any[],
+                                    timeout: number,
+                                    callback: (err, message: any) => void): Promise<void> {
 
         if (!this.clientActived) {
             this.clientActived = true
@@ -110,7 +112,7 @@ export class Topic extends EventBus {
 
         const clientRequest: IClientRequest = {
             resourceName,
-            handle: any
+            handle: parameters
         }
 
         if (this.isClientConnected) {
@@ -127,10 +129,11 @@ export class Topic extends EventBus {
 
     }
 
-    private rpcClientPromise(timeout: number,
+    private rpcClientPromise(
                              exchangeName: string,
                              resourceName: string,
-                             ...any: any): Promise<any> {
+                             parameters: any[],
+                             timeout: number): Promise<any> {
         return new Promise<any>(async (resolve, reject) => {
             if (!this.clientActived) {
                 this.clientActived = true
@@ -147,7 +150,7 @@ export class Topic extends EventBus {
 
             const clientRequest: IClientRequest = {
                 resourceName,
-                handle: any
+                handle: parameters
             }
 
             if (this.isClientConnected) {
@@ -173,10 +176,17 @@ export class Topic extends EventBus {
 
             if (!this.serverActived) {
                 this.serverActived = true
-                await this.serverConnection
-                    .tryConnect(this.host, this.port, this.username, this.password, this.options)
-                this.serverEventInitialization()
-                await this.serverConnection.conn.initialized
+
+                try{
+                    await this.serverConnection
+                        .tryConnect(this.host, this.port, this.username, this.password, this.options)
+                    this.serverEventInitialization()
+                    await this.serverConnection.conn.initialized
+                }catch (err) {
+                    this.serverActived = false
+                    return reject(err)
+                }
+
             }
 
             if (this.isServerConnected) {
@@ -194,3 +204,5 @@ export class Topic extends EventBus {
         })
     }
 }
+
+export const topic = new Topic()

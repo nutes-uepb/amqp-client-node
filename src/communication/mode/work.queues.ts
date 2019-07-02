@@ -1,6 +1,7 @@
 import { EventBus } from '../../rabbitmq/connection/eventbus'
 import { IEventHandler } from '../../rabbitmq/port/event.handler.interface'
 import { IClientRequest } from '../../rabbitmq/port/resource.handler.interface'
+import { Fanout } from './fanout'
 
 export class WorkQueues extends EventBus {
 
@@ -116,3 +117,5 @@ export class WorkQueues extends EventBus {
         })
     }
 }
+
+export const workQueues = new WorkQueues()

@@ -1,5 +1,4 @@
-import * as amqp from 'amqp-ts'
-import { Connection } from 'amqp-ts'
+import { Connection } from '../infrastructure/amqp-ts'
 import { IConnectionFactory } from '../port/connection.factory.interface'
 
 import { IConfiguration, IOptions } from '../port/configuration.inteface'
@@ -25,14 +24,13 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
 
     private configuration: IConfiguration
 
-    constructor(host: string, port: number, username: string, password: string, options?: IOptions) {
+    constructor(host?: string, port?: number, username?: string, password?: string, options?: IOptions) {
         this.configuration = defaultValues
-        this.configuration.host = host
-        this.configuration.port = port
-        this.configuration.username = username
-        this.configuration.password = password
-        if (options)
-            this.configuration.options = options
+        if (host) this.configuration.host = host
+        if (port) this.configuration.port = port
+        if (username) this.configuration.username = username
+        if (password) this.configuration.password = password
+        if (options) this.configuration.options = options
 
         // amqp.log.transports.console.level = 'info'
     }
@@ -47,6 +45,13 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
      */
     public async createConnection(): Promise<Connection> {
         try {
+            let certAuth
+
+            if (this.configuration.options.ssl.enabled){
+                certAuth = {ca: fs.readFileSync(this.configuration.options.ssl.ca)}
+            }else {
+                certAuth = {}
+            }
             const conn = new Connection('protocol://username:password@host:port/vhost'
                     .replace('protocol', this.configuration.options.ssl.enabled ? 'amqps' : 'amqp')
                     .replace('host', process.env.RABBITMQ_HOST || this.configuration.host)
@@ -55,7 +60,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
                     .replace('username', process.env.RABBITMQ_USERNAME || this.configuration.username)
                     .replace('password', process.env.RABBITMQ_PASSWORD || this.configuration.password)
                 ,
-                { ca: fs.readFileSync(this.configuration.options.ssl.ca) },
+                certAuth ,
                 { retries: this.configuration.options.retries, interval: this.configuration.options.interval })
 
             return Promise.resolve(conn)

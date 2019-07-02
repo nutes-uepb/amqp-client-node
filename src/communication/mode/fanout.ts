@@ -1,6 +1,7 @@
 import { EventBus } from '../../rabbitmq/connection/eventbus'
 import { IEventHandler } from '../../rabbitmq/port/event.handler.interface'
 import { IClientRequest } from '../../rabbitmq/port/resource.handler.interface'
+import { Topic } from './topic'
 
 export class Fanout extends EventBus {
 
@@ -124,3 +125,6 @@ export class Fanout extends EventBus {
         })
     }
 }
+
+export const fanout = new Fanout()
+
