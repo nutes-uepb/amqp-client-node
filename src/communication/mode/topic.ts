@@ -13,7 +13,7 @@ export class Topic extends EventBus {
             if (!this.pubActived) {
                 this.pubActived = true
                 await this.pubconnection
-                    .tryConnect(this.host, this.port, this.username, this.password, this.options)
+                    .tryConnect(this.vhost, this.host, this.port, this.username, this.password, this.options)
                 this.pubEventInitialization()
                 await this.pubconnection.conn.initialized
             }
@@ -46,7 +46,7 @@ export class Topic extends EventBus {
             if (!this.subActived) {
                 this.subActived = true
                 await this.subconnection
-                    .tryConnect(this.host, this.port, this.username, this.password, this.options)
+                    .tryConnect(this.vhost, this.host, this.port, this.username, this.password, this.options)
                 this.subEventInitialization()
                 await this.subconnection.conn.initialized
             }
@@ -67,41 +67,38 @@ export class Topic extends EventBus {
 
     public rpcClient(exchangeName: string,
                      resourceName: string,
-                     parameters: any[],
-                     timeout: number): Promise<any>;
+                     parameters: any[]): Promise<any>;
 
     public rpcClient(exchangeName: string,
                      resourceName: string,
                      parameters: any[],
-                     timeout: number,
                      callback: (err, message: any) => void): void;
 
     public rpcClient(exchangeName: string,
                      resourceName: string,
                      parameters: any[],
-                     timeout: number,
                      callback?: (err, message: any) => void): any {
 
-        if (callback){
-            this.rpcClientCallback(exchangeName, resourceName, parameters, timeout, callback)
+        if (callback) {
+            this.rpcClientCallback(exchangeName, resourceName, parameters, callback)
             return
-        }else {
-            return this.rpcClientPromise(exchangeName, resourceName, parameters, timeout)
         }
+
+        return this.rpcClientPromise(exchangeName, resourceName, parameters)
+
     }
 
     private async rpcClientCallback(
                                     exchangeName: string,
                                     resourceName: string,
                                     parameters: any[],
-                                    timeout: number,
                                     callback: (err, message: any) => void): Promise<void> {
 
         if (!this.clientActived) {
             this.clientActived = true
             try {
                 await this.clientConnection
-                    .tryConnect(this.host, this.port, this.username, this.password, this.options)
+                    .tryConnect(this.vhost, this.host, this.port, this.username, this.password, this.options)
                 this.clientEventInitialization()
                 await this.clientConnection.conn.initialized
             } catch (err) {
@@ -117,7 +114,7 @@ export class Topic extends EventBus {
 
         if (this.isClientConnected) {
             this.clientConnection
-                .registerClientDirectOrTopic(this.typeConnection, timeout, exchangeName, clientRequest, callback)
+                .registerClientDirectOrTopic(this.typeConnection, exchangeName, clientRequest, this.options.rcpTimeout, callback)
                 .then((result) => {
                     callback(undefined, result)
                 }).catch(err => {
@@ -132,14 +129,13 @@ export class Topic extends EventBus {
     private rpcClientPromise(
                              exchangeName: string,
                              resourceName: string,
-                             parameters: any[],
-                             timeout: number): Promise<any> {
+                             parameters: any[]): Promise<any> {
         return new Promise<any>(async (resolve, reject) => {
             if (!this.clientActived) {
                 this.clientActived = true
                 try{
                     await this.clientConnection
-                        .tryConnect(this.host, this.port, this.username, this.password, this.options)
+                        .tryConnect(this.vhost, this.host, this.port, this.username, this.password, this.options)
                     this.clientEventInitialization()
                     await this.clientConnection.conn.initialized
                 }catch (err) {
@@ -155,7 +151,7 @@ export class Topic extends EventBus {
 
             if (this.isClientConnected) {
                 this.clientConnection
-                    .registerClientDirectOrTopic(this.typeConnection, timeout, exchangeName, clientRequest)
+                    .registerClientDirectOrTopic(this.typeConnection, exchangeName, clientRequest, this.options.rcpTimeout)
                     .then(result => {
                         return resolve(result)
                     })
@@ -163,7 +159,7 @@ export class Topic extends EventBus {
                         return reject(err)
                     })
             } else {
-                return resolve(false)
+                return reject(new Error('Connection not stabilized'))
             }
         })
     }
@@ -179,7 +175,7 @@ export class Topic extends EventBus {
 
                 try{
                     await this.serverConnection
-                        .tryConnect(this.host, this.port, this.username, this.password, this.options)
+                        .tryConnect(this.vhost, this.host, this.port, this.username, this.password, this.options)
                     this.serverEventInitialization()
                     await this.serverConnection.conn.initialized
                 }catch (err) {

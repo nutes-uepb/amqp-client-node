@@ -14,4 +14,15 @@ export interface IOptions {
         enabled: boolean,
         ca: string
     }
+    rcpTimeout: number
+}
+
+export const defaultOptions: IOptions = {
+    retries: 0,
+    interval: 1000,
+    ssl: {
+        enabled: false,
+        ca: ''
+    },
+    rcpTimeout: 5000
 }

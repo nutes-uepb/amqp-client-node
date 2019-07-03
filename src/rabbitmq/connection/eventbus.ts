@@ -1,4 +1,4 @@
-import { IOptions } from '../port/configuration.inteface'
+import { IOptions, defaultOptions } from '../port/configuration.inteface'
 import { IEventbusInterface } from '../port/eventbus.interface'
 import { IResourceHandler } from '../port/resource.handler.interface'
 
@@ -15,6 +15,7 @@ export abstract class EventBus extends EventEmitter implements IEventbusInterfac
     protected clientConnection: ClientRegisterRabbitmq = new ClientRegisterRabbitmq()
     protected serverConnection: ServerRegisterRabbitmq = new ServerRegisterRabbitmq()
 
+    protected vhost: string
     protected host: string
     protected port: number
     protected username: string
@@ -26,19 +27,8 @@ export abstract class EventBus extends EventEmitter implements IEventbusInterfac
     protected clientActived: boolean = false
     protected serverActived: boolean = false
 
-    constructor(host?: string,
-                port?: number,
-                username?: string,
-                password?: string,
-                options?: IOptions) {
+    constructor() {
         super()
-
-        this.host = host
-        this.port = port
-        this.username = username
-        this.password = password
-        this.options = options
-
     }
 
     protected pubEventInitialization(): void {
@@ -164,16 +154,21 @@ export abstract class EventBus extends EventEmitter implements IEventbusInterfac
         return this.serverConnection.isConnected
     }
 
-    public setConfigurations(host: string,
+    public setConfigurations(vhost: string,
+                             host: string,
                              port: number,
                              username: string,
                              password: string,
                              options: IOptions): void{
+        this.vhost = vhost
         this.host = host
         this.port = port
         this.username = username
         this.password = password
-        this.options = options
+        this.options = defaultOptions
+
+        if (options)
+            this.options = options
     }
 
     public dispose(): Promise<boolean> {

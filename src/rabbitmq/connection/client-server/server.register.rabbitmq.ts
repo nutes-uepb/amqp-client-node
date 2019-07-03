@@ -163,7 +163,6 @@ export class ServerRegisterRabbitmq extends ConnectionRabbitMQ {
 
                 if (await exchange.initialized) {
                     this._logger.info('RoutingKey ' + routingKey + ' registered!')
-                    console.log(routingKey)
                     await queue.bind(exchange, routingKey)
                 }
 
@@ -177,8 +176,6 @@ export class ServerRegisterRabbitmq extends ConnectionRabbitMQ {
 
                         const resources_handler: IResourceHandler[] | undefined =
                             this.resource_handlers.get(queueName)
-
-                        console.log(message.fields.routingKey)
 
                         if(resources_handler) {
                             for (let resource of resources_handler) {

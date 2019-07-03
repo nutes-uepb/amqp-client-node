@@ -40,7 +40,8 @@ export abstract class ConnectionRabbitMQ implements IConnectionEventBus {
      * @param password
      * @param options
      */
-    public tryConnect(host: string,
+    public tryConnect(vhost: string,
+                      host: string,
                       port: number,
                       username: string,
                       password: string,
@@ -48,7 +49,7 @@ export abstract class ConnectionRabbitMQ implements IConnectionEventBus {
         return new Promise<Connection>((resolve, reject) => {
             if (this.isConnected) return resolve(this._connection)
 
-            new ConnectionFactoryRabbitMQ(host, port, username, password, options)
+            new ConnectionFactoryRabbitMQ(vhost, host, port, username, password, options)
                 .createConnection()
                 .then((connection: Connection) => {
                     this._connection = connection

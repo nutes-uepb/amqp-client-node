@@ -1,37 +1,25 @@
 import { Connection } from '../infrastructure/amqp-ts'
 import { IConnectionFactory } from '../port/connection.factory.interface'
 
-import { IConfiguration, IOptions } from '../port/configuration.inteface'
+import { IConfiguration, IOptions, defaultOptions } from '../port/configuration.inteface'
 import * as fs from 'fs'
-
-const defaultValues: IConfiguration = {
-    vhost: 'ocariot',
-    host: 'localhost',
-    port: 5672,
-    username: 'guest',
-    password: 'guest',
-    options: {
-        retries: 0,
-        interval: 1000,
-        ssl: {
-            enabled: false,
-            ca: ''
-        }
-    } as IOptions
-}
 
 export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
 
     private configuration: IConfiguration
 
-    constructor(host?: string, port?: number, username?: string, password?: string, options?: IOptions) {
-        this.configuration = defaultValues
-        if (host) this.configuration.host = host
-        if (port) this.configuration.port = port
-        if (username) this.configuration.username = username
-        if (password) this.configuration.password = password
-        if (options) this.configuration.options = options
+    constructor(vhost: string, host: string, port: number, username: string, password: string, options?: IOptions) {
+        this.configuration = {
+            vhost: vhost,
+            host: host,
+            port: port,
+            username: username,
+            password: password,
+            options: defaultOptions
+        } as IConfiguration
 
+        if(options)
+            this.configuration.options = options
         // amqp.log.transports.console.level = 'info'
     }
 
@@ -45,13 +33,14 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
      */
     public async createConnection(): Promise<Connection> {
         try {
-            let certAuth
+            let certAuth = {}
 
             if (this.configuration.options.ssl.enabled){
+                if(!this.configuration.options.ssl.ca)
+                    return Promise.reject(new Error('Paramater ca not passed'))
                 certAuth = {ca: fs.readFileSync(this.configuration.options.ssl.ca)}
-            }else {
-                certAuth = {}
             }
+
             const conn = new Connection('protocol://username:password@host:port/vhost'
                     .replace('protocol', this.configuration.options.ssl.enabled ? 'amqps' : 'amqp')
                     .replace('host', process.env.RABBITMQ_HOST || this.configuration.host)

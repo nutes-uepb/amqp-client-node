@@ -43,10 +43,10 @@ export class ClientRegisterRabbitmq extends ConnectionRabbitMQ {
     }
 
     public registerClientDirectOrTopic(type: string,
-                                       timeout: number,
                                        exchangeName: string,
                                        resource: IClientRequest,
-                                       callback?: (err,message: any) => void): Promise<any> {
+                                       timeout: number,
+                                       callback?: (err,message: any,) => void): Promise<any> {
         return new Promise<any>(async (resolve, reject) => {
             try {
                 const exchange = this._connection.declareExchange(exchangeName, type, { durable: true });
@@ -54,7 +54,7 @@ export class ClientRegisterRabbitmq extends ConnectionRabbitMQ {
                 let time
 
                 new Promise<any>( (resolve) => {
-                    time = setTimeout(resolve, timeout || 0)
+                    time = setTimeout(resolve, timeout)
                 }).then(() => {
                     reject(new Error('rpc timed out'))
                 })

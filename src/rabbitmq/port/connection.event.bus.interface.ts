@@ -6,7 +6,7 @@ export interface IConnectionEventBus {
 
     conn?: any
 
-    tryConnect(host: string, port: number, username: string, password: string, options?: IOptions): Promise<Connection>
+    tryConnect(vhost: string, host: string, port: number, username: string, password: string, options?: IOptions): Promise<Connection>
 
     closeConnection(): Promise<boolean>
 

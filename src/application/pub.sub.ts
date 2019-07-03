@@ -7,37 +7,28 @@ import { WorkQueues, workQueues } from '../communication/mode/work.queues'
 
 export class PubSub<E extends EventBus> {
 
-    protected host: string
-    protected port: number
-    protected username: string
-    protected password: string
-    protected options?: IOptions
+    constructor(vhost: string, host: string, port: number, username: string, password: string, options?: IOptions) {
 
-    constructor(host: string, port: number, username: string, password: string, options?: IOptions) {
-        this.host = host
-        this.port = port
-        this.username = username
-        this.password = password
-        this.options = options
-    }
+        topic.setConfigurations(vhost, host, port, username, password, options)
+        direct.setConfigurations(vhost, host, port, username, password, options)
+        fanout.setConfigurations(vhost, host, port, username, password, options)
+        workQueues.setConfigurations(vhost, host, port, username, password, options)
 
-    public createDirectInstance(): Direct {
-        direct.setConfigurations(this.host, this.port, this.username, this.password, this.options)
-        return direct
     }
 
     public createTopicInstance(): Topic {
-        topic.setConfigurations(this.host, this.port, this.username, this.password, this.options)
         return topic
     }
 
-    public createWorkerInstance(): WorkQueues {
-        workQueues.setConfigurations(this.host, this.port, this.username, this.password, this.options)
-        return workQueues
+    public createDirectInstance(): Direct {
+        return direct
     }
 
     public createFanoutInstance(): Fanout {
-        fanout.setConfigurations(this.host, this.port, this.username, this.password, this.options)
         return fanout
+    }
+
+    public createWorkerInstance(): WorkQueues {
+        return workQueues
     }
 }

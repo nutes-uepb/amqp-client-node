@@ -12,7 +12,7 @@ export class WorkQueues extends EventBus {
             if (!this.pubActived) {
                 this.pubActived = true
                 await this.pubconnection
-                    .tryConnect(this.host, this.port, this.username, this.password, this.options)
+                    .tryConnect(this.vhost, this.host, this.port, this.username, this.password, this.options)
                 this.pubEventInitialization()
                 await this.pubconnection.conn.initialized
             }
@@ -42,7 +42,7 @@ export class WorkQueues extends EventBus {
             if (!this.subActived) {
                 this.subActived = true
                 await this.subconnection
-                    .tryConnect(this.host, this.port, this.username, this.password, this.options)
+                    .tryConnect(this.vhost, this.host, this.port, this.username, this.password, this.options)
                 this.subEventInitialization()
                 await this.subconnection.conn.initialized
             }
@@ -69,7 +69,7 @@ export class WorkQueues extends EventBus {
             if (!this.clientActived) {
                 this.clientActived = true
                 await this.clientConnection
-                    .tryConnect(this.host, this.port, this.username, this.password, this.options)
+                    .tryConnect(this.vhost, this.host, this.port, this.username, this.password, this.options)
                 this.clientEventInitialization()
                 await this.clientConnection.conn.initialized
             }
@@ -99,8 +99,8 @@ export class WorkQueues extends EventBus {
 
             if (!this.serverActived) {
                 this.serverActived = true
-                await this.serverConnection.tryConnect(this.host, this.port,
-                    this.username, this.password, this.options)
+                await this.serverConnection
+                    .tryConnect(this.vhost, this.host, this.port, this.username, this.password, this.options)
                 this.serverEventInitialization()
                 await this.serverConnection.conn.initialized
             }
