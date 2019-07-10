@@ -1,6 +1,8 @@
 import { createLogger, format, Logger, transports } from 'winston'
+import { injectable } from 'inversify'
 
-export class CustomLogger implements ILogger {
+@injectable()
+export class CustomLogger implements ICustomLogger {
     private readonly _logger: Logger
     private _options: any = {}
 
@@ -70,9 +72,9 @@ export class CustomLogger implements ILogger {
         this._logger.silly(message)
     }
 
-    public changeLoggerConfiguration(enabled: boolean, level?: string): void{
+    public changeLoggerConfiguration(enabled: boolean, level?: string): void {
 
-        this._options.silent = enabled
+        this._options.silent = !enabled
 
         if (level)
             this._options.level = level
@@ -96,7 +98,7 @@ export class CustomLogger implements ILogger {
  *
  * @see {@link https://github.com/winstonjs/winston#using-logging-levels} for further information.
  */
-export interface ILogger {
+export interface ICustomLogger {
     logger: Logger
 
     error(message: string): void
