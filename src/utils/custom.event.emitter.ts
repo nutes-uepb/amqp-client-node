@@ -1,12 +1,12 @@
 import { EventEmitter } from 'events'
-import { injectable, decorate } from 'inversify'
+import { decorate, injectable } from 'inversify'
 
 decorate(injectable(), EventEmitter)
 
 @injectable()
-export class CustomEventEmitter extends EventEmitter implements ICustomEventEmitter{
+export class CustomEventEmitter extends EventEmitter implements ICustomEventEmitter {
 
-    constructor(){
+    constructor() {
         super()
     }
 

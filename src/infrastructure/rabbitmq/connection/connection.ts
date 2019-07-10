@@ -12,353 +12,343 @@ import { Binding } from '../bus/binding'
 import { Queue } from '../bus/queue'
 import { Exchange } from '../bus/exchange'
 
-import * as AmqpLib from 'amqplib/callback_api';
-// import * as Promise from "bluebird";
-import { createLogger, format, transports } from 'winston';
-import * as path from 'path';
-import * as os from 'os';
-import { EventEmitter } from 'events';
-
-
+import * as AmqpLib from 'amqplib/callback_api'
+import { createLogger, format, transports } from 'winston'
+import { EventEmitter } from 'events'
 
 // create a custom winston logger for amqp-ts
-var amqp_log = createLogger({
-  level: 'silly', // Used by transports that do not have this configuration defined
-  silent: false,
-  format: format.combine(
-      format.timestamp(),
-      format.json()
-  ),
-  transports: new transports.Console(this._options),
-  exitOnError: false
+const amqp_log = createLogger({
+    level: 'silly', // Used by transports that do not have this configuration defined
+    silent: false,
+    format: format.combine(
+        format.timestamp(),
+        format.json()
+    ),
+    transports: new transports.Console(this._options),
+    exitOnError: false
 })
-export var log = amqp_log;
+export const log = amqp_log
 
 // name for the RabbitMQ direct reply-to queue
 
-//----------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------
 // Connection class
-//----------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------
 export class Connection extends EventEmitter {
-  initialized: Promise<void>;
+    public initialized: Promise<void>
+    public isConnected: boolean = false
 
-  private url: string;
-  private socketOptions: any;
-  private reconnectStrategy: Connection.ReconnectStrategy;
-  private connectedBefore = false;
+    private url: string
+    private socketOptions: any
+    private reconnectStrategy: Connection.IReconnectStrategy
+    private connectedBefore = false
 
-  _connection: AmqpLib.Connection;
-  _retry: number;
-  _rebuilding: boolean = false;
-  _isClosing: boolean = false;
+    private _connection: AmqpLib.Connection
+    private _retry: number
+    private _rebuilding: boolean = false
+    private _isClosing: boolean = false
 
-  public isConnected: boolean = false;
+    private readonly _exchanges: { [id: string]: Exchange }
+    private readonly _queues: { [id: string]: Queue }
+    private readonly _bindings: { [id: string]: Binding }
 
-  _exchanges: { [id: string]: Exchange };
-  _queues: { [id: string]: Queue };
-  _bindings: { [id: string]: Binding };
+    constructor(url = 'amqp://localhost',
+                socketOptions: any = {},
+                reconnectStrategy: Connection.IReconnectStrategy = { retries: 0, interval: 1500 }) {
+        super()
 
-  constructor(url = "amqp://localhost",
-              socketOptions: any = {},
-              reconnectStrategy: Connection.ReconnectStrategy = { retries: 0, interval: 1500 }) {
-    super();
+        this.url = url
+        this.socketOptions = socketOptions
+        this.reconnectStrategy = reconnectStrategy
+        this._exchanges = {}
+        this._queues = {}
+        this._bindings = {}
 
-    this.url = url;
-    this.socketOptions = socketOptions;
-    this.reconnectStrategy = reconnectStrategy;
-    this._exchanges = {};
-    this._queues = {};
-    this._bindings = {};
-
-    this.rebuildConnection();
-  }
-
-  private rebuildConnection(): Promise<void> {
-    if (this._rebuilding) { // only one rebuild process can be active at any time
-      log.log("debug", "Connection rebuild already in progress, joining active rebuild attempt.", { module: "amqp-ts" });
-      return this.initialized;
+        this.rebuildConnection()
     }
-    this._retry = -1;
-    this._rebuilding = true;
-    this._isClosing = false;
 
-    // rebuild the connection
-    this.initialized = new Promise<void>((resolve, reject) => {
-      this.tryToConnect(this, 0, (err) => {
-        /* istanbul ignore if */
-        if (err) {
-          this._rebuilding = false;
-          reject(err);
-        } else {
-          this._rebuilding = false;
-          if (this.connectedBefore) {
-            log.log("warn", "Connection re-established", { module: "amqp-ts" });
-            this.emit("re_established_connection");
-          } else {
-            log.log("info", "Connection established.", { module: "amqp-ts" });
-            this.emit("open_connection");
-            this.connectedBefore = true;
-          }
-          resolve(null);
+    private rebuildConnection(): Promise<void> {
+        if (this._rebuilding) { // only one rebuild process can be active at any time
+            log.log('debug', 'Connection rebuild already in progress, joining active rebuild attempt.', { module: 'amqp-ts' })
+            return this.initialized
         }
-      });
-    });
-    /* istanbul ignore next */
-    this.initialized.catch((err) => {
-      log.log("warn", "Error creating connection!", { module: "amqp-ts" });
-      this.emit("error_connection", err);
+        this._retry = -1
+        this._rebuilding = true
+        this._isClosing = false
 
-      //throw (err);
-    });
+        // rebuild the connection
+        this.initialized = new Promise<void>((resolve, reject) => {
+            this.tryToConnect(this, 0, (err) => {
+                /* istanbul ignore if */
+                if (err) {
+                    this._rebuilding = false
+                    reject(err)
+                } else {
+                    this._rebuilding = false
+                    if (this.connectedBefore) {
+                        log.log('warn', 'Connection re-established', { module: 'amqp-ts' })
+                        this.emit('re_established_connection')
+                    } else {
+                        log.log('info', 'Connection established.', { module: 'amqp-ts' })
+                        this.emit('open_connection')
+                        this.connectedBefore = true
+                    }
+                    resolve(null)
+                }
+            })
+        })
+        /* istanbul ignore next */
+        this.initialized.catch((err) => {
+            log.log('warn', 'Error creating connection!', { module: 'amqp-ts' })
+            this.emit('error_connection', err)
 
-    return this.initialized;
-  }
+            // throw (err)
+        })
 
-  private tryToConnect(thisConnection: Connection, retry: number, callback: (err: any) => void): void {
-    AmqpLib.connect(thisConnection.url, thisConnection.socketOptions, (err, connection) => {
-      /* istanbul ignore if */
-      if (err) {
-        thisConnection.isConnected = false;
-        // only do every retry once, amqplib can return multiple connection errors for one connection request (error?)
-        if (retry <= this._retry) {
-          //amqpts_log.log("warn" , "Double retry " + retry + ", skipping.", {module: "amqp-ts"});
-          return;
+        return this.initialized
+    }
+
+    private tryToConnect(thisConnection: Connection, retry: number, callback: (err: any) => void): void {
+        AmqpLib.connect(thisConnection.url, thisConnection.socketOptions, (err, connection) => {
+            /* istanbul ignore if */
+            if (err) {
+                thisConnection.isConnected = false
+                // only do every retry once, amqplib can return multiple connection errors for one connection request (error?)
+                if (retry <= this._retry) {
+                    // amqpts_log.log("warn" , "Double retry " + retry + ", skipping.", {module: "amqp-ts"})
+                    return
+                }
+
+                log.log('warn', 'Connection failed.', { module: 'amqp-ts' })
+
+                this._retry = retry
+                if (thisConnection.reconnectStrategy.retries === 0 || thisConnection.reconnectStrategy.retries > retry) {
+                    log.log('warn', 'Connection retry ' + (retry + 1) + ' in ' + thisConnection.reconnectStrategy.interval + 'ms',
+                        { module: 'amqp-ts' })
+                    thisConnection.emit('trying_connect')
+
+                    setTimeout(thisConnection.tryToConnect,
+                        thisConnection.reconnectStrategy.interval,
+                        thisConnection,
+                        retry + 1,
+                        callback
+                    )
+                } else { // no reconnect strategy, or retries exhausted, so return the error
+                    log.log('warn', 'Connection failed, exiting: No connection ' +
+                        'retries left (retry ' + retry + ').', { module: 'amqp-ts' })
+                    callback(err)
+                }
+            } else {
+                const restart = (err: Error) => {
+                    log.log('debug', 'Connection error occurred.', { module: 'amqp-ts' })
+                    connection.removeListener('error', restart)
+
+                    // connection.removeListener("end", restart) // not sure this is needed
+                    thisConnection._rebuildAll(err) // try to rebuild the topology when the connection  unexpectedly closes
+                }
+                const onClose = () => {
+                    connection.removeListener('close', onClose)
+                    if (!this._isClosing) {
+                        thisConnection.emit('lost_connection')
+                        restart(new Error('Connection closed by remote host'))
+                    }
+
+                }
+                connection.on('error', restart)
+                connection.on('close', onClose)
+                // connection.on("end", restart) // not sure this is needed
+                thisConnection._connection = connection
+                thisConnection.isConnected = true
+
+                callback(null)
+            }
+        })
+    }
+
+    _rebuildAll(err: Error): Promise<void> {
+        log.log('warn', 'Connection error: ' + err.message, { module: 'amqp-ts' })
+
+        log.log('debug', 'Rebuilding connection NOW.', { module: 'amqp-ts' })
+        this.rebuildConnection()
+
+        // re initialize exchanges, queues and bindings if they exist
+        for (const exchangeId in this._exchanges) {
+            const exchange = this._exchanges[exchangeId]
+            log.log('debug', 'Re-initialize Exchange \'' + exchange.name + '\'.', { module: 'amqp-ts' })
+            exchange._initialize()
+        }
+        for (const queueId in this._queues) {
+            const queue = this._queues[queueId]
+            const consumer = queue.consumer
+            log.log('debug', 'Re-initialize queue \'' + queue.name + '\'.', { module: 'amqp-ts' })
+            queue._initialize()
+            if (consumer) {
+                log.log('debug', 'Re-initialize consumer for queue \'' + queue.name + '\'.', { module: 'amqp-ts' })
+                queue._initializeConsumer()
+            }
+        }
+        for (const bindingId in this._bindings) {
+            const binding = this._bindings[bindingId]
+            log.log('debug', 'Re-initialize binding from \'' + binding.source.name + '\' to \'' +
+                binding.destination.name + '\'.', { module: 'amqp-ts' })
+            binding.initialize()
         }
 
-        log.log("warn", "Connection failed.", { module: "amqp-ts" });
+        return new Promise<void>((resolve, reject) => {
+            this.completeConfiguration().then(() => {
+                    log.log('debug', 'Rebuild success.', { module: 'amqp-ts' })
+                    resolve(null)
+                }, /* istanbul ignore next */
+                (rejectReason) => {
+                    log.log('debug', 'Rebuild failed.', { module: 'amqp-ts' })
+                    reject(rejectReason)
+                })
+        })
+    }
 
-        this._retry = retry;
-        if (thisConnection.reconnectStrategy.retries === 0 || thisConnection.reconnectStrategy.retries > retry) {
-          log.log("warn", "Connection retry " + (retry + 1) + " in " + thisConnection.reconnectStrategy.interval + "ms",
-              { module: "amqp-ts" });
-          thisConnection.emit("trying_connect");
+    public close(): Promise<void> {
+        this._isClosing = true
+        return new Promise<void>((resolve, reject) => {
+            this.initialized.then(() => {
+                this._connection.close(err => {
+                    /* istanbul ignore if */
+                    if (err) {
+                        reject(err)
+                    } else {
+                        this.isConnected = false
+                        this.emit('close_connection')
+                        resolve(null)
+                    }
+                })
+            })
+        })
+    }
 
-          setTimeout(thisConnection.tryToConnect,
-              thisConnection.reconnectStrategy.interval,
-              thisConnection,
-              retry + 1,
-              callback
-          );
-        } else { //no reconnect strategy, or retries exhausted, so return the error
-          log.log("warn", "Connection failed, exiting: No connection retries left (retry " + retry + ").", { module: "amqp-ts" });
-          callback(err);
+    /**
+     * Make sure the whole defined connection topology is configured:
+     * return promise that fulfills after all defined exchanges, queues and bindings are initialized
+     */
+    public completeConfiguration(): Promise<any> {
+        const promises: Promise<any>[] = []
+        for (const exchangeId in this._exchanges) {
+            const exchange: Exchange = this._exchanges[exchangeId]
+            promises.push(exchange.initialized)
         }
-      } else {
-        var restart = (err: Error) => {
-          log.log("debug", "Connection error occurred.", { module: "amqp-ts" });
-          connection.removeListener("error", restart);
-
-          //connection.removeListener("end", restart); // not sure this is needed
-          thisConnection._rebuildAll(err); //try to rebuild the topology when the connection  unexpectedly closes
-        };
-        var onClose = () => {
-          connection.removeListener("close", onClose);
-          if (!this._isClosing) {
-            thisConnection.emit("lost_connection");
-            restart(new Error("Connection closed by remote host"));
-          }
-
-        };
-        connection.on("error", restart);
-        connection.on("close", onClose);
-        //connection.on("end", restart); // not sure this is needed
-        thisConnection._connection = connection;
-        thisConnection.isConnected = true;
-
-        callback(null);
-      }
-    });
-  }
-
-  _rebuildAll(err: Error): Promise<void> {
-    log.log("warn", "Connection error: " + err.message, { module: "amqp-ts" });
-
-    log.log("debug", "Rebuilding connection NOW.", { module: "amqp-ts" });
-    this.rebuildConnection();
-
-    //re initialize exchanges, queues and bindings if they exist
-    for (var exchangeId in this._exchanges) {
-      var exchange = this._exchanges[exchangeId];
-      log.log("debug", "Re-initialize Exchange '" + exchange._name + "'.", { module: "amqp-ts" });
-      exchange._initialize();
-    }
-    for (var queueId in this._queues) {
-      var queue = this._queues[queueId];
-      var consumer = queue._consumer;
-      log.log("debug", "Re-initialize queue '" + queue._name + "'.", { module: "amqp-ts" });
-      queue._initialize();
-      if (consumer) {
-        log.log("debug", "Re-initialize consumer for queue '" + queue._name + "'.", { module: "amqp-ts" });
-        queue._initializeConsumer();
-      }
-    }
-    for (var bindingId in this._bindings) {
-      var binding = this._bindings[bindingId];
-      log.log("debug", "Re-initialize binding from '" + binding._source._name + "' to '" +
-          binding._destination._name + "'.", { module: "amqp-ts" });
-      binding._initialize();
-    }
-
-    return new Promise<void>((resolve, reject) => {
-      this.completeConfiguration().then(() => {
-            log.log("debug", "Rebuild success.", { module: "amqp-ts" });
-            resolve(null);
-          }, /* istanbul ignore next */
-          (rejectReason) => {
-            log.log("debug", "Rebuild failed.", { module: "amqp-ts" });
-            reject(rejectReason);
-          });
-    });
-  }
-
-  close(): Promise<void> {
-    this._isClosing = true;
-    return new Promise<void>((resolve, reject) => {
-      this.initialized.then(() => {
-        this._connection.close(err => {
-          /* istanbul ignore if */
-          if (err) {
-            reject(err);
-          } else {
-            this.isConnected = false;
-            this.emit("close_connection");
-            resolve(null);
-          }
-        });
-      });
-    });
-  }
-
-  /**
-   * Make sure the whole defined connection topology is configured:
-   * return promise that fulfills after all defined exchanges, queues and bindings are initialized
-   */
-  completeConfiguration(): Promise<any> {
-    var promises: Promise<any>[] = [];
-    for (var exchangeId in this._exchanges) {
-      var exchange: Exchange = this._exchanges[exchangeId];
-      promises.push(exchange.initialized);
-    }
-    for (var queueId in this._queues) {
-      var queue: Queue = this._queues[queueId];
-      promises.push(queue.initialized);
-      if (queue._consumerInitialized) {
-        promises.push(queue._consumerInitialized);
-      }
-    }
-    for (var bindingId in this._bindings) {
-      var binding: Binding = this._bindings[bindingId];
-      promises.push(binding.initialized);
-    }
-    return Promise.all(promises);
-  }
-
-  /**
-   * Delete the whole defined connection topology:
-   * return promise that fulfills after all defined exchanges, queues and bindings have been removed
-   */
-  deleteConfiguration(): Promise<any> {
-    var promises: Promise<any>[] = [];
-    for (var bindingId in this._bindings) {
-      var binding: Binding = this._bindings[bindingId];
-      promises.push(binding.delete());
-    }
-    for (var queueId in this._queues) {
-      var queue: Queue = this._queues[queueId];
-      if (queue._consumerInitialized) {
-        promises.push(queue.stopConsumer());
-      }
-      promises.push(queue.delete());
-    }
-    for (var exchangeId in this._exchanges) {
-      var exchange: Exchange = this._exchanges[exchangeId];
-      promises.push(exchange.delete());
-    }
-    return Promise.all(promises);
-  }
-
-  declareExchange(name: string, type?: string, options?: Exchange.DeclarationOptions): Exchange {
-    var exchange = this._exchanges[name];
-    if (exchange === undefined) {
-      exchange = new Exchange(this, name, type, options);
-    }
-    return exchange;
-  }
-
-  declareQueue(name: string, options?: Queue.DeclarationOptions): Queue {
-    var queue = this._queues[name];
-    if (queue === undefined) {
-      queue = new Queue(this, name, options);
-    }
-    return queue;
-  }
-
-  declareTopology(topology: Connection.Topology): Promise<any> {
-    var promises: Promise<any>[] = [];
-    var i: number;
-    var len: number;
-
-    if (topology.exchanges !== undefined) {
-      for (i = 0, len = topology.exchanges.length; i < len; i++) {
-        var exchange = topology.exchanges[i];
-        promises.push(this.declareExchange(exchange.name, exchange.type, exchange.options).initialized);
-      }
-    }
-    if (topology.queues !== undefined) {
-      for (i = 0, len = topology.queues.length; i < len; i++) {
-        var queue = topology.queues[i];
-        promises.push(this.declareQueue(queue.name, queue.options).initialized);
-      }
-    }
-    if (topology.bindings !== undefined) {
-      for (i = 0, len = topology.bindings.length; i < len; i++) {
-        var binding = topology.bindings[i];
-        var source = this.declareExchange(binding.source);
-        var destination: Queue | Exchange;
-        if (binding.exchange !== undefined) {
-          destination = this.declareExchange(binding.exchange);
-        } else {
-          destination = this.declareQueue(binding.queue);
+        for (const queueId in this._queues) {
+            const queue: Queue = this._queues[queueId]
+            promises.push(queue.initialized)
+            if (queue.consumerInitialized) {
+                promises.push(queue.consumerInitialized)
+            }
         }
-        promises.push(destination.bind(source, binding.pattern, binding.args));
-      }
+        for (const bindingId in this._bindings) {
+            const binding: Binding = this._bindings[bindingId]
+            promises.push(binding.initialized)
+        }
+        return Promise.all(promises)
     }
-    return Promise.all(promises);
-  }
 
-  get getConnection(): AmqpLib.Connection {
-    return this._connection;
-  }
+    /**
+     * Delete the whole defined connection topology:
+     * return promise that fulfills after all defined exchanges, queues and bindings have been removed
+     */
+    public deleteConfiguration(): Promise<any> {
+        const promises: Promise<any>[] = []
+        for (const bindingId in this._bindings) {
+            const binding: Binding = this._bindings[bindingId]
+            promises.push(binding.delete())
+        }
+        for (const queueId in this._queues) {
+            const queue: Queue = this._queues[queueId]
+            if (queue.consumerInitialized) {
+                promises.push(queue.stopConsumer())
+            }
+            promises.push(queue.delete())
+        }
+        for (const exchangeId in this._exchanges) {
+            const exchange: Exchange = this._exchanges[exchangeId]
+            promises.push(exchange.delete())
+        }
+        return Promise.all(promises)
+    }
+
+    public declareExchange(name: string, type?: string, options?: Exchange.IDeclarationOptions): Exchange {
+        let exchange = this._exchanges[name]
+        if (exchange === undefined) {
+            exchange = new Exchange(this, name, type, options)
+        }
+        return exchange
+    }
+
+    public declareQueue(name: string, options?: Queue.IDeclarationOptions): Queue {
+        let queue = this._queues[name]
+        if (queue === undefined) {
+            queue = new Queue(this, name, options)
+        }
+        return queue
+    }
+
+    public declareTopology(topology: Connection.ITopology): Promise<any> {
+        const promises: Promise<any>[] = []
+        let i: number
+        let len: number
+
+        if (topology.exchanges !== undefined) {
+            for (i = 0, len = topology.exchanges.length; i < len; i++) {
+                const exchange = topology.exchanges[i]
+                promises.push(this.declareExchange(exchange.name, exchange.type, exchange.options).initialized)
+            }
+        }
+        if (topology.queues !== undefined) {
+            for (i = 0, len = topology.queues.length; i < len; i++) {
+                const queue = topology.queues[i]
+                promises.push(this.declareQueue(queue.name, queue.options).initialized)
+            }
+        }
+        if (topology.bindings !== undefined) {
+            for (i = 0, len = topology.bindings.length; i < len; i++) {
+                const binding = topology.bindings[i]
+                const source = this.declareExchange(binding.source)
+                let destination: Queue | Exchange
+                if (binding.exchange !== undefined) {
+                    destination = this.declareExchange(binding.exchange)
+                } else {
+                    destination = this.declareQueue(binding.queue)
+                }
+                promises.push(destination.bind(source, binding.pattern, binding.args))
+            }
+        }
+        return Promise.all(promises)
+    }
+
+    get connection(): AmqpLib.Connection {
+        return this._connection
+    }
+
+    get exchanges(): { [p: string]: Exchange } {
+        return this._exchanges
+    }
+
+    get queues(): { [p: string]: Queue } {
+        return this._queues
+    }
+
+    get bindings(): { [p: string]: Binding } {
+        return this._bindings
+    }
 }
+
 export namespace Connection {
-  "use strict";
-  export interface ReconnectStrategy {
-    retries: number; // number of retries, 0 is forever
-    interval: number; // retry interval in ms
-  }
-  export interface Topology {
-    exchanges: { name: string, type?: string, options?: any }[];
-    queues: { name: string, options?: any }[];
-    bindings: { source: string, queue?: string, exchange?: string, pattern?: string, args?: any }[];
-  }
+    'use strict'
+
+    export interface IReconnectStrategy {
+        retries: number // number of retries, 0 is forever
+        interval: number // retry interval in ms
+    }
+
+    export interface ITopology {
+        exchanges: { name: string, type?: string, options?: any }[]
+        queues: { name: string, options?: any }[]
+        bindings: { source: string, queue?: string, exchange?: string, pattern?: string, args?: any }[]
+    }
 }
-
-
-//----------------------------------------------------------------------------------------------------
-// Message class
-//----------------------------------------------------------------------------------------------------
-
-
-//----------------------------------------------------------------------------------------------------
-// Exchange class
-//----------------------------------------------------------------------------------------------------
-
-
-//----------------------------------------------------------------------------------------------------
-// Queue class
-//----------------------------------------------------------------------------------------------------
-
-
-//----------------------------------------------------------------------------------------------------
-// Binding class
-//----------------------------------------------------------------------------------------------------

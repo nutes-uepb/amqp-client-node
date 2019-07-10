@@ -3,21 +3,16 @@ import { inject, injectable } from 'inversify'
 import { Identifier } from '../../../di/identifier'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IConnection } from '../../port/connection/connection.interface'
-// import { Queue } from '../amqp-ts'
 import { Queue } from '../bus/queue'
 import { IServerRegister } from '../../port/rpc/server.register.interface'
 import { IConfigurationParameters } from '../../port/configuration.inteface'
-import { EventEmitter } from 'events'
-import StartConsumerResult = Queue.StartConsumerResult
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
-
-// import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
+import StartConsumerResult = Queue.IStartConsumerResult
 
 @injectable()
 export class ServerRegisterRabbitmq implements IServerRegister {
     private resource_handlers: Map<string, IResourceHandler[]> = new Map<string, IResourceHandler[]>()
     private consumersInitialized: Map<string, boolean> = new Map<string, boolean>()
-
 
     constructor(@inject(Identifier.RABBITMQ_CONNECTION) private readonly _connection: IConnection,
                 @inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger,

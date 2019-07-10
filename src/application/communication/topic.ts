@@ -197,7 +197,7 @@ export class Topic implements ITopic {
     }
 
     public on(event: string | symbol, listener: (...args: any[]) => void): void {
-        this._emitter.on(event,listener)
+        this._emitter.on(event, listener)
     }
 
 }

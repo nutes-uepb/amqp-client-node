@@ -29,8 +29,7 @@ export class ConnectionRabbitMQ implements IConnection {
 
     constructor(@inject(Identifier.RABBITMQ_CONNECTION_FACT) private readonly _connectionFactory: IConnectionFactory,
                 @inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger,
-                @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter)
-    {
+                @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
         this._startingConnection = false
     }
 
@@ -42,7 +41,7 @@ export class ConnectionRabbitMQ implements IConnection {
         this._configurations = config
     }
 
-    get startingConnection(): boolean{
+    get startingConnection(): boolean {
         return this._startingConnection
     }
 

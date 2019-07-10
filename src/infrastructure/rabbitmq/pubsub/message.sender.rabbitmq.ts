@@ -1,4 +1,3 @@
-// import { Message } from '../amqp-ts'
 import { Message } from '../bus/message'
 import { IMessage } from '../../port/pubsub/message.interface'
 import { inject, injectable } from 'inversify'
@@ -12,11 +11,9 @@ import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 @injectable()
 export class MessageSenderRabbitmq implements IMessageSender {
 
-
     constructor(@inject(Identifier.RABBITMQ_CONNECTION) private readonly _connection: IConnection,
                 @inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger,
-                @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter)
-    {
+                @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
     }
 
     public setConfigurations(config: IConfigurationParameters): void {
@@ -36,7 +33,7 @@ export class MessageSenderRabbitmq implements IMessageSender {
                 if (!this._connection.isConnected)
                     return resolve(false)
 
-                let msg = await this.createMessage(message)
+                const msg = await this.createMessage(message)
 
                 const exchange = this._connection.getExchange(exchangeName, type)
 

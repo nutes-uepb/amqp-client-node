@@ -7,8 +7,8 @@ import { IConnection } from '../../port/connection/connection.interface'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface'
 import { IConfigurationParameters } from '../../port/configuration.inteface'
-import StartConsumerResult = Queue.StartConsumerResult
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
+import StartConsumerResult = Queue.IStartConsumerResult
 
 @injectable()
 export class MessageReceiverRabbitmq implements IMessageReceiver {
@@ -19,8 +19,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
 
     constructor(@inject(Identifier.RABBITMQ_CONNECTION) private readonly _connection: IConnection,
                 @inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger,
-                @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter)
-    {
+                @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
         this._receiveFromYourself = false
     }
 
@@ -115,8 +114,6 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
             pattern = pattern.replace(/(\*)/g, '[a-zA-Z0-9_]*')
             pattern = pattern.replace(/(\.\#)/g, '.*')
             pattern = pattern.replace(/(\#)/g, '.*')
-
-            // pattern += '+$'
 
             const regex = new RegExp(pattern)
             return regex.test(expression)

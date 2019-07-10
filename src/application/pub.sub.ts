@@ -2,7 +2,6 @@ import { IOptions } from '../infrastructure/port/configuration.inteface'
 import { Topic } from './communication/topic'
 import { Identifier } from '../di/identifier'
 import { DependencyInject } from '../di/di'
-import { Container } from 'inversify'
 
 // import { Direct, direct } from './communication/direct'
 
@@ -21,8 +20,8 @@ import { Container } from 'inversify'
  *  LET'S GO BOY!!!
  */
 
-export class PubSub  {
-    private _topic: Topic
+export class PubSub {
+    private readonly _topic: Topic
     private readonly _logger
 
     constructor(

@@ -37,13 +37,13 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 if (!this._connection.isConnected)
                     return resolve(false)
 
-                const exchange = this._connection.getExchange(exchangeName, type);
+                const exchange = this._connection.getExchange(exchangeName, type)
 
                 let time
 
                 if (this._timeout > 0) {
-                    new Promise<any>((resolve) => {
-                        time = setTimeout(resolve, this._timeout)
+                    new Promise<any>((res) => {
+                        time = setTimeout(res, this._timeout)
                     }).then(() => {
                         reject(new Error('rpc timed out'))
                     })
@@ -52,7 +52,7 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 exchange.rpc(resource, resource.resourceName, (err, msg) => {
                     clearTimeout(time)
 
-                    let mensage = msg.getContent()
+                    const mensage = msg.getContent()
 
                     if (err) {
                         return reject(err)
@@ -66,7 +66,6 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 })
 
                 this._logger.info('Client registered in ' + exchangeName + ' exchange!')
-
 
             } catch (err) {
                 return reject(err)

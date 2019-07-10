@@ -48,7 +48,6 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
                 certAuth,
                 { retries: this._configuration.options.retries, interval: this._configuration.options.interval })
 
-
             return Promise.resolve(conn)
         } catch (err) {
             return Promise.reject(err)

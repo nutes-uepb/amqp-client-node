@@ -3,109 +3,130 @@ import { Queue } from './queue'
 import { Exchange } from './exchange'
 
 export class Binding {
-    initialized: Promise<Binding>;
+    private _initialized: Promise<Binding>
 
-    _source: Exchange;
-    _destination: Exchange | Queue;
-    _pattern: string;
-    _args: any;
+    private readonly _source: Exchange
+    private readonly _destination: Exchange | Queue
+    private readonly _pattern: string
+    private readonly _args: any
 
-    constructor(destination: Exchange | Queue, source: Exchange, pattern = "", args: any = {}) {
-        this._source = source;
-        this._destination = destination;
-        this._pattern = pattern;
-        this._args = args;
-        this._destination._connection._bindings[Binding.id(this._destination, this._source, this._pattern)] = this;
-        this._initialize();
+    constructor(destination: Exchange | Queue, source: Exchange, pattern = '', args: any = {}) {
+        this._source = source
+        this._destination = destination
+        this._pattern = pattern
+        this._args = args
+        this._destination.connection.bindings[Binding.id(this._destination, this._source, this._pattern)] = this
+        this.initialize()
     }
 
-    _initialize(): void {
-        this.initialized = new Promise<Binding>((resolve, reject) => {
+    public initialize(): void {
+        this._initialized = new Promise<Binding>((resolve, reject) => {
             if (this._destination instanceof Queue) {
-                var queue = <Queue>this._destination;
+                const queue = this._destination as Queue
                 queue.initialized.then(() => {
-                    queue._channel.bindQueue(this._destination._name, this._source._name, this._pattern, this._args, (err, ok) => {
-                        /* istanbul ignore if */
-                        if (err) {
-                            log.log("error",
-                                "Failed to create queue binding (" +
-                                this._source._name + "->" + this._destination._name + ")",
-                                { module: "amqp-ts" });
-                            delete this._destination._connection._bindings[Binding.id(this._destination, this._source, this._pattern)];
-                            reject(err);
-                        } else {
-                            resolve(this);
-                        }
-                    });
-                });
+                    queue.channel.bindQueue(this._destination.name,
+                        this._source.name, this._pattern, this._args, (err, ok) => {
+                            /* istanbul ignore if */
+                            if (err) {
+                                log.log('error',
+                                    'Failed to create queue binding (' +
+                                    this._source.name + '->' + this._destination.name + ')',
+                                    { module: 'amqp-ts' })
+                                delete this._destination.connection
+                                    .bindings[Binding.id(this._destination, this._source, this._pattern)]
+                                reject(err)
+                            } else {
+                                resolve(this)
+                            }
+                        })
+                })
             } else {
-                var exchange = <Exchange>this._destination;
+                const exchange = this._destination as Exchange
                 exchange.initialized.then(() => {
-                    exchange._channel.bindExchange(this._destination._name, this._source._name, this._pattern, this._args, (err, ok) => {
-                        /* istanbul ignore if */
-                        if (err) {
-                            log.log("error",
-                                "Failed to create exchange binding (" +
-                                this._source._name + "->" + this._destination._name + ")",
-                                { module: "amqp-ts" });
-                            delete this._destination._connection._bindings[Binding.id(this._destination, this._source, this._pattern)];
-                            reject(err);
-                        } else {
-                            resolve(this);
-                        }
-                    });
-                });
+                    exchange.channel.bindExchange(this._destination.name,
+                        this._source.name, this._pattern, this._args, (err, ok) => {
+                            /* istanbul ignore if */
+                            if (err) {
+                                log.log('error',
+                                    'Failed to create exchange binding (' +
+                                    this._source.name + '->' + this._destination.name + ')',
+                                    { module: 'amqp-ts' })
+                                delete this._destination.connection
+                                    .bindings[Binding.id(this._destination, this._source, this._pattern)]
+                                reject(err)
+                            } else {
+                                resolve(this)
+                            }
+                        })
+                })
             }
-        });
+        })
     }
 
-    delete(): Promise<void> {
+    public delete(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             if (this._destination instanceof Queue) {
-                var queue = <Queue>this._destination;
+                const queue = this._destination as Queue
                 queue.initialized.then(() => {
-                    queue._channel.unbindQueue(this._destination._name, this._source._name, this._pattern, this._args, (err, ok) => {
-                        /* istanbul ignore if */
-                        if (err) {
-                            reject(err);
-                        } else {
-                            delete this._destination._connection._bindings[Binding.id(this._destination, this._source, this._pattern)];
-                            resolve(null);
-                        }
-                    });
-                });
+                    queue.channel.unbindQueue(this._destination.name,
+                        this._source.name, this._pattern, this._args, (err, ok) => {
+                            /* istanbul ignore if */
+                            if (err) {
+                                reject(err)
+                            } else {
+                                delete this._destination.connection
+                                    .bindings[Binding.id(this._destination, this._source, this._pattern)]
+                                resolve(null)
+                            }
+                        })
+                })
             } else {
-                var exchange = <Exchange>this._destination;
+                const exchange = this._destination as Exchange
                 exchange.initialized.then(() => {
-                    exchange._channel.unbindExchange(this._destination._name, this._source._name, this._pattern, this._args, (err, ok) => {
-                        /* istanbul ignore if */
-                        if (err) {
-                            reject(err);
-                        } else {
-                            delete this._destination._connection._bindings[Binding.id(this._destination, this._source, this._pattern)];
-                            resolve(null);
-                        }
-                    });
-                });
-            };
-        });
+                    exchange.channel.unbindExchange(this._destination.name,
+                        this._source.name, this._pattern, this._args, (err, ok) => {
+                            /* istanbul ignore if */
+                            if (err) {
+                                reject(err)
+                            } else {
+                                delete this._destination.connection
+                                    .bindings[Binding.id(this._destination, this._source, this._pattern)]
+                                resolve(null)
+                            }
+                        })
+                })
+            }
+        })
     }
 
-    static id(destination: Exchange | Queue, source: Exchange, pattern?: string): string {
-        pattern = pattern || "";
-        return "[" + source._name + "]to" + (destination instanceof Queue ? "Queue" : "Exchange") + "[" + destination._name + "]" + pattern;
+    public static id(destination: Exchange | Queue, source: Exchange, pattern?: string): string {
+        pattern = pattern || ''
+        return '[' + source.name + ']to' + (destination instanceof Queue ? 'Queue' : 'Exchange')
+            + '[' + destination.name + ']' + pattern
     }
 
-    static removeBindingsContaining(connectionPoint: Exchange | Queue): Promise<any> {
-        var connection = connectionPoint._connection;
-        var promises: Promise<void>[] = [];
-        for (var bindingId in connection._bindings) {
+    public static removeBindingsContaining(connectionPoint: Exchange | Queue): Promise<any> {
+        const connection = connectionPoint.connection
+        const promises: Promise<void>[] = []
+        for (const bindingId in connection.bindings) {
 
-            var binding: Binding = connection._bindings[bindingId];
+            const binding: Binding = connection.bindings[bindingId]
             if (binding._source === connectionPoint || binding._destination === connectionPoint) {
-                promises.push(binding.delete());
+                promises.push(binding.delete())
             }
         }
-        return Promise.all(promises);
+        return Promise.all(promises)
+    }
+
+    get initialized(): Promise<Binding> {
+        return this._initialized
+    }
+
+    get source(): Exchange {
+        return this._source
+    }
+
+    get destination(): Exchange | Queue {
+        return this._destination
     }
 }
