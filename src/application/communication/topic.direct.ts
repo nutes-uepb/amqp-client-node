@@ -7,24 +7,35 @@ import { IMessageSender } from '../../infrastructure/port/pubsub/message.sender.
 import { IMessageReceiver } from '../../infrastructure/port/pubsub/message.receiver.interface'
 import { ICustomLogger } from '../../utils/custom.logger'
 import { IConfigurationParameters, IOptions } from '../../infrastructure/port/configuration.inteface'
-import { ITopic } from '../port/topic.inteface'
+import { ITopicDirect } from '../port/topic.direct.inteface'
 import { IClientRegister } from '../../infrastructure/port/rpc/client.register.interface'
 import { IServerRegister } from '../../infrastructure/port/rpc/server.register.interface'
 import { CustomEventEmitter } from '../../utils/custom.event.emitter'
+import { TypeCommunication } from '../port/type.communication'
+import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 
 @injectable()
-export class Topic implements ITopic {
+export class TopicDirect implements ITopicDirect {
+    private _typeConnection: TypeCommunication
 
-    private readonly typeConnection = 'topic'
+    private readonly _pubConnection: IMessageSender
+    private readonly _subConnection: IMessageReceiver
+    private readonly _clientConnection: IClientRegister
+    private readonly _serverConnection: IServerRegister
 
     constructor(
-        @inject(Identifier.RABBITMQ_MENSSAGE_SENDER) private readonly _pubConnection: IMessageSender,
-        @inject(Identifier.RABBITMQ_MENSSAGE_RECEIVER) private readonly _subConnection: IMessageReceiver,
-        @inject(Identifier.RABBITMQ_CLIENT_REGISTER) private readonly _clientConnection: IClientRegister,
-        @inject(Identifier.RABBITMQ_SERVER_REGISTER) private readonly _serverConnection: IServerRegister,
+        @inject(Identifier.EVENT_BUS) private readonly _connection: IEventBus,
         @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: CustomEventEmitter,
         @inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger
     ) {
+        this._pubConnection = this._connection.messageSender
+        this._subConnection = this._connection.messageReceiver
+        this._clientConnection = this._connection.clientRegister
+        this._serverConnection = this._connection.serverRegister
+    }
+
+    set typeConnection(value: TypeCommunication) {
+        this._typeConnection = value
     }
 
     get getPubConnection() {
@@ -57,10 +68,7 @@ export class Topic implements ITopic {
             password,
             options
         }
-        this._pubConnection.setConfigurations(config)
-        this._subConnection.setConfigurations(config)
-        this._clientConnection.setConfigurations(config)
-        this._serverConnection.setConfigurations(config)
+        this._connection.setConfigurations(config)
     }
 
     public receiveFromYourself(value: boolean): boolean {
@@ -71,7 +79,7 @@ export class Topic implements ITopic {
 
     public pub(exchangeName: string, routingKey: string, message: any): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
-            this._pubConnection.sendMessageTopicOrDirec(this.typeConnection, exchangeName, routingKey, message)
+            this._pubConnection.sendMessageTopicOrDirec(this._typeConnection, exchangeName, routingKey, message)
                 .then(result => {
                     return resolve(result)
                 })
@@ -91,7 +99,7 @@ export class Topic implements ITopic {
 
         return new Promise<boolean>(async (resolve, reject) => {
             this._subConnection
-                .receiveMessageTopicOrDirect(this.typeConnection, exchangeName, routingKey,
+                .receiveMessageTopicOrDirect(this._typeConnection, exchangeName, routingKey,
                     queueName, eventCallback).then(result => {
                 return resolve(result)
             }).catch(err => {
@@ -134,7 +142,7 @@ export class Topic implements ITopic {
         }
 
         this._clientConnection
-            .registerClientDirectOrTopic(this.typeConnection, exchangeName, clientRequest, callback)
+            .registerClientDirectOrTopic(this._typeConnection, exchangeName, clientRequest, callback)
             .then((result) => {
                 callback(undefined, result)
             }).catch(err => {
@@ -154,7 +162,7 @@ export class Topic implements ITopic {
             }
 
             this._clientConnection
-                .registerClientDirectOrTopic(this.typeConnection, exchangeName, clientRequest)
+                .registerClientDirectOrTopic(this._typeConnection, exchangeName, clientRequest)
                 .then(result => {
                     return resolve(result)
                 })
@@ -170,7 +178,7 @@ export class Topic implements ITopic {
         return new Promise<RegisterResource>(async (resolve, reject) => {
 
             this._serverConnection
-                .registerServerDirectOrTopic(this.typeConnection, exchangeName, routingKey, queueName)
+                .registerServerDirectOrTopic(this._typeConnection, exchangeName, routingKey, queueName)
                 .then(result => {
                     return resolve(new RegisterResource(this._serverConnection, queueName))
                 })

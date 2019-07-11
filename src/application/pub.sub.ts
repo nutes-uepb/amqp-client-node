@@ -1,7 +1,8 @@
 import { IOptions } from '../infrastructure/port/configuration.inteface'
-import { Topic } from './communication/topic'
+import { TopicDirect } from './communication/topic.direct'
 import { Identifier } from '../di/identifier'
 import { DependencyInject } from '../di/di'
+import { TypeCommunication } from './port/type.communication'
 
 // import { Direct, direct } from './communication/direct'
 
@@ -21,7 +22,8 @@ import { DependencyInject } from '../di/di'
  */
 
 export class PubSub {
-    private readonly _topic: Topic
+    private readonly _topic: TopicDirect
+    private readonly _direct: TopicDirect
     private readonly _logger
 
     constructor(
@@ -34,18 +36,24 @@ export class PubSub {
         const container = new DependencyInject().getContainer()
 
         this._logger = container.get(Identifier.CUSTOM_LOGGER)
-        this._topic = container.get(Identifier.TOPIC)
+
+        this._topic = container.get(Identifier.TOPIC_DIRECT)
+        this._topic.typeConnection = TypeCommunication.TOPIC
         this._topic.setConfigurations(this.vhost, this.host, this.port, this.username, this.password, this.options)
+
+        this._direct = container.get(Identifier.TOPIC_DIRECT)
+        this._direct.typeConnection = TypeCommunication.DIRECT
+        this._direct.setConfigurations(this.vhost, this.host, this.port, this.username, this.password, this.options)
 
     }
 
-    get topic(): Topic {
+    get topic(): TopicDirect {
         return this._topic
     }
 
-// public direct(): Direct {
-//     return this._direct
-//     }
+    get direct(): TopicDirect {
+        return this._direct
+    }
 
     public logger(enabled: boolean, level?: string): void {
         this._logger.changeLoggerConfiguration(enabled, level)

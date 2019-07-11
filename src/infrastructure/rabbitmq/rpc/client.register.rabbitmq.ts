@@ -18,11 +18,6 @@ export class ClientRegisterRabbitmq implements IClientRegister {
 
     }
 
-    public setConfigurations(config: IConfigurationParameters): void {
-        this._connection.setConfigurations(config)
-        this._timeout = this._connection.configurations.options.rcpTimeout
-    }
-
     public registerClientDirectOrTopic(type: string,
                                        exchangeName: string,
                                        resource: IClientRequest,

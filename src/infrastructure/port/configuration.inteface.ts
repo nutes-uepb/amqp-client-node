@@ -1,9 +1,5 @@
 export interface IConnectionBase {
-    setConfigurations(config: IConfigurationParameters): void
-
     closeConnection(): Promise<boolean>
-
-    // on(event: string | symbol, listener: (...args: any[]) => void): void
 }
 
 export interface IConfigurationParameters {

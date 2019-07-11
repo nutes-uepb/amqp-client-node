@@ -1,4 +1,4 @@
-import { Connection, log } from '../connection/connection'
+import { ConnectionFactoryRabbitMQ, log } from '../connection/connectionFactoryRabbitMQ'
 import { Binding } from './binding'
 import { Message } from './message'
 import { Exchange } from './exchange'
@@ -9,7 +9,7 @@ const DIRECT_REPLY_TO_QUEUE = 'amq.rabbitmq.reply-to'
 export class Queue {
     public initialized: Promise<Queue.IInitializeResult>
 
-    private _connection: Connection
+    private _connection: ConnectionFactoryRabbitMQ
     private _channel: AmqpLib.Channel
     private _name: string
     private _options: Queue.IDeclarationOptions
@@ -24,7 +24,7 @@ export class Queue {
     private _deleting: Promise<Queue.IDeleteResult>
     private _closing: Promise<void>
 
-    constructor(connection: Connection, name: string, options: Queue.IDeclarationOptions = {}) {
+    constructor(connection: ConnectionFactoryRabbitMQ, name: string, options: Queue.IDeclarationOptions = {}) {
         this._connection = connection
         this._name = name
         this._options = options
@@ -404,7 +404,7 @@ export class Queue {
         return this._connection.bindings[Binding.id(this, source, pattern)].delete()
     }
 
-    get connection(): Connection {
+    get connection(): ConnectionFactoryRabbitMQ {
         return this._connection
     }
 

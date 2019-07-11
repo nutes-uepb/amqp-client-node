@@ -23,10 +23,6 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
         this._receiveFromYourself = false
     }
 
-    public setConfigurations(config: IConfigurationParameters): void {
-        this._connection.setConfigurations(config)
-    }
-
     set receiveFromYourself(value: boolean) {
         this._receiveFromYourself = value
     }

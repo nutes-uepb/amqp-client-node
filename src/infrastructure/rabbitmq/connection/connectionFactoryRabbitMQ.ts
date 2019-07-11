@@ -14,7 +14,10 @@ import { Exchange } from '../bus/exchange'
 
 import * as AmqpLib from 'amqplib/callback_api'
 import { createLogger, format, transports } from 'winston'
-import { EventEmitter } from 'events'
+import { inject, injectable } from 'inversify'
+import { Identifier } from '../../../di/identifier'
+import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
+import { IConnectionFactory, IReconnectStrategy, ITopology } from '../../port/connection/connection.factory.interface'
 
 // create a custom winston logger for amqp-ts
 const amqp_log = createLogger({
@@ -29,18 +32,17 @@ const amqp_log = createLogger({
 })
 export const log = amqp_log
 
-// name for the RabbitMQ direct reply-to queue
-
 // ----------------------------------------------------------------------------------------------------
-// Connection class
+// ConnectionFactoryRabbitMQ class
 // ----------------------------------------------------------------------------------------------------
-export class Connection extends EventEmitter {
+@injectable()
+export class ConnectionFactoryRabbitMQ implements IConnectionFactory{
     public initialized: Promise<void>
     public isConnected: boolean = false
 
     private url: string
     private socketOptions: any
-    private reconnectStrategy: Connection.IReconnectStrategy
+    private reconnectStrategy: IReconnectStrategy
     private connectedBefore = false
 
     private _connection: AmqpLib.Connection
@@ -48,15 +50,28 @@ export class Connection extends EventEmitter {
     private _rebuilding: boolean = false
     private _isClosing: boolean = false
 
-    private readonly _exchanges: { [id: string]: Exchange }
-    private readonly _queues: { [id: string]: Queue }
-    private readonly _bindings: { [id: string]: Binding }
+    private _exchanges: { [id: string]: Exchange }
+    private _queues: { [id: string]: Queue }
+    private _bindings: { [id: string]: Binding }
 
-    constructor(url = 'amqp://localhost',
-                socketOptions: any = {},
-                reconnectStrategy: Connection.IReconnectStrategy = { retries: 0, interval: 1500 }) {
-        super()
+    constructor(@inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
+    }
 
+    /**
+     * Create instance of {@link Connection} Class belonging
+     * to the amqp-ts library to connect to RabbitMQ.
+     *
+     * @return Promise<Connection>
+     * @param url
+     * @param socketOptions
+     * @param reconnectStrategy
+     */
+    public async createConnection(url = 'amqp://localhost',
+                                  socketOptions: any = {},
+                                  reconnectStrategy: IReconnectStrategy = {
+                                      retries: 0,
+                                      interval: 1500
+                                  }): Promise<ConnectionFactoryRabbitMQ> {
         this.url = url
         this.socketOptions = socketOptions
         this.reconnectStrategy = reconnectStrategy
@@ -65,11 +80,13 @@ export class Connection extends EventEmitter {
         this._bindings = {}
 
         this.rebuildConnection()
+
+        return Promise.resolve(this)
     }
 
     private rebuildConnection(): Promise<void> {
         if (this._rebuilding) { // only one rebuild process can be active at any time
-            log.log('debug', 'Connection rebuild already in progress, joining active rebuild attempt.', { module: 'amqp-ts' })
+            log.log('debug', 'ConnectionFactoryRabbitMQ rebuild already in progress, joining active rebuild attempt.', { module: 'amqp-ts' })
             return this.initialized
         }
         this._retry = -1
@@ -86,11 +103,11 @@ export class Connection extends EventEmitter {
                 } else {
                     this._rebuilding = false
                     if (this.connectedBefore) {
-                        log.log('warn', 'Connection re-established', { module: 'amqp-ts' })
-                        this.emit('re_established_connection')
+                        log.log('warn', 'ConnectionFactoryRabbitMQ re-established', { module: 'amqp-ts' })
+                        this._emitter.emit('re_established_connection')
                     } else {
-                        log.log('info', 'Connection established.', { module: 'amqp-ts' })
-                        this.emit('open_connection')
+                        log.log('info', 'ConnectionFactoryRabbitMQ established.', { module: 'amqp-ts' })
+                        this._emitter.emit('open_connection')
                         this.connectedBefore = true
                     }
                     resolve(null)
@@ -100,7 +117,7 @@ export class Connection extends EventEmitter {
         /* istanbul ignore next */
         this.initialized.catch((err) => {
             log.log('warn', 'Error creating connection!', { module: 'amqp-ts' })
-            this.emit('error_connection', err)
+            this._emitter.emit('error_connection', err)
 
             // throw (err)
         })
@@ -108,7 +125,7 @@ export class Connection extends EventEmitter {
         return this.initialized
     }
 
-    private tryToConnect(thisConnection: Connection, retry: number, callback: (err: any) => void): void {
+    private tryToConnect(thisConnection: ConnectionFactoryRabbitMQ, retry: number, callback: (err: any) => void): void {
         AmqpLib.connect(thisConnection.url, thisConnection.socketOptions, (err, connection) => {
             /* istanbul ignore if */
             if (err) {
@@ -119,13 +136,13 @@ export class Connection extends EventEmitter {
                     return
                 }
 
-                log.log('warn', 'Connection failed.', { module: 'amqp-ts' })
+                log.log('warn', 'ConnectionFactoryRabbitMQ failed.', { module: 'amqp-ts' })
 
                 this._retry = retry
                 if (thisConnection.reconnectStrategy.retries === 0 || thisConnection.reconnectStrategy.retries > retry) {
-                    log.log('warn', 'Connection retry ' + (retry + 1) + ' in ' + thisConnection.reconnectStrategy.interval + 'ms',
+                    log.log('warn', 'ConnectionFactoryRabbitMQ retry ' + (retry + 1) + ' in ' + thisConnection.reconnectStrategy.interval + 'ms',
                         { module: 'amqp-ts' })
-                    thisConnection.emit('trying_connect')
+                    thisConnection._emitter.emit('trying_connect')
 
                     setTimeout(thisConnection.tryToConnect,
                         thisConnection.reconnectStrategy.interval,
@@ -134,13 +151,13 @@ export class Connection extends EventEmitter {
                         callback
                     )
                 } else { // no reconnect strategy, or retries exhausted, so return the error
-                    log.log('warn', 'Connection failed, exiting: No connection ' +
+                    log.log('warn', 'ConnectionFactoryRabbitMQ failed, exiting: No connection ' +
                         'retries left (retry ' + retry + ').', { module: 'amqp-ts' })
                     callback(err)
                 }
             } else {
                 const restart = (err: Error) => {
-                    log.log('debug', 'Connection error occurred.', { module: 'amqp-ts' })
+                    log.log('debug', 'ConnectionFactoryRabbitMQ error occurred.', { module: 'amqp-ts' })
                     connection.removeListener('error', restart)
 
                     // connection.removeListener("end", restart) // not sure this is needed
@@ -149,8 +166,8 @@ export class Connection extends EventEmitter {
                 const onClose = () => {
                     connection.removeListener('close', onClose)
                     if (!this._isClosing) {
-                        thisConnection.emit('lost_connection')
-                        restart(new Error('Connection closed by remote host'))
+                        thisConnection._emitter.emit('lost_connection')
+                        restart(new Error('ConnectionFactoryRabbitMQ closed by remote host'))
                     }
 
                 }
@@ -166,7 +183,7 @@ export class Connection extends EventEmitter {
     }
 
     _rebuildAll(err: Error): Promise<void> {
-        log.log('warn', 'Connection error: ' + err.message, { module: 'amqp-ts' })
+        log.log('warn', 'ConnectionFactoryRabbitMQ error: ' + err.message, { module: 'amqp-ts' })
 
         log.log('debug', 'Rebuilding connection NOW.', { module: 'amqp-ts' })
         this.rebuildConnection()
@@ -216,7 +233,7 @@ export class Connection extends EventEmitter {
                         reject(err)
                     } else {
                         this.isConnected = false
-                        this.emit('close_connection')
+                        this._emitter.emit('close_connection')
                         resolve(null)
                     }
                 })
@@ -288,7 +305,7 @@ export class Connection extends EventEmitter {
         return queue
     }
 
-    public declareTopology(topology: Connection.ITopology): Promise<any> {
+    public declareTopology(topology: ITopology): Promise<any> {
         const promises: Promise<any>[] = []
         let i: number
         let len: number
@@ -335,20 +352,5 @@ export class Connection extends EventEmitter {
 
     get bindings(): { [p: string]: Binding } {
         return this._bindings
-    }
-}
-
-export namespace Connection {
-    'use strict'
-
-    export interface IReconnectStrategy {
-        retries: number // number of retries, 0 is forever
-        interval: number // retry interval in ms
-    }
-
-    export interface ITopology {
-        exchanges: { name: string, type?: string, options?: any }[]
-        queues: { name: string, options?: any }[]
-        bindings: { source: string, queue?: string, exchange?: string, pattern?: string, args?: any }[]
     }
 }

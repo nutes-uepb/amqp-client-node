@@ -1,4 +1,4 @@
-import { log } from '../connection/connection'
+import { log } from '../connection/connectionFactoryRabbitMQ'
 import { Queue } from './queue'
 import { Exchange } from './exchange'
 

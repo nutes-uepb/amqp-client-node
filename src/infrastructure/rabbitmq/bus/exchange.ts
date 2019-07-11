@@ -1,5 +1,5 @@
 import * as os from 'os'
-import { Connection, log } from '../connection/connection'
+import { ConnectionFactoryRabbitMQ, log } from '../connection/connectionFactoryRabbitMQ'
 import { Binding } from './binding'
 import { Queue } from './queue'
 import * as AmqpLib from 'amqplib/callback_api'
@@ -17,7 +17,7 @@ export class Exchange {
     private _consumer_handlers: Array<[string, any]> = new Array<[string, any]>()
     private _isConsumerInitializedRcp: boolean = false
 
-    private _connection: Connection
+    private _connection: ConnectionFactoryRabbitMQ
     private _channel: AmqpLib.Channel
     private _name: string
     private _type: string
@@ -26,7 +26,7 @@ export class Exchange {
     private _deleting: Promise<void>
     private _closing: Promise<void>
 
-    constructor(connection: Connection, name: string, type?: string, options: Exchange.IDeclarationOptions = {}) {
+    constructor(connection: ConnectionFactoryRabbitMQ, name: string, type?: string, options: Exchange.IDeclarationOptions = {}) {
         this._connection = connection
         this._name = name
         this._type = type
@@ -122,26 +122,13 @@ export class Exchange {
                             }
                         }
 
-                    }, { noAck: true }, (err, ok) => {
-                        /* istanbul ignore if */
-                        if (err) {
-                            reject(new Error('amqp-ts: Queue.rpc error: ' + err.message))
-                        } else {
-                            // send the rpc request
-                            this._consumer_handlers.push([uuid, callback])
-                            // consumerTag = ok.consumerTag
-                            const message = new Message(requestParameters,
-                                { correlationId: uuid, replyTo: DIRECT_REPLY_TO_QUEUE })
-                            message.sendTo(this, routingKey)
-                        }
-                    })
-                } else {
-                    this._consumer_handlers.push([uuid, callback])
-                    const message = new Message(requestParameters,
-                        { correlationId: uuid, replyTo: DIRECT_REPLY_TO_QUEUE })
-                    message.sendTo(this, routingKey)
+                    }, { noAck: true })
                 }
-
+                console.log('Callback registrado')
+                this._consumer_handlers.push([uuid, callback])
+                const message = new Message(requestParameters,
+                    { correlationId: uuid, replyTo: DIRECT_REPLY_TO_QUEUE })
+                message.sendTo(this, routingKey)
             }
 
             // execute sync when possible
@@ -280,7 +267,7 @@ export class Exchange {
         return this._initialized
     }
 
-    get connection(): Connection {
+    get connection(): ConnectionFactoryRabbitMQ {
         return this._connection
     }
 

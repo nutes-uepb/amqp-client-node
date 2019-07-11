@@ -6,6 +6,7 @@ export abstract class Identifier {
     public static readonly RABBITMQ_MENSSAGE_RECEIVER: any = Symbol.for('MessageReceiver')
     public static readonly RABBITMQ_CLIENT_REGISTER: any = Symbol.for('ClientRegister')
     public static readonly RABBITMQ_SERVER_REGISTER: any = Symbol.for('ServerRegister')
-    public static readonly TOPIC: any = Symbol.for('Topic')
+    public static readonly TOPIC_DIRECT: any = Symbol.for('Topic')
     public static readonly CUSTOM_EVENT_EMITTER: any = Symbol.for('CustomEventEmitter')
+    public static readonly EVENT_BUS: any = Symbol.for('EventBus')
 }

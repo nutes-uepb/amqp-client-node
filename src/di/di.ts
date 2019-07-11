@@ -4,10 +4,9 @@ import { Identifier } from './identifier'
 import { IConnection } from '../infrastructure/port/connection/connection.interface'
 import { ConnectionRabbitMQ } from '../infrastructure/rabbitmq/connection/connection.rabbitmq'
 import { IConnectionFactory } from '../infrastructure/port/connection/connection.factory.interface'
-import { ConnectionFactoryRabbitMQ } from '../infrastructure/rabbitmq/connection/connection.factory.rabbitmq'
 import { CustomLogger, ICustomLogger } from '../utils/custom.logger'
-import { Topic } from '../application/communication/topic'
-import { ITopic } from '../application/port/topic.inteface'
+import { TopicDirect } from '../application/communication/topic.direct'
+import { ITopicDirect } from '../application/port/topic.direct.inteface'
 import { IMessageReceiver } from '../infrastructure/port/pubsub/message.receiver.interface'
 import { MessageReceiverRabbitmq } from '../infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq'
 import { IMessageSender } from '../infrastructure/port/pubsub/message.sender.interface'
@@ -17,6 +16,9 @@ import { ClientRegisterRabbitmq } from '../infrastructure/rabbitmq/rpc/client.re
 import { ServerRegisterRabbitmq } from '../infrastructure/rabbitmq/rpc/server.register.rabbitmq'
 import { IServerRegister } from '../infrastructure/port/rpc/server.register.interface'
 import { CustomEventEmitter, ICustomEventEmitter } from '../utils/custom.event.emitter'
+import { EventBus } from '../infrastructure/rabbitmq/event.bus'
+import { IEventBus } from '../infrastructure/port/event.bus.interface'
+import { ConnectionFactoryRabbitMQ } from '../infrastructure/rabbitmq/connection/connectionFactoryRabbitMQ'
 
 export class DependencyInject {
     private readonly container: Container
@@ -48,12 +50,11 @@ export class DependencyInject {
      */
     private initDependencies(): void {
 
-        this.container.bind<IConnectionFactory>(Identifier.RABBITMQ_CONNECTION_FACT)
-            .to(ConnectionFactoryRabbitMQ)
-        this.container.bind<IConnection>(Identifier.RABBITMQ_CONNECTION)
-            .to(ConnectionRabbitMQ).inSingletonScope()
-        this.container.bind<ICustomLogger>(Identifier.CUSTOM_LOGGER)
-            .to(CustomLogger).inSingletonScope()
+        this.container.bind<ITopicDirect>(Identifier.TOPIC_DIRECT)
+            .to(TopicDirect)
+
+        this.container.bind<IEventBus>(Identifier.EVENT_BUS)
+            .to(EventBus)
         this.container.bind<IMessageSender>(Identifier.RABBITMQ_MENSSAGE_SENDER)
             .to(MessageSenderRabbitmq)
         this.container.bind<IMessageReceiver>(Identifier.RABBITMQ_MENSSAGE_RECEIVER)
@@ -62,9 +63,14 @@ export class DependencyInject {
             .to(ClientRegisterRabbitmq)
         this.container.bind<IServerRegister>(Identifier.RABBITMQ_SERVER_REGISTER)
             .to(ServerRegisterRabbitmq)
-        this.container.bind<ITopic>(Identifier.TOPIC)
-            .to(Topic)
 
+        this.container.bind<IConnectionFactory>(Identifier.RABBITMQ_CONNECTION_FACT)
+            .to(ConnectionFactoryRabbitMQ)
+        this.container.bind<IConnection>(Identifier.RABBITMQ_CONNECTION)
+            .to(ConnectionRabbitMQ).inSingletonScope()
+
+        this.container.bind<ICustomLogger>(Identifier.CUSTOM_LOGGER)
+            .to(CustomLogger).inSingletonScope()
         this.container.bind<ICustomEventEmitter>(Identifier.CUSTOM_EVENT_EMITTER)
             .to(CustomEventEmitter).inSingletonScope()
 

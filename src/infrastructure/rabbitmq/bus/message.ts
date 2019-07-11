@@ -1,4 +1,4 @@
-import { log } from '../connection/connection'
+import { log } from '../connection/connectionFactoryRabbitMQ'
 import { Exchange } from './exchange'
 import { Queue } from './queue'
 import * as AmqpLib from 'amqplib/callback_api'

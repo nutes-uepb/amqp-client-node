@@ -16,10 +16,6 @@ export class MessageSenderRabbitmq implements IMessageSender {
                 @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
     }
 
-    public setConfigurations(config: IConfigurationParameters): void {
-        this._connection.setConfigurations(config)
-    }
-
     public sendMessageTopicOrDirec(type: string,
                                    exchangeName: string,
                                    topicKey: string,

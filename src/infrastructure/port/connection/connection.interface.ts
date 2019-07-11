@@ -1,10 +1,11 @@
 import { IConfigurationParameters, IConnectionBase } from '../configuration.inteface'
-import { Connection } from '../../rabbitmq/connection/connection'
+import { ConnectionFactoryRabbitMQ } from '../../rabbitmq/connection/connectionFactoryRabbitMQ'
 import { Exchange } from '../../rabbitmq/bus/exchange'
 import { Queue } from '../../rabbitmq/bus/queue'
-// import { Connection, Exchange, Queue } from '../../rabbitmq/amqp-ts'
 
 export interface IConnection extends IConnectionBase {
+    setConfigurations: IConfigurationParameters
+
     idConnection: string
 
     isConnected: boolean
@@ -15,7 +16,7 @@ export interface IConnection extends IConnectionBase {
 
     conn?: any
 
-    tryConnect(): Promise<Connection>
+    tryConnect(): Promise<ConnectionFactoryRabbitMQ>
 
     getExchange(exchangeName: string, type: string): Exchange
 

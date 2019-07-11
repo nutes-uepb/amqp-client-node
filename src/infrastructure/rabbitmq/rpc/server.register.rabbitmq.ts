@@ -19,10 +19,6 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                 @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
     }
 
-    public setConfigurations(config: IConfigurationParameters): void {
-        this._connection.setConfigurations(config)
-    }
-
     public registerResource(queueName: string,
                             resource: IResourceHandler): Promise<boolean> {
 

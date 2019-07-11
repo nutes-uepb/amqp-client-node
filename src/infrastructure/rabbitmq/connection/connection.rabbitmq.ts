@@ -1,4 +1,4 @@
-// import { Connection,Queue,Exchange } from '../amqp-ts'
+// import { ConnectionFactoryRabbitMQ,Queue,Exchange } from '../amqp-ts'
 import { IConnection } from '../../port/connection/connection.interface'
 import { IConfigurationParameters } from '../../port/configuration.inteface'
 import { inject, injectable } from 'inversify'
@@ -6,10 +6,11 @@ import { Identifier } from '../../../di/identifier'
 import { IConnectionFactory } from '../../port/connection/connection.factory.interface'
 import { ICustomLogger } from '../../../utils/custom.logger'
 
-import { Connection } from './connection'
+import { ConnectionFactoryRabbitMQ } from './connectionFactoryRabbitMQ'
 import { Queue } from '../bus/queue'
 import { Exchange } from '../bus/exchange'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
+import * as fs from 'fs'
 
 /**
  * Implementation of the interface that provides conn with RabbitMQ.
@@ -22,8 +23,8 @@ import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 export class ConnectionRabbitMQ implements IConnection {
 
     private _idConnection: string
-    private _connection?: Connection
-    private _configurations: IConfigurationParameters
+    private _connection?: ConnectionFactoryRabbitMQ
+    private _configuration: IConfigurationParameters
 
     private _startingConnection
 
@@ -34,11 +35,11 @@ export class ConnectionRabbitMQ implements IConnection {
     }
 
     get configurations(): IConfigurationParameters {
-        return this._configurations
+        return this._configuration
     }
 
-    public setConfigurations(config: IConfigurationParameters): void {
-        this._configurations = config
+    set setConfigurations(config: IConfigurationParameters) {
+        this._configuration = config
     }
 
     get startingConnection(): boolean {
@@ -58,7 +59,7 @@ export class ConnectionRabbitMQ implements IConnection {
         return this._connection.isConnected
     }
 
-    get conn(): Connection | undefined {
+    get conn(): ConnectionFactoryRabbitMQ | undefined {
         return this._connection
     }
 
@@ -70,46 +71,33 @@ export class ConnectionRabbitMQ implements IConnection {
      *
      * @return Promise<void>
      */
-    public tryConnect(): Promise<Connection> {
+    public tryConnect(): Promise<ConnectionFactoryRabbitMQ> {
 
         this._startingConnection = true
-        return new Promise<Connection>((resolve, reject) => {
+        return new Promise<ConnectionFactoryRabbitMQ>((resolve, reject) => {
             if (this.isConnected) return resolve(this._connection)
 
+            let certAuth = {}
+
+            if (this._configuration.options.ssl.enabled) {
+                if (!this._configuration.options.ssl.ca)
+                    return Promise.reject(new Error('Paramater ca not found'))
+                certAuth = { ca: fs.readFileSync(this._configuration.options.ssl.ca) }
+            }
+
             this._connectionFactory
-                .createConnection(this._configurations)
-                .then(async (connection: Connection) => {
+                .createConnection('protocol://username:password@host:port/vhost'
+                        .replace('protocol', this._configuration.options.ssl.enabled ? 'amqps' : 'amqp')
+                        .replace('host', this._configuration.host)
+                        .replace('port', (this._configuration.port).toString())
+                        .replace('vhost', this._configuration.vhost)
+                        .replace('username', this._configuration.username)
+                        .replace('password', this._configuration.password)
+                    ,
+                    certAuth,
+                    { retries: this._configuration.options.retries, interval: this._configuration.options.interval })
+                .then(async (connection: ConnectionFactoryRabbitMQ) => {
                     this._connection = connection
-
-                    this._connection.on('error_connection', (err: Error) => {
-                        this._emitter.emit('erro', err)
-                        this._logger.error('Error during connection ')
-                    })
-
-                    this._connection.on('close_connection', () => {
-                        this._emitter.emit('disconnected')
-                        this._logger.info('Close connection with success! ')
-                    })
-
-                    this._connection.on('open_connection', () => {
-                        this._emitter.emit('connected')
-                        this._logger.info('Connection established.')
-                    })
-
-                    this._connection.on('lost_connection', () => {
-                        this._emitter.emit('lost_connection')
-                        this._logger.warn('Lost connection ')
-                    })
-
-                    this._connection.on('trying_connect', () => {
-                        this._emitter.emit('trying_connection')
-                        this._logger.warn('Trying re-established connection')
-                    })
-
-                    this._connection.on('re_established_connection', () => {
-                        this._emitter.emit('reconnected')
-                        this._logger.warn('Re-established connection')
-                    })
 
                     await this._connection.initialized
                     this._startingConnection = false

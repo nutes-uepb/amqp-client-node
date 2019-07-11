@@ -2,7 +2,7 @@ import { IOptions } from '../../infrastructure/port/configuration.inteface'
 import { ICommunication } from './communication.interface'
 import { RegisterResource } from '../communication/register.resource'
 
-export interface ITopic extends ICommunication {
+export interface ITopicDirect extends ICommunication {
     setConfigurations(vhost: string,
                       host: string,
                       port: number,
