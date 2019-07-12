@@ -36,7 +36,6 @@ export class MessageSenderRabbitmq implements IMessageSender {
                 if (await exchange.initialized) {
                     exchange.send(msg, topicKey)
                     this._logger.info('Bus event message sent with success!')
-                    await exchange.close()
                 }
 
                 return resolve(true)

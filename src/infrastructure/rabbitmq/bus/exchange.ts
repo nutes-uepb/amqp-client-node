@@ -1,10 +1,12 @@
 import * as os from 'os'
-import { ConnectionFactoryRabbitMQ, log } from '../connection/connectionFactoryRabbitMQ'
+import { ConnectionFactoryRabbitMQ, log } from '../connection/connection.factory.rabbitmq'
 import { Binding } from './binding'
 import { Queue } from './queue'
 import * as AmqpLib from 'amqplib/callback_api'
 import { Message } from './message'
 import * as path from 'path'
+import { IExchangeDeclarationOptions, IExchangeInitializeResult } from '../../port/bus/exchange.options.interface'
+import { IActivateConsumerOptions, IStartConsumerOptions } from '../../port/bus/queue.options.interface'
 
 const ApplicationName = process.env.AMQPTS_APPLICATIONNAME ||
     (path.parse ? path.parse(process.argv[1]).name : path.basename(process.argv[1]))
@@ -12,7 +14,7 @@ const ApplicationName = process.env.AMQPTS_APPLICATIONNAME ||
 const DIRECT_REPLY_TO_QUEUE = 'amq.rabbitmq.reply-to'
 
 export class Exchange {
-    private _initialized: Promise<Exchange.IInitializeResult>
+    private _initialized: Promise<IExchangeInitializeResult>
 
     private _consumer_handlers: Array<[string, any]> = new Array<[string, any]>()
     private _isConsumerInitializedRcp: boolean = false
@@ -21,12 +23,12 @@ export class Exchange {
     private _channel: AmqpLib.Channel
     private _name: string
     private _type: string
-    private _options: Exchange.IDeclarationOptions
+    private _options: IExchangeDeclarationOptions
 
     private _deleting: Promise<void>
     private _closing: Promise<void>
 
-    constructor(connection: ConnectionFactoryRabbitMQ, name: string, type?: string, options: Exchange.IDeclarationOptions = {}) {
+    constructor(connection: ConnectionFactoryRabbitMQ, name: string, type?: string, options: IExchangeDeclarationOptions = {}) {
         this._connection = connection
         this._name = name
         this._type = type
@@ -35,7 +37,7 @@ export class Exchange {
     }
 
     public _initialize() {
-        this._initialized = new Promise<Exchange.IInitializeResult>((resolve, reject) => {
+        this._initialized = new Promise<IExchangeInitializeResult>((resolve, reject) => {
             this._connection.initialized.then(() => {
                 this._connection.connection.createChannel((err, channel) => {
                     /* istanbul ignore if */
@@ -43,14 +45,14 @@ export class Exchange {
                         reject(err)
                     } else {
                         this._channel = channel
-                        const callback = (err, ok) => {
+                        const callback = (e, ok) => {
                             /* istanbul ignore if */
-                            if (err) {
+                            if (e) {
                                 log.log('error', 'Failed to create exchange \'' + this._name + '\'.', { module: 'amqp-ts' })
                                 delete this._connection.exchanges[this._name]
-                                reject(err)
+                                reject(e)
                             } else {
-                                resolve(ok as Exchange.IInitializeResult)
+                                resolve(ok as IExchangeInitializeResult)
                             }
                         }
                         if (this._options.noCreate) {
@@ -97,8 +99,7 @@ export class Exchange {
         message.sendTo(this, routingKey)
     }
 
-    public rpc(requestParameters: any, routingKey = '', callback?: (err, message: Message) => void): Promise<Message> {
-        return new Promise<Message>((resolve, reject) => {
+    public rpc(requestParameters: any, routingKey = '', callback: (err, message: Message) => void): void {
 
             function generateUuid(): string {
                 return Math.random().toString() +
@@ -117,27 +118,20 @@ export class Exchange {
 
                         for (const handler of this._consumer_handlers) {
                             if (handler[0] === resultMsg.properties.correlationId) {
-                                const func: Function = handler[1]
+                                const func: (err, parameters) => void = handler[1]
                                 func.apply('', [undefined, result])
                             }
                         }
 
                     }, { noAck: true })
                 }
-                console.log('Callback registrado')
                 this._consumer_handlers.push([uuid, callback])
                 const message = new Message(requestParameters,
                     { correlationId: uuid, replyTo: DIRECT_REPLY_TO_QUEUE })
                 message.sendTo(this, routingKey)
             }
 
-            // execute sync when possible
-            // if (this.initialized.isFulfilled()) {
-            //   processRpc()
-            // } else {
             this._initialized.then(processRpc)
-            // }
-        })
     }
 
     public delete(): Promise<void> {
@@ -151,12 +145,12 @@ export class Exchange {
                         if (err) {
                             reject(err)
                         } else {
-                            this._channel.close((err) => {
+                            this._channel.close((e) => {
                                 delete this._initialized // invalidate exchange
                                 delete this._connection.exchanges[this._name] // remove the exchange from our administration
                                 /* istanbul ignore if */
-                                if (err) {
-                                    reject(err)
+                                if (e) {
+                                    reject(e)
                                 } else {
                                     delete this._channel
                                     delete this._connection
@@ -216,7 +210,7 @@ export class Exchange {
      * deprecated, use 'exchange.activateConsumer(...)' instead
      */
     public startConsumer(onMessage: (msg: any, channel?: AmqpLib.Channel) => any,
-                         options?: Queue.IStartConsumerOptions): Promise<any> {
+                         options?: IStartConsumerOptions): Promise<any> {
         const queueName = this.consumerQueueName()
         if (this._connection.queues[queueName]) {
             return new Promise<void>((_, reject) => {
@@ -235,7 +229,7 @@ export class Exchange {
         }
     }
 
-    public activateConsumer(onMessage: (msg: Message) => any, options?: Queue.IActivateConsumerOptions): Promise<any> {
+    public activateConsumer(onMessage: (msg: Message) => any, options?: IActivateConsumerOptions): Promise<any> {
         const queueName = this.consumerQueueName()
         if (this._connection.queues[queueName]) {
             return new Promise<void>((_, reject) => {
@@ -263,7 +257,7 @@ export class Exchange {
         }
     }
 
-    get initialized(): Promise<Exchange.IInitializeResult> {
+    get initialized(): Promise<IExchangeInitializeResult> {
         return this._initialized
     }
 
@@ -281,22 +275,5 @@ export class Exchange {
 
     get type() {
         return this._type
-    }
-}
-
-export namespace Exchange {
-    'use strict'
-
-    export interface IDeclarationOptions {
-        durable?: boolean
-        internal?: boolean
-        autoDelete?: boolean
-        alternateExchange?: string
-        arguments?: any
-        noCreate?: boolean
-    }
-
-    export interface IInitializeResult {
-        exchange: string
     }
 }

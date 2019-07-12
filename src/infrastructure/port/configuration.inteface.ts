@@ -1,3 +1,6 @@
+import { IQueueDeclarationOptions } from './bus/queue.options.interface'
+import { IExchangeDeclarationOptions } from './bus/exchange.options.interface'
+
 export interface IConnectionBase {
     closeConnection(): Promise<boolean>
 }
@@ -19,6 +22,8 @@ export interface IOptions {
         ca: string
     }
     rcpTimeout: number
+    queue?: IQueueDeclarationOptions
+    exchange?: IExchangeDeclarationOptions
 }
 
 export const defaultOptions: IOptions = {

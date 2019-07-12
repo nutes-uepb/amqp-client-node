@@ -8,7 +8,7 @@ import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface'
 import { IConfigurationParameters } from '../../port/configuration.inteface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
-import StartConsumerResult = Queue.IStartConsumerResult
+import { IStartConsumerResult } from '../../port/bus/queue.options.interface'
 
 @injectable()
 export class MessageReceiverRabbitmq implements IMessageReceiver {
@@ -95,7 +95,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                     }
                 }
 
-            }, { noAck: false }).then((result: StartConsumerResult) => {
+            }, { noAck: false }).then((result: IStartConsumerResult) => {
                 this._logger.info('Queue consumer ' + queue.name + ' successfully created! ')
             })
                 .catch(err => {

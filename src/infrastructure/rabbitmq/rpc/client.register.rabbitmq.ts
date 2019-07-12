@@ -10,8 +10,6 @@ import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 @injectable()
 export class ClientRegisterRabbitmq implements IClientRegister {
 
-    private _timeout: number
-
     constructor(@inject(Identifier.RABBITMQ_CONNECTION) private readonly _connection: IConnection,
                 @inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger,
                 @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
@@ -35,10 +33,11 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 const exchange = this._connection.getExchange(exchangeName, type)
 
                 let time
+                const timeout = this._connection.configurations.options.rcpTimeout
 
-                if (this._timeout > 0) {
+                if (timeout > 0) {
                     new Promise<any>((res) => {
-                        time = setTimeout(res, this._timeout)
+                        time = setTimeout(res, timeout)
                     }).then(() => {
                         reject(new Error('rpc timed out'))
                     })
@@ -55,9 +54,6 @@ export class ClientRegisterRabbitmq implements IClientRegister {
 
                     return resolve(mensage)
 
-                }).catch(e => {
-                    console.log(e)
-                    this._logger.error('WWithout server response!')
                 })
 
                 this._logger.info('Client registered in ' + exchangeName + ' exchange!')

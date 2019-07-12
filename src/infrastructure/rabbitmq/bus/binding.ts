@@ -1,4 +1,4 @@
-import { log } from '../connection/connectionFactoryRabbitMQ'
+import { log } from '../connection/connection.factory.rabbitmq'
 import { Queue } from './queue'
 import { Exchange } from './exchange'
 
@@ -108,7 +108,7 @@ export class Binding {
     public static removeBindingsContaining(connectionPoint: Exchange | Queue): Promise<any> {
         const connection = connectionPoint.connection
         const promises: Promise<void>[] = []
-        for (const bindingId in connection.bindings) {
+        for (const bindingId of Object.keys(connection.bindings)) {
 
             const binding: Binding = connection.bindings[bindingId]
             if (binding._source === connectionPoint || binding._destination === connectionPoint) {

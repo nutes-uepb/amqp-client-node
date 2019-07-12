@@ -18,6 +18,8 @@ import { inject, injectable } from 'inversify'
 import { Identifier } from '../../../di/identifier'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 import { IConnectionFactory, IReconnectStrategy, ITopology } from '../../port/connection/connection.factory.interface'
+import { IExchangeDeclarationOptions } from '../../port/bus/exchange.options.interface'
+import { IQueueDeclarationOptions } from '../../port/bus/queue.options.interface'
 
 // create a custom winston logger for amqp-ts
 const amqp_log = createLogger({
@@ -36,7 +38,7 @@ export const log = amqp_log
 // ConnectionFactoryRabbitMQ class
 // ----------------------------------------------------------------------------------------------------
 @injectable()
-export class ConnectionFactoryRabbitMQ implements IConnectionFactory{
+export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
     public initialized: Promise<void>
     public isConnected: boolean = false
 
@@ -86,7 +88,8 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory{
 
     private rebuildConnection(): Promise<void> {
         if (this._rebuilding) { // only one rebuild process can be active at any time
-            log.log('debug', 'ConnectionFactoryRabbitMQ rebuild already in progress, joining active rebuild attempt.', { module: 'amqp-ts' })
+            log.log('debug', 'ConnectionFactoryRabbitMQ rebuild already in progress, ' +
+                'joining active rebuild attempt.', { module: 'amqp-ts' })
             return this.initialized
         }
         this._retry = -1
@@ -140,7 +143,8 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory{
 
                 this._retry = retry
                 if (thisConnection.reconnectStrategy.retries === 0 || thisConnection.reconnectStrategy.retries > retry) {
-                    log.log('warn', 'ConnectionFactoryRabbitMQ retry ' + (retry + 1) + ' in ' + thisConnection.reconnectStrategy.interval + 'ms',
+                    log.log('warn', 'ConnectionFactoryRabbitMQ retry ' + (retry + 1) +
+                        ' in ' + thisConnection.reconnectStrategy.interval + 'ms',
                         { module: 'amqp-ts' })
                     thisConnection._emitter.emit('trying_connect')
 
@@ -156,12 +160,12 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory{
                     callback(err)
                 }
             } else {
-                const restart = (err: Error) => {
+                const restart = (e: Error) => {
                     log.log('debug', 'ConnectionFactoryRabbitMQ error occurred.', { module: 'amqp-ts' })
                     connection.removeListener('error', restart)
 
                     // connection.removeListener("end", restart) // not sure this is needed
-                    thisConnection._rebuildAll(err) // try to rebuild the topology when the connection  unexpectedly closes
+                    thisConnection._rebuildAll(e) // try to rebuild the topology when the connection  unexpectedly closes
                 }
                 const onClose = () => {
                     connection.removeListener('close', onClose)
@@ -182,19 +186,19 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory{
         })
     }
 
-    _rebuildAll(err: Error): Promise<void> {
+    public _rebuildAll(err: Error): Promise<void> {
         log.log('warn', 'ConnectionFactoryRabbitMQ error: ' + err.message, { module: 'amqp-ts' })
 
         log.log('debug', 'Rebuilding connection NOW.', { module: 'amqp-ts' })
         this.rebuildConnection()
 
         // re initialize exchanges, queues and bindings if they exist
-        for (const exchangeId in this._exchanges) {
+        for (const exchangeId of Object.keys(this._exchanges)) {
             const exchange = this._exchanges[exchangeId]
             log.log('debug', 'Re-initialize Exchange \'' + exchange.name + '\'.', { module: 'amqp-ts' })
             exchange._initialize()
         }
-        for (const queueId in this._queues) {
+        for (const queueId of Object.keys(this._queues)) {
             const queue = this._queues[queueId]
             const consumer = queue.consumer
             log.log('debug', 'Re-initialize queue \'' + queue.name + '\'.', { module: 'amqp-ts' })
@@ -204,7 +208,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory{
                 queue._initializeConsumer()
             }
         }
-        for (const bindingId in this._bindings) {
+        for (const bindingId of Object.keys(this._bindings)) {
             const binding = this._bindings[bindingId]
             log.log('debug', 'Re-initialize binding from \'' + binding.source.name + '\' to \'' +
                 binding.destination.name + '\'.', { module: 'amqp-ts' })
@@ -247,18 +251,18 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory{
      */
     public completeConfiguration(): Promise<any> {
         const promises: Promise<any>[] = []
-        for (const exchangeId in this._exchanges) {
+        for (const exchangeId of Object.keys(this._exchanges)) {
             const exchange: Exchange = this._exchanges[exchangeId]
             promises.push(exchange.initialized)
         }
-        for (const queueId in this._queues) {
+        for (const queueId of Object.keys(this._queues)) {
             const queue: Queue = this._queues[queueId]
             promises.push(queue.initialized)
             if (queue.consumerInitialized) {
                 promises.push(queue.consumerInitialized)
             }
         }
-        for (const bindingId in this._bindings) {
+        for (const bindingId of Object.keys(this._bindings)) {
             const binding: Binding = this._bindings[bindingId]
             promises.push(binding.initialized)
         }
@@ -271,25 +275,25 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory{
      */
     public deleteConfiguration(): Promise<any> {
         const promises: Promise<any>[] = []
-        for (const bindingId in this._bindings) {
+        for (const bindingId of Object.keys(this._bindings)) {
             const binding: Binding = this._bindings[bindingId]
             promises.push(binding.delete())
         }
-        for (const queueId in this._queues) {
+        for (const queueId of Object.keys(this._queues)) {
             const queue: Queue = this._queues[queueId]
             if (queue.consumerInitialized) {
                 promises.push(queue.stopConsumer())
             }
             promises.push(queue.delete())
         }
-        for (const exchangeId in this._exchanges) {
+        for (const exchangeId of Object.keys(this._exchanges)) {
             const exchange: Exchange = this._exchanges[exchangeId]
             promises.push(exchange.delete())
         }
         return Promise.all(promises)
     }
 
-    public declareExchange(name: string, type?: string, options?: Exchange.IDeclarationOptions): Exchange {
+    public declareExchange(name: string, type?: string, options?: IExchangeDeclarationOptions): Exchange {
         let exchange = this._exchanges[name]
         if (exchange === undefined) {
             exchange = new Exchange(this, name, type, options)
@@ -297,7 +301,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory{
         return exchange
     }
 
-    public declareQueue(name: string, options?: Queue.IDeclarationOptions): Queue {
+    public declareQueue(name: string, options?: IQueueDeclarationOptions): Queue {
         let queue = this._queues[name]
         if (queue === undefined) {
             queue = new Queue(this, name, options)

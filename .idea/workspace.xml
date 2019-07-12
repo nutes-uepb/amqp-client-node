@@ -3,22 +3,17 @@
   <component name="ChangeListManager">
     <list default="true" id="25cb9888-dba4-4926-9796-b6e7eb10ea06" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/application/communication/direct.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/application/communication/topic.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/application/communication/topic.direct.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/application/port/topic.inteface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/application/port/topic.direct.inteface.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/application/pub.sub.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/application/pub.sub.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/di/di.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/di/di.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/di/identifier.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/di/identifier.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/infrastructure/port/connection/connection.factory.interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/port/connection/connection.factory.interface.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/infrastructure/port/connection/connection.interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/port/connection/connection.interface.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/binding.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/binding.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/exchange.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/exchange.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/message.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/message.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/queue.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/queue.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.factory.rabbitmq.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.factory.rabbitmq.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.rabbitmq.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.rabbitmq.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connectionFactoryRabbitMQ.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connectionFactoryRabbitMQ.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.factory.rabbitmq.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.sender.rabbitmq.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.sender.rabbitmq.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/client.register.rabbitmq.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/client.register.rabbitmq.ts" afterDir="false" />
@@ -39,62 +34,11 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/application/pub.sub.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="328">
-              <caret line="49" column="30" selection-start-line="49" selection-start-column="30" selection-end-line="49" selection-end-column="30" />
-              <folding>
-                <element signature="e#0#72#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" selection-start-line="2" selection-end-line="2" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connectionFactoryRabbitMQ.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="273">
-              <caret line="80" lean-forward="true" selection-start-line="80" selection-end-line="80" />
-              <folding>
-                <element signature="n#!!doc" />
-                <element signature="e#351#391#0" expanded="true" />
-                <element signature="n#!!doc;n#createConnection#0;n#Connection#0" />
-                <element signature="n#!!block;n#rebuildConnection#0;n#Connection#0" />
-                <element signature="n#!!block;n#tryToConnect#0;n#Connection#0" />
-                <element signature="n#!!block;n#_rebuildAll#0;n#Connection#0" />
-                <element signature="n#!!block;n#close#0;n#Connection#0" />
-                <element signature="n#!!doc;n#completeConfiguration#0;n#Connection#0" />
-                <element signature="n#!!block;n#completeConfiguration#0;n#Connection#0" />
-                <element signature="n#!!doc;n#deleteConfiguration#0;n#Connection#0" />
-                <element signature="n#!!block;n#deleteConfiguration#0;n#Connection#0" />
-                <element signature="n#!!block;n#declareExchange#0;n#Connection#0" />
-                <element signature="n#!!block;n#declareQueue#0;n#Connection#0" />
-                <element signature="n#!!block;n#declareTopology#0;n#Connection#0" />
-                <element signature="n#!!block;n#connection#0;n#Connection#0" />
-                <element signature="n#!!block#1;n#exchanges#0;n#Connection#0" />
-                <element signature="n#!!block#1;n#queues#0;n#Connection#0" />
-                <element signature="n#!!block#1;n#bindings#0;n#Connection#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.rabbitmq.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="553">
-              <caret line="113" column="36" lean-forward="true" selection-start-line="113" selection-end-line="114" />
+            <state relative-caret-position="1676">
+              <caret line="124" column="47" selection-start-line="124" selection-start-column="47" selection-end-line="124" selection-end-column="47" />
               <folding>
-                <element signature="n#!!doc;n#tryConnect#0;n#ConnectionRabbitMQ#0" />
                 <element signature="n#!!block;n#closeConnection#0;n#ConnectionRabbitMQ#0" />
               </folding>
             </state>
@@ -102,58 +46,123 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/infrastructure/port/connection/connection.factory.interface.ts">
+        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.sender.rabbitmq.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="13" column="1" selection-start-line="13" selection-start-column="1" selection-end-line="13" selection-end-column="1" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.factory.rabbitmq.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="8" column="71" selection-start-line="8" selection-start-column="42" selection-end-line="8" selection-end-column="71" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/infrastructure/port/event.bus.interface.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
+            <state relative-caret-position="450">
+              <caret line="38" selection-start-line="38" selection-end-line="38" />
               <folding>
-                <element signature="e#0#66#0" expanded="true" />
+                <element signature="n#!!block;n#closeConnection#0;n#MessageSenderRabbitmq#0" />
+                <element signature="n#!!block;n#createMessage#0;n#MessageSenderRabbitmq#0" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/infrastructure/port/rpc/resource.handler.interface.ts">
+        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/client.register.rabbitmq.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="10" selection-start-line="10" selection-end-line="10" />
+            <state relative-caret-position="375">
+              <caret line="48" column="40" selection-start-line="48" selection-start-column="40" selection-end-line="48" selection-end-column="40" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/application/port/topic.direct.inteface.ts">
+        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/server.register.rabbitmq.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="4" column="29" selection-start-line="4" selection-start-column="29" selection-end-line="4" selection-end-column="29" />
+            <state relative-caret-position="210">
+              <caret line="99" column="70" selection-start-line="99" selection-start-column="70" selection-end-line="99" selection-end-column="70" />
+              <folding>
+                <element signature="e#0#92#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/application/port/type.communication.ts">
+        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/message.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="7" selection-start-line="7" selection-end-line="7" />
+            <state relative-caret-position="-89">
+              <caret line="19" column="5" lean-forward="true" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
+              <folding>
+                <element signature="e#0#63#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="421">
+              <caret line="92" column="60" selection-start-line="92" selection-start-column="60" selection-end-line="92" selection-end-column="60" />
+              <folding>
+                <element signature="e#0#73#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/message.interface.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="315">
+              <caret line="21" column="1" lean-forward="true" selection-start-line="21" selection-start-column="1" selection-end-line="21" selection-end-column="1" />
+              <folding>
+                <element signature="e#0#54#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret line="1" column="78" selection-start-line="1" selection-start-column="78" selection-end-line="1" selection-end-column="78" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node_modules/typescript/lib/lib.es5.d.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="198">
+              <caret line="1058" column="4" selection-start-line="1058" selection-start-column="4" selection-end-line="1058" selection-end-column="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/queue.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="230">
+              <caret line="280" column="90" selection-start-line="280" selection-start-column="90" selection-end-line="280" selection-end-column="90" />
+              <folding>
+                <element signature="n#!!block;n#constructor#0;n#Queue#0" />
+                <element signature="n#!!block;n#_initialize#0;n#Queue#0" />
+                <element signature="n#!!block;n#_packMessageContent#0;n#Queue#0" />
+                <element signature="n#!!block;n#_unpackMessageContent#0;n#Queue#0" />
+                <element signature="n#!!doc;n#publish#0;n#Queue#0" />
+                <element signature="n#!!block;n#publish#0;n#Queue#0" />
+                <element signature="n#!!block;n#send#0;n#Queue#0" />
+                <element signature="n#!!block;n#rpc#0;n#Queue#0" />
+                <element signature="n#!!block;n#prefetch#0;n#Queue#0" />
+                <element signature="n#!!block;n#recover#0;n#Queue#0" />
+                <element signature="n#!!doc;n#startConsumer#0;n#Queue#0" />
+                <element signature="n#!!block;n#startConsumer#0;n#Queue#0" />
+                <element signature="n#!!block;n#activateConsumer#0;n#Queue#0" />
+                <element signature="n#!!block;n#stopConsumer#0;n#Queue#0" />
+                <element signature="n#!!block;n#delete#0;n#Queue#0" />
+                <element signature="n#!!block;n#close#0;n#Queue#0" />
+                <element signature="n#!!block;n#bind#0;n#Queue#0" />
+                <element signature="n#!!block;n#unbind#0;n#Queue#0" />
+                <element signature="n#!!block;n#connection#0;n#Queue#0" />
+                <element signature="n#!!block;n#channel#0;n#Queue#0" />
+                <element signature="n#!!block;n#name#0;n#Queue#0" />
+                <element signature="n#!!block;n#consumer#0;n#Queue#0" />
+                <element signature="n#!!block;n#consumerInitialized#0;n#Queue#0" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -170,19 +179,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>DIRECT_REPLY_TO_QUEUE</find>
-      <find>queueName</find>
-      <find>pubEventInitialization</find>
-      <find>this.</find>
-      <find>declare</find>
-      <find>experima</find>
-      <find>this</find>
-      <find>logger</find>
-      <find>declareExchange</find>
-      <find>IMessage</find>
-      <find>reflect-metadata</find>
-      <find>RABBITMQ_SERVER_REGISTER</find>
-      <find>EventEmitter</find>
       <find>thisConnection.emit</find>
       <find>;</find>
       <find>//</find>
@@ -200,6 +196,19 @@
       <find>conso</find>
       <find>isFulfilled</find>
       <find>emit</find>
+      <find>resolve</find>
+      <find>close</find>
+      <find>Queue.IInitializeResult</find>
+      <find>IQueueInitializeResult</find>
+      <find>Queue.IStartConsumerOptions</find>
+      <find>Queue.IQueueDeclarationOptions</find>
+      <find>Queue.IActivateConsumerOptions</find>
+      <find>Exchange.IDeclarationOptions</find>
+      <find>Queue.IDeleteResult</find>
+      <find>getC</find>
+      <find>Publish error</find>
+      <find>Queue.onMessage consumer function returned error:</find>
+      <find>Queue.onMessage</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -208,6 +217,11 @@
       <replace>// thisConnection.emit</replace>
       <replace>//</replace>
       <replace>'</replace>
+      <replace>IStartConsumerOptions</replace>
+      <replace>IQueueDeclarationOptions</replace>
+      <replace>IActivateConsumerOptions</replace>
+      <replace>IDeleteResult</replace>
+      <replace>IExchangeDeclarationOptions</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/client-server</dir>
@@ -219,11 +233,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/infrastructure/port/connection.event.bus.interface.ts" />
-        <option value="$PROJECT_DIR$/src/di/Identifier.ts" />
-        <option value="$PROJECT_DIR$/tsconfig.json" />
-        <option value="$PROJECT_DIR$/src/infrastructure/port/connection.factory.interface.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/port/message.receiver.interface.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/port/message.sender.interface.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/port/connection.interface.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/port/eventbus.interface.ts" />
@@ -244,11 +253,6 @@
         <option value="$PROJECT_DIR$/src/application/port/communication.interface.ts" />
         <option value="$PROJECT_DIR$/src/application/communication/topic.ts" />
         <option value="$PROJECT_DIR$/src/application/communication/register.resource.ts" />
-        <option value="$PROJECT_DIR$/package.json" />
-        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/queue.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/message.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/exchange.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/binding.ts" />
         <option value="$PROJECT_DIR$/src/application/communication/direct.ts" />
         <option value="$PROJECT_DIR$/src/application/port/topic.inteface.ts" />
         <option value="$PROJECT_DIR$/src/application/port/type.communication.ts" />
@@ -257,19 +261,29 @@
         <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/event.bus.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/port/connection/connection.interface.ts" />
         <option value="$PROJECT_DIR$/src/application/communication/topic.direct.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/client.register.rabbitmq.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/server.register.rabbitmq.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.sender.rabbitmq.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/port/event.bus.interface.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.factory.rabbitmq.ts" />
         <option value="$PROJECT_DIR$/src/di/di.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.rabbitmq.ts" />
         <option value="$PROJECT_DIR$/src/application/pub.sub.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/port/connection/connection.factory.interface.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connectionFactoryRabbitMQ.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.sender.rabbitmq.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.rabbitmq.ts" />
+        <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/binding.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/port/bus/exchange.options.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/port/bus/queue.options.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.factory.rabbitmq.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/port/bus/queue.interface.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/port/bus/binding.interface.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/exchange.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/queue.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/server.register.rabbitmq.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/client.register.rabbitmq.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/port/bus/message.interface.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/message.ts" />
       </list>
     </option>
   </component>
@@ -300,6 +314,12 @@
               <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
               <item name="pubsub" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="application" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pubsub" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -315,7 +335,7 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
               <item name="port" type="462c0819:PsiDirectoryNode" />
-              <item name="connection" type="462c0819:PsiDirectoryNode" />
+              <item name="bus" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
@@ -330,7 +350,31 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
               <item name="rabbitmq" type="462c0819:PsiDirectoryNode" />
+              <item name="bus" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pubsub" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
+              <item name="rabbitmq" type="462c0819:PsiDirectoryNode" />
               <item name="connection" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pubsub" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
+              <item name="rabbitmq" type="462c0819:PsiDirectoryNode" />
+              <item name="pubsub" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pubsub" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
+              <item name="rabbitmq" type="462c0819:PsiDirectoryNode" />
+              <item name="rpc" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -417,16 +461,18 @@
       <workItem from="1562762780506" duration="1066000" />
       <workItem from="1562763905614" duration="14575000" />
       <workItem from="1562851801912" duration="16921000" />
+      <workItem from="1562938014709" duration="13727000" />
+      <workItem from="1562962630393" duration="9314000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="383763000" />
+    <option name="totallyTimeSpent" value="406819000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="32" y="-11" width="1889" height="1092" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49938196" visible="true" weight="0.2532189" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49938196" visible="true" weight="0.2532189" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" sideWeight="0.50061804" side_tool="true" weight="0.2532189" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -439,7 +485,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="TypeScript" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49839056" visible="true" weight="0.3781855" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.49839056" visible="true" weight="0.36493373" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.50160944" side_tool="true" weight="0.4138634" />
       <window_info anchor="bottom" id="Inspection Results" order="12" weight="0.32925585" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -481,24 +527,6 @@
     </option>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/application/communication/fanout.ts" />
-    <entry file="file://$PROJECT_DIR$/lib/src/communication/port/topic.interface.d.ts" />
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/eventbus.interface.ts" />
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/eventbus.ts" />
-    <entry file="file://$PROJECT_DIR$/node_modules/typescript/lib/lib.dom.d.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="3442" column="4" selection-start-line="3442" selection-start-column="4" selection-end-line="3442" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/@types/node/events.d.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="43" selection-start-line="4" selection-start-column="31" selection-end-line="4" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/node_modules/inversify/dts/annotation/decorator_utils.d.ts">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -520,13 +548,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="222">
           <caret line="577" column="10" selection-start-line="577" selection-start-column="10" selection-end-line="577" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/index.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" selection-start-line="4" selection-end-line="4" />
         </state>
       </provider>
     </entry>
@@ -560,23 +581,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/application/communication/direct.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" column="36" selection-start-line="17" selection-start-column="36" selection-end-line="17" selection-end-column="36" />
-          <folding>
-            <element signature="e#0#88#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="28" column="14" selection-start-line="28" selection-start-column="5" selection-end-line="28" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/application/communication/direct.ts" />
     <entry file="file://$PROJECT_DIR$/node_modules/inversify/dts/interfaces/interfaces.d.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="194">
@@ -609,46 +614,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <caret column="17" selection-start-column="17" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/client.register.rabbitmq.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-357">
-          <caret line="20" selection-start-line="20" selection-end-line="20" />
-          <folding>
-            <element signature="e#0#74#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/server.register.rabbitmq.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1302">
-          <caret line="21" selection-start-line="21" selection-end-line="21" />
-          <folding>
-            <element signature="e#0#92#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.sender.rabbitmq.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-447">
-          <caret line="18" selection-start-line="18" selection-end-line="18" />
-          <folding>
-            <element signature="e#0#40#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/queue.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="47" selection-start-line="4" selection-start-column="47" selection-end-line="4" selection-end-column="47" />
-          <folding>
-            <element signature="e#0#58#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -703,46 +668,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/connection/connection.interface.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" selection-start-line="17" selection-end-line="17" />
-          <folding>
-            <element signature="e#0#85#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/binding.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="37" selection-start-line="2" selection-start-column="37" selection-end-line="2" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#46#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/exchange.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="117" selection-start-line="117" selection-end-line="117" />
-          <folding>
-            <element signature="e#0#24#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/message.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="42" column="17" selection-start-line="42" selection-start-column="17" selection-end-line="42" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#46#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/di/di.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="303">
@@ -753,22 +678,56 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/event.bus.ts">
+    <entry file="file://$PROJECT_DIR$/src/application/port/communication.interface.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="43" column="24" selection-start-line="43" selection-start-column="13" selection-end-line="43" selection-end-column="24" />
+        <state relative-caret-position="195">
+          <caret line="13" selection-start-line="13" selection-end-line="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/application/port/topic.direct.inteface.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="4" column="29" selection-start-line="4" selection-start-column="29" selection-end-line="4" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/application/port/type.communication.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/rpc/resource.handler.interface.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/event.bus.interface.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
           <folding>
-            <element signature="e#0#55#0" expanded="true" />
+            <element signature="e#0#66#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/connection/connection.factory.interface.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="1" selection-start-line="13" selection-start-column="1" selection-end-line="13" selection-end-column="1" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/application/communication/topic.direct.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="61" column="54" selection-start-line="61" selection-start-column="54" selection-end-line="61" selection-end-column="54" />
+        <state relative-caret-position="-578">
+          <caret line="26" column="66" selection-start-line="26" selection-start-column="55" selection-end-line="26" selection-end-column="66" />
           <folding>
-            <element signature="n#!!block;n#constructor#0;n#TopicDirect#0" />
             <element signature="n#!!block;n#typeConnection#0;n#TopicDirect#0" />
             <element signature="n#!!block;n#getPubConnection#0;n#TopicDirect#0" />
             <element signature="n#!!block;n#getSubConnection#0;n#TopicDirect#0" />
@@ -802,128 +761,237 @@
             <element signature="e#6648#6759#0" />
             <element signature="e#6791#6849#0" />
             <element signature="n#!!block;n#dispose#0;n#TopicDirect#0" />
-            <element signature="e#6973#7364#0" />
-            <element signature="e#6991#7291#0" />
             <element signature="e#7304#7354#0" />
             <element signature="n#!!block;n#on#0;n#TopicDirect#0" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq.ts">
+    <entry file="file://$PROJECT_DIR$/index.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-972">
-          <caret line="25" selection-start-line="25" selection-end-line="25" />
+        <state relative-caret-position="30">
+          <caret line="2" column="14" selection-start-line="2" selection-start-column="14" selection-end-line="2" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/event.bus.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="412">
+          <caret line="43" column="51" selection-start-line="43" selection-start-column="51" selection-end-line="43" selection-end-column="51" />
           <folding>
-            <element signature="e#0#73#0" expanded="true" />
+            <element signature="e#0#55#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/application/port/communication.interface.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" selection-start-line="13" selection-end-line="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/application/port/topic.direct.inteface.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="4" column="29" selection-start-line="4" selection-start-column="29" selection-end-line="4" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/application/port/type.communication.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" selection-start-line="7" selection-end-line="7" />
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/node_modules/amqplib/callback_api.js">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/src/application/pub.sub.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="328">
-          <caret line="49" column="30" selection-start-line="49" selection-start-column="30" selection-end-line="49" selection-end-column="30" />
+        <state relative-caret-position="240">
+          <caret line="16" column="37" selection-start-line="16" selection-start-column="37" selection-end-line="16" selection-end-column="37" />
           <folding>
             <element signature="e#0#72#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/rpc/resource.handler.interface.ts">
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/connection/connection.interface.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" selection-start-line="10" selection-end-line="10" />
+        <state relative-caret-position="30">
+          <caret line="5" column="17" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/event.bus.interface.ts">
+    <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
+        <state relative-caret-position="466">
+          <caret line="41" column="1" selection-start-line="41" selection-start-column="1" selection-end-line="41" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/exchange.options.interface.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="17" selection-start-column="17" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/queue.options.interface.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="17" selection-start-column="17" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/queue.interface.ts">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/binding.interface.ts">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.factory.rabbitmq.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="290">
+          <caret line="92" column="13" selection-start-line="92" selection-start-column="13" selection-end-line="92" selection-end-column="13" />
           <folding>
-            <element signature="e#0#66#0" expanded="true" />
+            <element signature="n#!!doc" />
+            <element signature="e#351#391#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts">
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/binding.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" selection-start-line="2" selection-end-line="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/connection/connection.factory.interface.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="1" selection-start-line="13" selection-start-column="1" selection-end-line="13" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connectionFactoryRabbitMQ.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="80" lean-forward="true" selection-start-line="80" selection-end-line="80" />
+        <state relative-caret-position="506">
+          <caret line="111" selection-start-line="111" selection-end-line="111" />
           <folding>
-            <element signature="n#!!doc" />
-            <element signature="e#351#391#0" expanded="true" />
-            <element signature="n#!!doc;n#createConnection#0;n#Connection#0" />
-            <element signature="n#!!block;n#rebuildConnection#0;n#Connection#0" />
-            <element signature="n#!!block;n#tryToConnect#0;n#Connection#0" />
-            <element signature="n#!!block;n#_rebuildAll#0;n#Connection#0" />
-            <element signature="n#!!block;n#close#0;n#Connection#0" />
-            <element signature="n#!!doc;n#completeConfiguration#0;n#Connection#0" />
-            <element signature="n#!!block;n#completeConfiguration#0;n#Connection#0" />
-            <element signature="n#!!doc;n#deleteConfiguration#0;n#Connection#0" />
-            <element signature="n#!!block;n#deleteConfiguration#0;n#Connection#0" />
-            <element signature="n#!!block;n#declareExchange#0;n#Connection#0" />
-            <element signature="n#!!block;n#declareQueue#0;n#Connection#0" />
-            <element signature="n#!!block;n#declareTopology#0;n#Connection#0" />
-            <element signature="n#!!block;n#connection#0;n#Connection#0" />
-            <element signature="n#!!block#1;n#exchanges#0;n#Connection#0" />
-            <element signature="n#!!block#1;n#queues#0;n#Connection#0" />
-            <element signature="n#!!block#1;n#bindings#0;n#Connection#0" />
+            <element signature="e#0#63#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/exchange.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="260">
+          <caret line="132" selection-start-line="132" selection-end-line="132" />
+          <folding>
+            <element signature="n#!!block;n#constructor#0;n#Exchange#0" />
+            <element signature="n#!!block;n#_initialize#0;n#Exchange#0" />
+            <element signature="n#!!doc;n#publish#0;n#Exchange#0" />
+            <element signature="n#!!block;n#publish#0;n#Exchange#0" />
+            <element signature="n#!!block;n#send#0;n#Exchange#0" />
+            <element signature="n#!!block;n#generateUuid#0;n#!!block;n#rpc#0;n#Exchange#0" />
+            <element signature="n#!!block;n#delete#0;n#Exchange#0" />
+            <element signature="n#!!block;n#close#0;n#Exchange#0" />
+            <element signature="n#!!block;n#bind#0;n#Exchange#0" />
+            <element signature="n#!!block;n#unbind#0;n#Exchange#0" />
+            <element signature="n#!!block;n#consumerQueueName#0;n#Exchange#0" />
+            <element signature="n#!!doc;n#startConsumer#0;n#Exchange#0" />
+            <element signature="n#!!block;n#startConsumer#0;n#Exchange#0" />
+            <element signature="n#!!block;n#activateConsumer#0;n#Exchange#0" />
+            <element signature="n#!!block;n#stopConsumer#0;n#Exchange#0" />
+            <element signature="n#!!block;n#initialized#0;n#Exchange#0" />
+            <element signature="n#!!block;n#connection#0;n#Exchange#0" />
+            <element signature="n#!!block;n#channel#0;n#Exchange#0" />
+            <element signature="n#!!block;n#name#0;n#Exchange#0" />
+            <element signature="n#!!block;n#type#0;n#Exchange#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/typescript/lib/lib.es5.d.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="1058" column="4" selection-start-line="1058" selection-start-column="4" selection-end-line="1058" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/queue.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="230">
+          <caret line="280" column="90" selection-start-line="280" selection-start-column="90" selection-end-line="280" selection-end-column="90" />
+          <folding>
+            <element signature="n#!!block;n#constructor#0;n#Queue#0" />
+            <element signature="n#!!block;n#_initialize#0;n#Queue#0" />
+            <element signature="n#!!block;n#_packMessageContent#0;n#Queue#0" />
+            <element signature="n#!!block;n#_unpackMessageContent#0;n#Queue#0" />
+            <element signature="n#!!doc;n#publish#0;n#Queue#0" />
+            <element signature="n#!!block;n#publish#0;n#Queue#0" />
+            <element signature="n#!!block;n#send#0;n#Queue#0" />
+            <element signature="n#!!block;n#rpc#0;n#Queue#0" />
+            <element signature="n#!!block;n#prefetch#0;n#Queue#0" />
+            <element signature="n#!!block;n#recover#0;n#Queue#0" />
+            <element signature="n#!!doc;n#startConsumer#0;n#Queue#0" />
+            <element signature="n#!!block;n#startConsumer#0;n#Queue#0" />
+            <element signature="n#!!block;n#activateConsumer#0;n#Queue#0" />
+            <element signature="n#!!block;n#stopConsumer#0;n#Queue#0" />
+            <element signature="n#!!block;n#delete#0;n#Queue#0" />
+            <element signature="n#!!block;n#close#0;n#Queue#0" />
+            <element signature="n#!!block;n#bind#0;n#Queue#0" />
+            <element signature="n#!!block;n#unbind#0;n#Queue#0" />
+            <element signature="n#!!block;n#connection#0;n#Queue#0" />
+            <element signature="n#!!block;n#channel#0;n#Queue#0" />
+            <element signature="n#!!block;n#name#0;n#Queue#0" />
+            <element signature="n#!!block;n#consumer#0;n#Queue#0" />
+            <element signature="n#!!block;n#consumerInitialized#0;n#Queue#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/server.register.rabbitmq.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="99" column="70" selection-start-line="99" selection-start-column="70" selection-end-line="99" selection-end-column="70" />
+          <folding>
+            <element signature="e#0#92#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/client.register.rabbitmq.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="48" column="40" selection-start-line="48" selection-start-column="40" selection-end-line="48" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.sender.rabbitmq.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="38" selection-start-line="38" selection-end-line="38" />
+          <folding>
+            <element signature="n#!!block;n#closeConnection#0;n#MessageSenderRabbitmq#0" />
+            <element signature="n#!!block;n#createMessage#0;n#MessageSenderRabbitmq#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="421">
+          <caret line="92" column="60" selection-start-line="92" selection-start-column="60" selection-end-line="92" selection-end-column="60" />
+          <folding>
+            <element signature="e#0#73#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.rabbitmq.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="553">
-          <caret line="113" column="36" lean-forward="true" selection-start-line="113" selection-end-line="114" />
+        <state relative-caret-position="1676">
+          <caret line="124" column="47" selection-start-line="124" selection-start-column="47" selection-end-line="124" selection-end-column="47" />
           <folding>
-            <element signature="n#!!doc;n#tryConnect#0;n#ConnectionRabbitMQ#0" />
             <element signature="n#!!block;n#closeConnection#0;n#ConnectionRabbitMQ#0" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.factory.rabbitmq.ts">
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/message.interface.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="71" selection-start-line="8" selection-start-column="42" selection-end-line="8" selection-end-column="71" />
+        <state relative-caret-position="315">
+          <caret line="21" column="1" lean-forward="true" selection-start-line="21" selection-start-column="1" selection-end-line="21" selection-end-column="1" />
+          <folding>
+            <element signature="e#0#54#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/message.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-89">
+          <caret line="19" column="5" lean-forward="true" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
+          <folding>
+            <element signature="e#0#63#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret line="1" column="78" selection-start-line="1" selection-start-column="78" selection-end-line="1" selection-end-column="78" />
         </state>
       </provider>
     </entry>

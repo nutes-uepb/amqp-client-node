@@ -1,30 +1,37 @@
-import { ConnectionFactoryRabbitMQ, log } from '../connection/connectionFactoryRabbitMQ'
+import { ConnectionFactoryRabbitMQ, log } from '../connection/connection.factory.rabbitmq'
 import { Binding } from './binding'
 import { Message } from './message'
 import { Exchange } from './exchange'
 import * as AmqpLib from 'amqplib/callback_api'
+import {
+    IActivateConsumerOptions, IDeleteResult,
+    IQueueDeclarationOptions,
+    IQueueInitializeResult,
+    IStartConsumerOptions,
+    IStartConsumerResult
+} from '../../port/bus/queue.options.interface'
 
 const DIRECT_REPLY_TO_QUEUE = 'amq.rabbitmq.reply-to'
 
 export class Queue {
-    public initialized: Promise<Queue.IInitializeResult>
+    public initialized: Promise<IQueueInitializeResult>
 
     private _connection: ConnectionFactoryRabbitMQ
     private _channel: AmqpLib.Channel
     private _name: string
-    private _options: Queue.IDeclarationOptions
+    private _options: IQueueDeclarationOptions
 
     private _consumer: (msg: any, channel?: AmqpLib.Channel) => any
     private _isStartConsumer: boolean
     private _rawConsumer: boolean
-    private _consumerOptions: Queue.IStartConsumerOptions
+    private _consumerOptions: IStartConsumerOptions
     private _consumerTag: string
-    private _consumerInitialized: Promise<Queue.IStartConsumerResult>
+    private _consumerInitialized: Promise<IStartConsumerResult>
     private _consumerStopping: boolean
-    private _deleting: Promise<Queue.IDeleteResult>
+    private _deleting: Promise<IDeleteResult>
     private _closing: Promise<void>
 
-    constructor(connection: ConnectionFactoryRabbitMQ, name: string, options: Queue.IDeclarationOptions = {}) {
+    constructor(connection: ConnectionFactoryRabbitMQ, name: string, options: IQueueDeclarationOptions = {}) {
         this._connection = connection
         this._name = name
         this._options = options
@@ -33,7 +40,7 @@ export class Queue {
     }
 
     public _initialize(): void {
-        this.initialized = new Promise<Queue.IInitializeResult>((resolve, reject) => {
+        this.initialized = new Promise<IQueueInitializeResult>((resolve, reject) => {
             this._connection.initialized.then(() => {
                 this._connection.connection.createChannel((err, channel) => {
                     /* istanbul ignore if */
@@ -41,17 +48,17 @@ export class Queue {
                         reject(err)
                     } else {
                         this._channel = channel
-                        const callback = (err, ok) => {
+                        const callback = (e, ok) => {
                             /* istanbul ignore if */
-                            if (err) {
+                            if (e) {
                                 log.log('error', 'Failed to create queue \'' + this._name + '\'.', { module: 'amqp-ts' })
                                 delete this._connection.queues[this._name]
-                                reject(err)
+                                reject(e)
                             } else {
                                 if (this._options.prefetch) {
                                     this._channel.prefetch(this._options.prefetch)
                                 }
-                                resolve(ok as Queue.IInitializeResult)
+                                resolve(ok as IQueueInitializeResult)
                             }
                         }
 
@@ -179,10 +186,10 @@ export class Queue {
      * deprecated, use 'queue.activateConsumer(...)' instead
      */
     public startConsumer(onMessage: (msg: any, channel?: AmqpLib.Channel) => any,
-                         options: Queue.IStartConsumerOptions = {})
-        : Promise<Queue.IStartConsumerResult> {
+                         options: IStartConsumerOptions = {})
+        : Promise<IStartConsumerResult> {
         if (this._consumerInitialized) {
-            return new Promise<Queue.IStartConsumerResult>((_, reject) => {
+            return new Promise<IStartConsumerResult>((_, reject) => {
                 reject(new Error('amqp-ts Queue.startConsumer error: consumer already defined'))
             })
         }
@@ -198,10 +205,10 @@ export class Queue {
     }
 
     public activateConsumer(onMessage: (msg: Message) => any,
-                            options: Queue.IActivateConsumerOptions = {})
-        : Promise<Queue.IStartConsumerResult> {
+                            options: IActivateConsumerOptions = {})
+        : Promise<IStartConsumerResult> {
         if (this._consumerInitialized) {
-            return new Promise<Queue.IStartConsumerResult>((_, reject) => {
+            return new Promise<IStartConsumerResult>((_, reject) => {
                 reject(new Error('amqp-ts Queue.activateConsumer error: consumer already defined'))
             })
         }
@@ -285,11 +292,11 @@ export class Queue {
                 }
             } catch (err) {
                 /* istanbul ignore next */
-                log.log('error', 'Queue.onMessage3 consumer function returned error: ' + err.message, { module: 'amqp-ts' })
+                log.log('error', 'Queue.onMessage33 consumer function returned error: ' + err.message, { module: 'amqp-ts' })
             }
         }
 
-        this._consumerInitialized = new Promise<Queue.IStartConsumerResult>((resolve, reject) => {
+        this._consumerInitialized = new Promise<IStartConsumerResult>((resolve, reject) => {
             this.initialized.then(() => {
                 let consumerFunction = activateConsumerWrapper
                 if (this._isStartConsumer) {
@@ -332,9 +339,9 @@ export class Queue {
         })
     }
 
-    public delete(): Promise<Queue.IDeleteResult> {
+    public delete(): Promise<IDeleteResult> {
         if (this._deleting === undefined) {
-            this._deleting = new Promise<Queue.IDeleteResult>((resolve, reject) => {
+            this._deleting = new Promise<IDeleteResult>((resolve, reject) => {
                 this.initialized.then(() => {
                     return Binding.removeBindingsContaining(this)
                 }).then(() => {
@@ -347,14 +354,14 @@ export class Queue {
                         } else {
                             delete this.initialized // invalidate queue
                             delete this._connection.queues[this._name] // remove the queue from our administration
-                            this._channel.close((err) => {
+                            this._channel.close((e) => {
                                 /* istanbul ignore if */
-                                if (err) {
-                                    reject(err)
+                                if (e) {
+                                    reject(e)
                                 } else {
                                     delete this._channel
                                     delete this._connection
-                                    resolve(ok as Queue.IDeleteResult)
+                                    resolve(ok as IDeleteResult)
                                 }
                             })
                         }
@@ -420,57 +427,7 @@ export class Queue {
         return this._consumer
     }
 
-    get consumerInitialized(): Promise<Queue.IStartConsumerResult> {
+    get consumerInitialized(): Promise<IStartConsumerResult> {
         return this._consumerInitialized
-    }
-}
-
-export namespace Queue {
-    'use strict'
-
-    export interface IDeclarationOptions {
-        exclusive?: boolean
-        durable?: boolean
-        autoDelete?: boolean
-        arguments?: any
-        messageTtl?: number
-        expires?: number
-        deadLetterExchange?: string
-        maxLength?: number
-        prefetch?: number
-        noCreate?: boolean
-    }
-
-    export interface IStartConsumerOptions {
-        rawMessage?: boolean
-        consumerTag?: string
-        noLocal?: boolean
-        noAck?: boolean
-        exclusive?: boolean
-        priority?: number
-        arguments?: Object
-    }
-
-    export interface IActivateConsumerOptions {
-        consumerTag?: string
-        noLocal?: boolean
-        noAck?: boolean
-        exclusive?: boolean
-        priority?: number
-        arguments?: Object
-    }
-
-    export interface IStartConsumerResult {
-        consumerTag: string
-    }
-
-    export interface IInitializeResult {
-        queue: string
-        messageCount: number
-        consumerCount: number
-    }
-
-    export interface IDeleteResult {
-        messageCount: number
     }
 }

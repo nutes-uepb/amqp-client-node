@@ -3,11 +3,9 @@ import { inject, injectable } from 'inversify'
 import { Identifier } from '../../../di/identifier'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IConnection } from '../../port/connection/connection.interface'
-import { Queue } from '../bus/queue'
 import { IServerRegister } from '../../port/rpc/server.register.interface'
-import { IConfigurationParameters } from '../../port/configuration.inteface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
-import StartConsumerResult = Queue.IStartConsumerResult
+import { IStartConsumerResult } from '../../port/bus/queue.options.interface'
 
 @injectable()
 export class ServerRegisterRabbitmq implements IServerRegister {
@@ -93,9 +91,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                     await queue.bind(exchange, routingKey)
                 }
 
-                console.log('consumer1')
                 if (!this.consumersInitialized.get(queueName)) {
-                    console.log('consumer2')
                     this.consumersInitialized.set(queueName, true)
 
                     await queue.activateConsumer((message) => {
@@ -118,7 +114,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                             }
                         }
                         return {}
-                    }, { noAck: false }).then((result: StartConsumerResult) => {
+                    }, { noAck: false }).then((result: IStartConsumerResult) => {
                         this._logger.info('Server registered in ' + exchangeName + ' exchange!')
                     })
                         .catch(err => {

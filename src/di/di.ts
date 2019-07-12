@@ -18,7 +18,7 @@ import { IServerRegister } from '../infrastructure/port/rpc/server.register.inte
 import { CustomEventEmitter, ICustomEventEmitter } from '../utils/custom.event.emitter'
 import { EventBus } from '../infrastructure/rabbitmq/event.bus'
 import { IEventBus } from '../infrastructure/port/event.bus.interface'
-import { ConnectionFactoryRabbitMQ } from '../infrastructure/rabbitmq/connection/connectionFactoryRabbitMQ'
+import { ConnectionFactoryRabbitMQ } from '../infrastructure/rabbitmq/connection/connection.factory.rabbitmq'
 
 export class DependencyInject {
     private readonly container: Container

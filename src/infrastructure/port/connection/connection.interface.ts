@@ -1,5 +1,5 @@
 import { IConfigurationParameters, IConnectionBase } from '../configuration.inteface'
-import { ConnectionFactoryRabbitMQ } from '../../rabbitmq/connection/connectionFactoryRabbitMQ'
+import { ConnectionFactoryRabbitMQ } from '../../rabbitmq/connection/connection.factory.rabbitmq'
 import { Exchange } from '../../rabbitmq/bus/exchange'
 import { Queue } from '../../rabbitmq/bus/queue'
 

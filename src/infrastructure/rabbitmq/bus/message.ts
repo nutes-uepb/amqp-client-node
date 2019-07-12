@@ -1,10 +1,11 @@
-import { log } from '../connection/connectionFactoryRabbitMQ'
+import { log } from '../connection/connection.factory.rabbitmq'
 import { Exchange } from './exchange'
 import { Queue } from './queue'
 import * as AmqpLib from 'amqplib/callback_api'
+import { IMessageInterface } from '../../port/bus/message.interface'
 
-export class Message {
-    private content: Buffer
+export class Message implements IMessageInterface {
+    private _content: Buffer
     private _fields: any
     private _properties: any
 
@@ -14,23 +15,27 @@ export class Message {
     constructor(content?: any, options: any = {}) {
         this._properties = options
         if (content !== undefined) {
-            this.setContent(content)
-        }
-    }
-
-    public setContent(content: any): void {
-        if (typeof content === 'string') {
-            this.content = new Buffer(content)
-        } else if (!(content instanceof Buffer)) {
-            this.content = new Buffer(JSON.stringify(content))
-            this._properties.contentType = 'application/json'
-        } else {
             this.content = content
         }
     }
 
+    set content(content: any) {
+        if (typeof content === 'string') {
+            this._content = new Buffer(content)
+        } else if (!(content instanceof Buffer)) {
+            this._content = new Buffer(JSON.stringify(content))
+            this._properties.contentType = 'application/json'
+        } else {
+            this._content = content
+        }
+    }
+
+    get content(): any {
+        return this._content
+    }
+
     public getContent(): any {
-        let content = this.content.toString()
+        let content = this._content.toString()
         if (this._properties.contentType === 'application/json') {
             content = JSON.parse(content)
         }
@@ -41,18 +46,18 @@ export class Message {
         // inline function to send the message
         const sendMessage = () => {
             try {
-                destination.channel.publish(exchange, routingKey, this.content, this._properties)
+                destination.channel.publish(exchange, routingKey, this._content, this._properties)
             } catch (err) {
-                log.log('debug', 'Publish error: ' + err.message, { module: 'amqp-ts' })
+                log.log('debug', 'Publish error11: ' + err.message, { module: 'amqp-ts' })
                 const destinationName = destination.name
                 const connection = destination.connection
                 log.log('debug', 'Try to rebuild connection, before Call.', { module: 'amqp-ts' })
                 connection._rebuildAll(err).then(() => {
                     log.log('debug', 'Retransmitting message.', { module: 'amqp-ts' })
                     if (destination instanceof Queue) {
-                        connection.queues[destinationName].publish(this.content, this._properties)
+                        connection.queues[destinationName].publish(this._content, this._properties)
                     } else {
-                        connection.exchanges[destinationName].publish(this.content, routingKey, this._properties)
+                        connection.exchanges[destinationName].publish(this._content, routingKey, this._properties)
                     }
 
                 })
@@ -67,12 +72,7 @@ export class Message {
             exchange = destination.name
         }
 
-        // execute sync when possible
-        // if (destination.initialized.isFulfilled()) {
-        //   sendMessage()
-        // } else {
         (destination.initialized as Promise<any>).then(sendMessage)
-        // }
     }
 
     public ack(allUpTo?: boolean): void {

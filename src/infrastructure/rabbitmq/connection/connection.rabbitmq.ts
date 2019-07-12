@@ -6,7 +6,7 @@ import { Identifier } from '../../../di/identifier'
 import { IConnectionFactory } from '../../port/connection/connection.factory.interface'
 import { ICustomLogger } from '../../../utils/custom.logger'
 
-import { ConnectionFactoryRabbitMQ } from './connectionFactoryRabbitMQ'
+import { ConnectionFactoryRabbitMQ } from './connection.factory.rabbitmq'
 import { Queue } from '../bus/queue'
 import { Exchange } from '../bus/exchange'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
@@ -95,7 +95,10 @@ export class ConnectionRabbitMQ implements IConnection {
                         .replace('password', this._configuration.password)
                     ,
                     certAuth,
-                    { retries: this._configuration.options.retries, interval: this._configuration.options.interval })
+                    {
+                        retries: this._configuration.options.retries,
+                        interval: this._configuration.options.interval
+                    })
                 .then(async (connection: ConnectionFactoryRabbitMQ) => {
                     this._connection = connection
 
@@ -111,12 +114,12 @@ export class ConnectionRabbitMQ implements IConnection {
     }
 
     public getExchange(exchangeName: string, type: string): Exchange {
-        return this._connection.declareExchange(exchangeName, type, { durable: true })
+        return this._connection.declareExchange(exchangeName, type, this._configuration.options.exchange)
     }
 
     public getQueue(queueName: string): Queue {
 
-        return this._connection.declareQueue(queueName, { durable: true, autoDelete: true })
+        return this._connection.declareQueue(queueName, this._configuration.options.queue)
     }
 
     public closeConnection(): Promise<boolean> {
