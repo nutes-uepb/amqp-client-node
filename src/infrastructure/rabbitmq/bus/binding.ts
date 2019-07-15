@@ -1,8 +1,9 @@
 import { log } from '../connection/connection.factory.rabbitmq'
 import { Queue } from './queue'
 import { Exchange } from './exchange'
+import { IBinding } from '../../port/bus/binding.interface'
 
-export class Binding {
+export class Binding implements IBinding{
     private _initialized: Promise<Binding>
 
     private readonly _source: Exchange
@@ -118,7 +119,7 @@ export class Binding {
         return Promise.all(promises)
     }
 
-    get initialized(): Promise<Binding> {
+    get initialized(): Promise<IBinding> {
         return this._initialized
     }
 

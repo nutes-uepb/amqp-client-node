@@ -10,6 +10,7 @@ import {
     IStartConsumerOptions,
     IStartConsumerResult
 } from '../../port/bus/queue.options.interface'
+import { IBinding } from '../../port/bus/binding.interface'
 
 const DIRECT_REPLY_TO_QUEUE = 'amq.rabbitmq.reply-to'
 
@@ -402,7 +403,7 @@ export class Queue {
         return this._closing
     }
 
-    public bind(source: Exchange, pattern = '', args: any = {}): Promise<Binding> {
+    public bind(source: Exchange, pattern = '', args: any = {}): Promise<IBinding> {
         const binding = new Binding(this, source, pattern, args)
         return binding.initialized
     }

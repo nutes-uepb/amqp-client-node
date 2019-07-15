@@ -1,4 +1,4 @@
-import { IQueueDeclarationOptions } from './bus/queue.options.interface'
+import { IActivateConsumerOptions, IQueueDeclarationOptions } from './bus/queue.options.interface'
 import { IExchangeDeclarationOptions } from './bus/exchange.options.interface'
 
 export interface IConnectionBase {
@@ -24,6 +24,7 @@ export interface IOptions {
     rcpTimeout: number
     queue?: IQueueDeclarationOptions
     exchange?: IExchangeDeclarationOptions
+    consumer?: IActivateConsumerOptions
 }
 
 export const defaultOptions: IOptions = {

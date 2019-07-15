@@ -3,21 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="25cb9888-dba4-4926-9796-b6e7eb10ea06" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/di/di.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/di/di.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/infrastructure/port/bus/binding.interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/port/bus/binding.interface.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/infrastructure/port/connection/connection.interface.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/port/connection/connection.interface.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/binding.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/binding.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/exchange.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/exchange.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/message.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/message.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/queue.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/queue.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.rabbitmq.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.rabbitmq.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connectionFactoryRabbitMQ.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.factory.rabbitmq.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.sender.rabbitmq.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.sender.rabbitmq.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/client.register.rabbitmq.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/client.register.rabbitmq.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/server.register.rabbitmq.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/server.register.rabbitmq.ts" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -34,43 +25,9 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.rabbitmq.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1676">
-              <caret line="124" column="47" selection-start-line="124" selection-start-column="47" selection-end-line="124" selection-end-column="47" />
-              <folding>
-                <element signature="n#!!block;n#closeConnection#0;n#ConnectionRabbitMQ#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.sender.rabbitmq.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
-              <caret line="38" selection-start-line="38" selection-end-line="38" />
-              <folding>
-                <element signature="n#!!block;n#closeConnection#0;n#MessageSenderRabbitmq#0" />
-                <element signature="n#!!block;n#createMessage#0;n#MessageSenderRabbitmq#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/client.register.rabbitmq.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="375">
-              <caret line="48" column="40" selection-start-line="48" selection-start-column="40" selection-end-line="48" selection-end-column="40" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/server.register.rabbitmq.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
+            <state relative-caret-position="1260">
               <caret line="99" column="70" selection-start-line="99" selection-start-column="70" selection-end-line="99" selection-end-column="70" />
               <folding>
                 <element signature="e#0#92#0" expanded="true" />
@@ -80,24 +37,195 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/message.ts">
+        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-89">
-              <caret line="19" column="5" lean-forward="true" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
+            <state relative-caret-position="435">
+              <caret line="32" selection-start-line="32" selection-end-line="32" />
               <folding>
-                <element signature="e#0#63#0" expanded="true" />
+                <element signature="e#0#73#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq.ts">
+        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/event.bus.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="421">
-              <caret line="92" column="60" selection-start-line="92" selection-start-column="60" selection-end-line="92" selection-end-column="60" />
+            <state relative-caret-position="455">
+              <caret line="43" column="51" selection-start-line="43" selection-start-column="51" selection-end-line="43" selection-end-column="51" />
               <folding>
-                <element signature="e#0#73#0" expanded="true" />
+                <element signature="e#0#55#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/message.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="150">
+              <caret line="19" column="5" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
+              <folding>
+                <element signature="n#!!block;n#constructor#0;n#Message#0" />
+                <element signature="e#706#752#0" />
+                <element signature="n#!!block;n#content#0;n#Message#0" />
+                <element signature="e#833#892#0" />
+                <element signature="e#932#1069#0" />
+                <element signature="e#1075#1122#0" />
+                <element signature="n#!!block;n#content#1;n#Message#0" />
+                <element signature="n#!!block;n#getContent#0;n#Message#0" />
+                <element signature="e#1334#1387#0" />
+                <element signature="n#!!block;n#sendTo#0;n#Message#0" />
+                <element signature="e#1581#2542#0" />
+                <element signature="e#1599#1713#0" />
+                <element signature="e#1726#2532#0" />
+                <element signature="e#2088#2517#0" />
+                <element signature="e#2231#2354#0" />
+                <element signature="e#2360#2498#0" />
+                <element signature="e#2615#2694#0" />
+                <element signature="e#2700#2751#0" />
+                <element signature="n#!!block;n#ack#0;n#Message#0" />
+                <element signature="e#2911#2976#0" />
+                <element signature="n#!!block;n#nack#0;n#Message#0" />
+                <element signature="e#3087#3162#0" />
+                <element signature="n#!!block;n#reject#0;n#Message#0" />
+                <element signature="e#3254#3322#0" />
+                <element signature="n#!!block;n#fields#0;n#Message#0" />
+                <element signature="n#!!block;n#fields#1;n#Message#0" />
+                <element signature="n#!!block;n#properties#0;n#Message#0" />
+                <element signature="n#!!block;n#properties#1;n#Message#0" />
+                <element signature="n#!!block;n#channel#0;n#Message#0" />
+                <element signature="n#!!block;n#message#0;n#Message#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/exchange.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="478">
+              <caret line="270" column="5" selection-start-line="270" selection-start-column="5" selection-end-line="270" selection-end-column="5" />
+              <folding>
+                <element signature="n#!!block;n#constructor#0;n#Exchange#0" />
+                <element signature="n#!!block;n#_initialize#0;n#Exchange#0" />
+                <element signature="e#1611#3056#0" />
+                <element signature="e#1665#2906#0" />
+                <element signature="e#1743#2891#0" />
+                <element signature="e#1765#1789#0" />
+                <element signature="e#1819#1878#0" />
+                <element signature="e#1884#2873#0" />
+                <element signature="e#1986#2488#0" />
+                <element signature="e#2016#2040#0" />
+                <element signature="e#2076#2352#0" />
+                <element signature="e#2358#2462#0" />
+                <element signature="e#2541#2646#0" />
+                <element signature="e#2652#2851#0" />
+                <element signature="e#2923#3045#0" />
+                <element signature="n#!!doc;n#publish#0;n#Exchange#0" />
+                <element signature="n#!!block;n#publish#0;n#Exchange#0" />
+                <element signature="e#3318#3371#0" />
+                <element signature="e#3411#3556#0" />
+                <element signature="e#3594#4198#0" />
+                <element signature="e#3612#3707#0" />
+                <element signature="e#3720#4188#0" />
+                <element signature="e#3974#4173#0" />
+                <element signature="n#!!block;n#send#0;n#Exchange#0" />
+                <element signature="n#!!block;n#rpc#0;n#Exchange#0" />
+                <element signature="n#!!block;n#generateUuid#0;n#!!block;n#rpc#0;n#Exchange#0" />
+                <element signature="e#4662#5747#0" />
+                <element signature="e#4769#5481#0" />
+                <element signature="e#4909#5445#0" />
+                <element signature="e#5129#5422#0" />
+                <element signature="e#5214#5396#0" />
+                <element signature="n#!!block;n#delete#0;n#Exchange#0" />
+                <element signature="e#5882#7175#0" />
+                <element signature="e#5952#7164#0" />
+                <element signature="e#5999#6084#0" />
+                <element signature="e#6097#7081#0" />
+                <element signature="e#6177#7062#0" />
+                <element signature="e#6203#6227#0" />
+                <element signature="e#6261#6328#0" />
+                <element signature="e#6334#7040#0" />
+                <element signature="e#6391#7013#0" />
+                <element signature="e#6630#6654#0" />
+                <element signature="e#6694#6775#0" />
+                <element signature="e#6781#6983#0" />
+                <element signature="e#7098#7149#0" />
+                <element signature="n#!!block;n#close#0;n#Exchange#0" />
+                <element signature="e#7290#8198#0" />
+                <element signature="e#7359#8187#0" />
+                <element signature="e#7406#7491#0" />
+                <element signature="e#7504#8104#0" />
+                <element signature="e#7736#8085#0" />
+                <element signature="e#7762#7786#0" />
+                <element signature="e#7820#7887#0" />
+                <element signature="e#7893#8063#0" />
+                <element signature="e#8121#8172#0" />
+                <element signature="n#!!block;n#unbind#0;n#Exchange#0" />
+                <element signature="n#!!block;n#consumerQueueName#0;n#Exchange#0" />
+                <element signature="n#!!doc;n#startConsumer#0;n#Exchange#0" />
+                <element signature="n#!!block;n#startConsumer#0;n#Exchange#0" />
+                <element signature="e#9076#9256#0" />
+                <element signature="e#9130#9245#0" />
+                <element signature="e#9262#9680#0" />
+                <element signature="n#!!block;n#activateConsumer#0;n#Exchange#0" />
+                <element signature="e#9901#10084#0" />
+                <element signature="e#9955#10073#0" />
+                <element signature="e#10090#10511#0" />
+                <element signature="n#!!block;n#stopConsumer#0;n#Exchange#0" />
+                <element signature="e#10652#10697#0" />
+                <element signature="e#10703#10751#0" />
+                <element signature="n#!!block;n#initialized#0;n#Exchange#0" />
+                <element signature="n#!!block;n#connection#0;n#Exchange#0" />
+                <element signature="n#!!block;n#channel#0;n#Exchange#0" />
+                <element signature="n#!!block;n#name#0;n#Exchange#0" />
+                <element signature="n#!!block;n#type#0;n#Exchange#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/binding.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="420">
+              <caret line="122" column="32" selection-start-line="122" selection-start-column="20" selection-end-line="122" selection-end-column="32" />
+              <folding>
+                <element signature="n#!!block;n#initialize#0;n#Binding#0" />
+                <element signature="e#837#2955#0" />
+                <element signature="e#891#1906#0" />
+                <element signature="e#995#1891#0" />
+                <element signature="e#1148#1872#0" />
+                <element signature="e#1178#1202#0" />
+                <element signature="e#1240#1763#0" />
+                <element signature="e#1769#1846#0" />
+                <element signature="e#1912#2945#0" />
+                <element signature="e#2025#2930#0" />
+                <element signature="e#2184#2911#0" />
+                <element signature="e#2214#2238#0" />
+                <element signature="e#2276#2802#0" />
+                <element signature="e#2808#2885#0" />
+                <element signature="n#!!block;n#delete#0;n#Binding#0" />
+                <element signature="e#3055#4626#0" />
+                <element signature="e#3109#3852#0" />
+                <element signature="e#3213#3837#0" />
+                <element signature="e#3368#3818#0" />
+                <element signature="e#3398#3422#0" />
+                <element signature="e#3460#3535#0" />
+                <element signature="e#3541#3792#0" />
+                <element signature="e#3858#4616#0" />
+                <element signature="e#3971#4601#0" />
+                <element signature="e#4132#4582#0" />
+                <element signature="e#4162#4186#0" />
+                <element signature="e#4224#4299#0" />
+                <element signature="e#4305#4556#0" />
+                <element signature="n#!!block;n#id#0;n#Binding#0" />
+                <element signature="n#!!block;n#removeBindingsContaining#0;n#Binding#0" />
+                <element signature="e#5181#5422#0" />
+                <element signature="e#5349#5412#0" />
+                <element signature="n#!!block;n#source#0;n#Binding#0" />
+                <element signature="n#!!block;n#destination#0;n#Binding#0" />
               </folding>
             </state>
           </provider>
@@ -107,7 +235,28 @@
         <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/message.interface.ts">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="315">
-              <caret line="21" column="1" lean-forward="true" selection-start-line="21" selection-start-column="1" selection-end-line="21" selection-end-column="1" />
+              <caret line="21" column="1" selection-start-line="21" selection-start-column="1" selection-end-line="21" selection-end-column="1" />
+              <folding>
+                <element signature="e#0#54#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/package.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="7" column="51" selection-start-line="7" selection-start-column="51" selection-end-line="7" selection-end-column="51" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/binding.interface.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="75">
+              <caret line="5" column="4" selection-start-line="5" selection-start-column="4" selection-end-line="5" selection-end-column="4" />
               <folding>
                 <element signature="e#0#54#0" expanded="true" />
               </folding>
@@ -116,46 +265,133 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret line="1" column="78" selection-start-line="1" selection-start-column="78" selection-end-line="1" selection-end-column="78" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/node_modules/typescript/lib/lib.es5.d.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
-              <caret line="1058" column="4" selection-start-line="1058" selection-start-column="4" selection-end-line="1058" selection-end-column="4" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/queue.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="230">
-              <caret line="280" column="90" selection-start-line="280" selection-start-column="90" selection-end-line="280" selection-end-column="90" />
+            <state relative-caret-position="1125">
+              <caret line="434" selection-start-line="434" selection-end-line="434" />
               <folding>
                 <element signature="n#!!block;n#constructor#0;n#Queue#0" />
                 <element signature="n#!!block;n#_initialize#0;n#Queue#0" />
+                <element signature="e#1578#3141#0" />
+                <element signature="e#1632#2991#0" />
+                <element signature="e#1710#2976#0" />
+                <element signature="e#1732#1756#0" />
+                <element signature="e#1786#1845#0" />
+                <element signature="e#1851#2958#0" />
+                <element signature="e#1953#2625#0" />
+                <element signature="e#1983#2007#0" />
+                <element signature="e#2043#2313#0" />
+                <element signature="e#2319#2599#0" />
+                <element signature="e#2381#2499#0" />
+                <element signature="e#2679#2781#0" />
+                <element signature="e#2787#2936#0" />
+                <element signature="e#3008#3130#0" />
                 <element signature="n#!!block;n#_packMessageContent#0;n#Queue#0" />
+                <element signature="e#3268#3321#0" />
+                <element signature="e#3361#3483#0" />
                 <element signature="n#!!block;n#_unpackMessageContent#0;n#Queue#0" />
+                <element signature="e#3692#3745#0" />
                 <element signature="n#!!doc;n#publish#0;n#Queue#0" />
                 <element signature="n#!!block;n#publish#0;n#Queue#0" />
+                <element signature="e#3995#4667#0" />
+                <element signature="e#4013#4100#0" />
+                <element signature="e#4113#4657#0" />
+                <element signature="e#4461#4642#0" />
+                <element signature="e#4739#4768#0" />
                 <element signature="n#!!block;n#send#0;n#Queue#0" />
                 <element signature="n#!!block;n#rpc#0;n#Queue#0" />
+                <element signature="e#5151#6397#0" />
+                <element signature="e#5190#6086#0" />
+                <element signature="e#5308#5554#0" />
+                <element signature="e#5586#6071#0" />
+                <element signature="e#5608#5632#0" />
+                <element signature="e#5662#5771#0" />
+                <element signature="e#5777#6053#0" />
+                <element signature="e#6188#6217#0" />
                 <element signature="n#!!block;n#prefetch#0;n#Queue#0" />
+                <element signature="e#6485#6581#0" />
                 <element signature="n#!!block;n#recover#0;n#Queue#0" />
+                <element signature="e#6682#6978#0" />
+                <element signature="e#6724#6967#0" />
+                <element signature="e#6777#6952#0" />
+                <element signature="e#6808#6867#0" />
+                <element signature="e#6873#6934#0" />
                 <element signature="n#!!doc;n#startConsumer#0;n#Queue#0" />
                 <element signature="n#!!block;n#startConsumer#0;n#Queue#0" />
+                <element signature="e#7289#7482#0" />
+                <element signature="e#7359#7471#0" />
                 <element signature="n#!!block;n#activateConsumer#0;n#Queue#0" />
+                <element signature="e#8033#8229#0" />
+                <element signature="e#8103#8218#0" />
+                <element signature="n#!!block;n#_initializeConsumer#0;n#Queue#0" />
+                <element signature="e#8494#9989#0" />
+                <element signature="e#8512#9784#0" />
+                <element signature="e#8530#8554#0" />
+                <element signature="e#8581#8662#0" />
+                <element signature="e#8873#9648#0" />
+                <element signature="e#8970#9434#0" />
+                <element signature="e#9025#9237#0" />
+                <element signature="e#9254#9411#0" />
+                <element signature="e#9440#9630#0" />
+                <element signature="e#9708#9770#0" />
+                <element signature="e#9797#9979#0" />
+                <element signature="e#9815#9841#0" />
+                <element signature="e#10048#10337#0" />
+                <element signature="e#10066#10132#0" />
+                <element signature="e#10145#10327#0" />
+                <element signature="e#10163#10189#0" />
+                <element signature="e#10405#12109#0" />
+                <element signature="e#10423#11902#0" />
+                <element signature="e#10773#11888#0" />
+                <element signature="e#10826#11498#0" />
+                <element signature="e#10881#11301#0" />
+                <element signature="e#10950#11056#0" />
+                <element signature="e#11318#11475#0" />
+                <element signature="e#11504#11870#0" />
+                <element signature="e#11564#11652#0" />
+                <element signature="e#11915#12099#0" />
+                <element signature="e#11933#11959#0" />
+                <element signature="e#12202#12955#0" />
+                <element signature="e#12244#12944#0" />
+                <element signature="e#12352#12468#0" />
+                <element signature="e#12620#12929#0" />
+                <element signature="e#12646#12670#0" />
+                <element signature="e#12704#12771#0" />
+                <element signature="e#12777#12907#0" />
                 <element signature="n#!!block;n#stopConsumer#0;n#Queue#0" />
+                <element signature="e#13073#13121#0" />
+                <element signature="e#13214#13792#0" />
+                <element signature="e#13265#13781#0" />
+                <element signature="e#13336#13766#0" />
+                <element signature="e#13358#13382#0" />
+                <element signature="e#13412#13471#0" />
+                <element signature="e#13477#13748#0" />
                 <element signature="n#!!block;n#delete#0;n#Queue#0" />
+                <element signature="e#13889#15270#0" />
+                <element signature="e#13968#15259#0" />
+                <element signature="e#14014#14099#0" />
+                <element signature="e#14112#14178#0" />
+                <element signature="e#14191#15176#0" />
+                <element signature="e#14275#15157#0" />
+                <element signature="e#14301#14325#0" />
+                <element signature="e#14359#14426#0" />
+                <element signature="e#14432#15135#0" />
+                <element signature="e#14676#15108#0" />
+                <element signature="e#14710#14734#0" />
+                <element signature="e#14774#14855#0" />
+                <element signature="e#14861#15078#0" />
+                <element signature="e#15193#15244#0" />
                 <element signature="n#!!block;n#close#0;n#Queue#0" />
-                <element signature="n#!!block;n#bind#0;n#Queue#0" />
+                <element signature="e#15385#16361#0" />
+                <element signature="e#15454#16350#0" />
+                <element signature="e#15500#15585#0" />
+                <element signature="e#15598#15664#0" />
+                <element signature="e#15677#16267#0" />
+                <element signature="e#15899#16248#0" />
+                <element signature="e#15925#15949#0" />
+                <element signature="e#15983#16050#0" />
+                <element signature="e#16056#16226#0" />
+                <element signature="e#16284#16335#0" />
                 <element signature="n#!!block;n#unbind#0;n#Queue#0" />
                 <element signature="n#!!block;n#connection#0;n#Queue#0" />
                 <element signature="n#!!block;n#channel#0;n#Queue#0" />
@@ -269,21 +505,21 @@
         <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connectionFactoryRabbitMQ.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.sender.rabbitmq.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.rabbitmq.ts" />
-        <option value="$PROJECT_DIR$/package.json" />
-        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/binding.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/port/bus/exchange.options.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/port/bus/queue.options.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.factory.rabbitmq.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/port/bus/queue.interface.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/port/bus/binding.interface.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/exchange.ts" />
-        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/queue.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/server.register.rabbitmq.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/client.register.rabbitmq.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/port/bus/message.interface.ts" />
         <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/message.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts" />
+        <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/src/infrastructure/port/bus/binding.interface.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/binding.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/queue.ts" />
+        <option value="$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/exchange.ts" />
       </list>
     </option>
   </component>
@@ -314,28 +550,7 @@
               <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
               <item name="pubsub" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="application" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
-              <item name="pubsub" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
-              <item name="pubsub" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
-              <item name="port" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
-              <item name="pubsub" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
-              <item name="port" type="462c0819:PsiDirectoryNode" />
-              <item name="bus" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
@@ -343,38 +558,6 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
               <item name="rabbitmq" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
-              <item name="pubsub" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
-              <item name="rabbitmq" type="462c0819:PsiDirectoryNode" />
-              <item name="bus" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
-              <item name="pubsub" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
-              <item name="rabbitmq" type="462c0819:PsiDirectoryNode" />
-              <item name="connection" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
-              <item name="pubsub" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
-              <item name="rabbitmq" type="462c0819:PsiDirectoryNode" />
-              <item name="pubsub" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="pubsub" type="b2602c69:ProjectViewProjectNode" />
-              <item name="pubsub" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="infrastructure" type="462c0819:PsiDirectoryNode" />
-              <item name="rabbitmq" type="462c0819:PsiDirectoryNode" />
-              <item name="rpc" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -462,12 +645,13 @@
       <workItem from="1562763905614" duration="14575000" />
       <workItem from="1562851801912" duration="16921000" />
       <workItem from="1562938014709" duration="13727000" />
-      <workItem from="1562962630393" duration="9314000" />
+      <workItem from="1562962630393" duration="9561000" />
+      <workItem from="1563195054835" duration="1783000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="406819000" />
+    <option name="totallyTimeSpent" value="408849000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="32" y="-11" width="1889" height="1092" extended-state="6" />
@@ -485,7 +669,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="TypeScript" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.49839056" visible="true" weight="0.36493373" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.49839056" visible="true" weight="0.35575944" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.50160944" side_tool="true" weight="0.4138634" />
       <window_info anchor="bottom" id="Inspection Results" order="12" weight="0.32925585" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -596,13 +780,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/src/application/communication/topic.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="34" column="31" selection-start-line="34" selection-start-column="31" selection-end-line="34" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/src/application/communication/topic.js" />
     <entry file="file://$PROJECT_DIR$/src/di/identifier.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
@@ -610,13 +788,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/src/infrastructure/port/eventbus.interface.d.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="17" selection-start-column="17" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/src/infrastructure/port/eventbus.interface.d.ts" />
     <entry file="file://$PROJECT_DIR$/src/infrastructure/port/rpc/server.register.interface.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -658,13 +830,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
           <caret line="5" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/pubsub/event.handler.interface.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" selection-start-line="3" selection-end-line="3" />
         </state>
       </provider>
     </entry>
@@ -774,16 +939,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/event.bus.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="412">
-          <caret line="43" column="51" selection-start-line="43" selection-start-column="51" selection-end-line="43" selection-end-column="51" />
-          <folding>
-            <element signature="e#0#55#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/node_modules/amqplib/callback_api.js">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -804,32 +959,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="466">
-          <caret line="41" column="1" selection-start-line="41" selection-start-column="1" selection-end-line="41" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/exchange.options.interface.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <caret column="17" selection-start-column="17" selection-end-column="17" />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/queue.options.interface.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="17" selection-start-column="17" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/queue.interface.ts">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/binding.interface.ts">
-      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.factory.rabbitmq.ts">
       <provider selected="true" editor-type-id="text-editor">
@@ -842,98 +977,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/binding.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="506">
-          <caret line="111" selection-start-line="111" selection-end-line="111" />
-          <folding>
-            <element signature="e#0#63#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/exchange.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="132" selection-start-line="132" selection-end-line="132" />
-          <folding>
-            <element signature="n#!!block;n#constructor#0;n#Exchange#0" />
-            <element signature="n#!!block;n#_initialize#0;n#Exchange#0" />
-            <element signature="n#!!doc;n#publish#0;n#Exchange#0" />
-            <element signature="n#!!block;n#publish#0;n#Exchange#0" />
-            <element signature="n#!!block;n#send#0;n#Exchange#0" />
-            <element signature="n#!!block;n#generateUuid#0;n#!!block;n#rpc#0;n#Exchange#0" />
-            <element signature="n#!!block;n#delete#0;n#Exchange#0" />
-            <element signature="n#!!block;n#close#0;n#Exchange#0" />
-            <element signature="n#!!block;n#bind#0;n#Exchange#0" />
-            <element signature="n#!!block;n#unbind#0;n#Exchange#0" />
-            <element signature="n#!!block;n#consumerQueueName#0;n#Exchange#0" />
-            <element signature="n#!!doc;n#startConsumer#0;n#Exchange#0" />
-            <element signature="n#!!block;n#startConsumer#0;n#Exchange#0" />
-            <element signature="n#!!block;n#activateConsumer#0;n#Exchange#0" />
-            <element signature="n#!!block;n#stopConsumer#0;n#Exchange#0" />
-            <element signature="n#!!block;n#initialized#0;n#Exchange#0" />
-            <element signature="n#!!block;n#connection#0;n#Exchange#0" />
-            <element signature="n#!!block;n#channel#0;n#Exchange#0" />
-            <element signature="n#!!block;n#name#0;n#Exchange#0" />
-            <element signature="n#!!block;n#type#0;n#Exchange#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/node_modules/typescript/lib/lib.es5.d.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="198">
           <caret line="1058" column="4" selection-start-line="1058" selection-start-column="4" selection-end-line="1058" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/queue.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="280" column="90" selection-start-line="280" selection-start-column="90" selection-end-line="280" selection-end-column="90" />
-          <folding>
-            <element signature="n#!!block;n#constructor#0;n#Queue#0" />
-            <element signature="n#!!block;n#_initialize#0;n#Queue#0" />
-            <element signature="n#!!block;n#_packMessageContent#0;n#Queue#0" />
-            <element signature="n#!!block;n#_unpackMessageContent#0;n#Queue#0" />
-            <element signature="n#!!doc;n#publish#0;n#Queue#0" />
-            <element signature="n#!!block;n#publish#0;n#Queue#0" />
-            <element signature="n#!!block;n#send#0;n#Queue#0" />
-            <element signature="n#!!block;n#rpc#0;n#Queue#0" />
-            <element signature="n#!!block;n#prefetch#0;n#Queue#0" />
-            <element signature="n#!!block;n#recover#0;n#Queue#0" />
-            <element signature="n#!!doc;n#startConsumer#0;n#Queue#0" />
-            <element signature="n#!!block;n#startConsumer#0;n#Queue#0" />
-            <element signature="n#!!block;n#activateConsumer#0;n#Queue#0" />
-            <element signature="n#!!block;n#stopConsumer#0;n#Queue#0" />
-            <element signature="n#!!block;n#delete#0;n#Queue#0" />
-            <element signature="n#!!block;n#close#0;n#Queue#0" />
-            <element signature="n#!!block;n#bind#0;n#Queue#0" />
-            <element signature="n#!!block;n#unbind#0;n#Queue#0" />
-            <element signature="n#!!block;n#connection#0;n#Queue#0" />
-            <element signature="n#!!block;n#channel#0;n#Queue#0" />
-            <element signature="n#!!block;n#name#0;n#Queue#0" />
-            <element signature="n#!!block;n#consumer#0;n#Queue#0" />
-            <element signature="n#!!block;n#consumerInitialized#0;n#Queue#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/server.register.rabbitmq.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="99" column="70" selection-start-line="99" selection-start-column="70" selection-end-line="99" selection-end-column="70" />
-          <folding>
-            <element signature="e#0#92#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/client.register.rabbitmq.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="48" column="40" selection-start-line="48" selection-start-column="40" selection-end-line="48" selection-end-column="40" />
         </state>
       </provider>
     </entry>
@@ -948,22 +995,119 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/client.register.rabbitmq.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="615">
+          <caret line="48" column="40" selection-start-line="48" selection-start-column="40" selection-end-line="48" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/queue.options.interface.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="23" column="41" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.rabbitmq.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="550">
+          <caret line="124" column="47" lean-forward="true" selection-start-line="124" selection-start-column="47" selection-end-line="124" selection-end-column="47" />
+          <folding>
+            <element signature="n#!!block;n#closeConnection#0;n#ConnectionRabbitMQ#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="26" column="39" selection-start-line="26" selection-start-column="39" selection-end-line="26" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/queue.interface.ts">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/pubsub/event.handler.interface.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="17" selection-start-column="17" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/rpc/server.register.rabbitmq.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1260">
+          <caret line="99" column="70" selection-start-line="99" selection-start-column="70" selection-end-line="99" selection-end-column="70" />
+          <folding>
+            <element signature="e#0#92#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="421">
-          <caret line="92" column="60" selection-start-line="92" selection-start-column="60" selection-end-line="92" selection-end-column="60" />
+        <state relative-caret-position="435">
+          <caret line="32" selection-start-line="32" selection-end-line="32" />
           <folding>
             <element signature="e#0#73#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/connection/connection.rabbitmq.ts">
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/event.bus.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1676">
-          <caret line="124" column="47" selection-start-line="124" selection-start-column="47" selection-end-line="124" selection-end-column="47" />
+        <state relative-caret-position="455">
+          <caret line="43" column="51" selection-start-line="43" selection-start-column="51" selection-end-line="43" selection-end-column="51" />
           <folding>
-            <element signature="n#!!block;n#closeConnection#0;n#ConnectionRabbitMQ#0" />
+            <element signature="e#0#55#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="51" selection-start-line="7" selection-start-column="51" selection-end-line="7" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/message.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="19" column="5" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
+          <folding>
+            <element signature="n#!!block;n#constructor#0;n#Message#0" />
+            <element signature="e#706#752#0" />
+            <element signature="n#!!block;n#content#0;n#Message#0" />
+            <element signature="e#833#892#0" />
+            <element signature="e#932#1069#0" />
+            <element signature="e#1075#1122#0" />
+            <element signature="n#!!block;n#content#1;n#Message#0" />
+            <element signature="n#!!block;n#getContent#0;n#Message#0" />
+            <element signature="e#1334#1387#0" />
+            <element signature="n#!!block;n#sendTo#0;n#Message#0" />
+            <element signature="e#1581#2542#0" />
+            <element signature="e#1599#1713#0" />
+            <element signature="e#1726#2532#0" />
+            <element signature="e#2088#2517#0" />
+            <element signature="e#2231#2354#0" />
+            <element signature="e#2360#2498#0" />
+            <element signature="e#2615#2694#0" />
+            <element signature="e#2700#2751#0" />
+            <element signature="n#!!block;n#ack#0;n#Message#0" />
+            <element signature="e#2911#2976#0" />
+            <element signature="n#!!block;n#nack#0;n#Message#0" />
+            <element signature="e#3087#3162#0" />
+            <element signature="n#!!block;n#reject#0;n#Message#0" />
+            <element signature="e#3254#3322#0" />
+            <element signature="n#!!block;n#fields#0;n#Message#0" />
+            <element signature="n#!!block;n#fields#1;n#Message#0" />
+            <element signature="n#!!block;n#properties#0;n#Message#0" />
+            <element signature="n#!!block;n#properties#1;n#Message#0" />
+            <element signature="n#!!block;n#channel#0;n#Message#0" />
+            <element signature="n#!!block;n#message#0;n#Message#0" />
           </folding>
         </state>
       </provider>
@@ -971,27 +1115,283 @@
     <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/message.interface.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
-          <caret line="21" column="1" lean-forward="true" selection-start-line="21" selection-start-column="1" selection-end-line="21" selection-end-column="1" />
+          <caret line="21" column="1" selection-start-line="21" selection-start-column="1" selection-end-line="21" selection-end-column="1" />
           <folding>
             <element signature="e#0#54#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/message.ts">
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/binding.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-89">
-          <caret line="19" column="5" lean-forward="true" selection-start-line="19" selection-start-column="5" selection-end-line="19" selection-end-column="5" />
+        <state relative-caret-position="420">
+          <caret line="122" column="32" selection-start-line="122" selection-start-column="20" selection-end-line="122" selection-end-column="32" />
           <folding>
-            <element signature="e#0#63#0" expanded="true" />
+            <element signature="n#!!block;n#initialize#0;n#Binding#0" />
+            <element signature="e#837#2955#0" />
+            <element signature="e#891#1906#0" />
+            <element signature="e#995#1891#0" />
+            <element signature="e#1148#1872#0" />
+            <element signature="e#1178#1202#0" />
+            <element signature="e#1240#1763#0" />
+            <element signature="e#1769#1846#0" />
+            <element signature="e#1912#2945#0" />
+            <element signature="e#2025#2930#0" />
+            <element signature="e#2184#2911#0" />
+            <element signature="e#2214#2238#0" />
+            <element signature="e#2276#2802#0" />
+            <element signature="e#2808#2885#0" />
+            <element signature="n#!!block;n#delete#0;n#Binding#0" />
+            <element signature="e#3055#4626#0" />
+            <element signature="e#3109#3852#0" />
+            <element signature="e#3213#3837#0" />
+            <element signature="e#3368#3818#0" />
+            <element signature="e#3398#3422#0" />
+            <element signature="e#3460#3535#0" />
+            <element signature="e#3541#3792#0" />
+            <element signature="e#3858#4616#0" />
+            <element signature="e#3971#4601#0" />
+            <element signature="e#4132#4582#0" />
+            <element signature="e#4162#4186#0" />
+            <element signature="e#4224#4299#0" />
+            <element signature="e#4305#4556#0" />
+            <element signature="n#!!block;n#id#0;n#Binding#0" />
+            <element signature="n#!!block;n#removeBindingsContaining#0;n#Binding#0" />
+            <element signature="e#5181#5422#0" />
+            <element signature="e#5349#5412#0" />
+            <element signature="n#!!block;n#source#0;n#Binding#0" />
+            <element signature="n#!!block;n#destination#0;n#Binding#0" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/configuration.inteface.ts">
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/port/bus/binding.interface.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="1" column="78" selection-start-line="1" selection-start-column="78" selection-end-line="1" selection-end-column="78" />
+        <state relative-caret-position="75">
+          <caret line="5" column="4" selection-start-line="5" selection-start-column="4" selection-end-line="5" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#54#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/exchange.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="478">
+          <caret line="270" column="5" selection-start-line="270" selection-start-column="5" selection-end-line="270" selection-end-column="5" />
+          <folding>
+            <element signature="n#!!block;n#constructor#0;n#Exchange#0" />
+            <element signature="n#!!block;n#_initialize#0;n#Exchange#0" />
+            <element signature="e#1611#3056#0" />
+            <element signature="e#1665#2906#0" />
+            <element signature="e#1743#2891#0" />
+            <element signature="e#1765#1789#0" />
+            <element signature="e#1819#1878#0" />
+            <element signature="e#1884#2873#0" />
+            <element signature="e#1986#2488#0" />
+            <element signature="e#2016#2040#0" />
+            <element signature="e#2076#2352#0" />
+            <element signature="e#2358#2462#0" />
+            <element signature="e#2541#2646#0" />
+            <element signature="e#2652#2851#0" />
+            <element signature="e#2923#3045#0" />
+            <element signature="n#!!doc;n#publish#0;n#Exchange#0" />
+            <element signature="n#!!block;n#publish#0;n#Exchange#0" />
+            <element signature="e#3318#3371#0" />
+            <element signature="e#3411#3556#0" />
+            <element signature="e#3594#4198#0" />
+            <element signature="e#3612#3707#0" />
+            <element signature="e#3720#4188#0" />
+            <element signature="e#3974#4173#0" />
+            <element signature="n#!!block;n#send#0;n#Exchange#0" />
+            <element signature="n#!!block;n#rpc#0;n#Exchange#0" />
+            <element signature="n#!!block;n#generateUuid#0;n#!!block;n#rpc#0;n#Exchange#0" />
+            <element signature="e#4662#5747#0" />
+            <element signature="e#4769#5481#0" />
+            <element signature="e#4909#5445#0" />
+            <element signature="e#5129#5422#0" />
+            <element signature="e#5214#5396#0" />
+            <element signature="n#!!block;n#delete#0;n#Exchange#0" />
+            <element signature="e#5882#7175#0" />
+            <element signature="e#5952#7164#0" />
+            <element signature="e#5999#6084#0" />
+            <element signature="e#6097#7081#0" />
+            <element signature="e#6177#7062#0" />
+            <element signature="e#6203#6227#0" />
+            <element signature="e#6261#6328#0" />
+            <element signature="e#6334#7040#0" />
+            <element signature="e#6391#7013#0" />
+            <element signature="e#6630#6654#0" />
+            <element signature="e#6694#6775#0" />
+            <element signature="e#6781#6983#0" />
+            <element signature="e#7098#7149#0" />
+            <element signature="n#!!block;n#close#0;n#Exchange#0" />
+            <element signature="e#7290#8198#0" />
+            <element signature="e#7359#8187#0" />
+            <element signature="e#7406#7491#0" />
+            <element signature="e#7504#8104#0" />
+            <element signature="e#7736#8085#0" />
+            <element signature="e#7762#7786#0" />
+            <element signature="e#7820#7887#0" />
+            <element signature="e#7893#8063#0" />
+            <element signature="e#8121#8172#0" />
+            <element signature="n#!!block;n#unbind#0;n#Exchange#0" />
+            <element signature="n#!!block;n#consumerQueueName#0;n#Exchange#0" />
+            <element signature="n#!!doc;n#startConsumer#0;n#Exchange#0" />
+            <element signature="n#!!block;n#startConsumer#0;n#Exchange#0" />
+            <element signature="e#9076#9256#0" />
+            <element signature="e#9130#9245#0" />
+            <element signature="e#9262#9680#0" />
+            <element signature="n#!!block;n#activateConsumer#0;n#Exchange#0" />
+            <element signature="e#9901#10084#0" />
+            <element signature="e#9955#10073#0" />
+            <element signature="e#10090#10511#0" />
+            <element signature="n#!!block;n#stopConsumer#0;n#Exchange#0" />
+            <element signature="e#10652#10697#0" />
+            <element signature="e#10703#10751#0" />
+            <element signature="n#!!block;n#initialized#0;n#Exchange#0" />
+            <element signature="n#!!block;n#connection#0;n#Exchange#0" />
+            <element signature="n#!!block;n#channel#0;n#Exchange#0" />
+            <element signature="n#!!block;n#name#0;n#Exchange#0" />
+            <element signature="n#!!block;n#type#0;n#Exchange#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/infrastructure/rabbitmq/bus/queue.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1125">
+          <caret line="434" selection-start-line="434" selection-end-line="434" />
+          <folding>
+            <element signature="n#!!block;n#constructor#0;n#Queue#0" />
+            <element signature="n#!!block;n#_initialize#0;n#Queue#0" />
+            <element signature="e#1578#3141#0" />
+            <element signature="e#1632#2991#0" />
+            <element signature="e#1710#2976#0" />
+            <element signature="e#1732#1756#0" />
+            <element signature="e#1786#1845#0" />
+            <element signature="e#1851#2958#0" />
+            <element signature="e#1953#2625#0" />
+            <element signature="e#1983#2007#0" />
+            <element signature="e#2043#2313#0" />
+            <element signature="e#2319#2599#0" />
+            <element signature="e#2381#2499#0" />
+            <element signature="e#2679#2781#0" />
+            <element signature="e#2787#2936#0" />
+            <element signature="e#3008#3130#0" />
+            <element signature="n#!!block;n#_packMessageContent#0;n#Queue#0" />
+            <element signature="e#3268#3321#0" />
+            <element signature="e#3361#3483#0" />
+            <element signature="n#!!block;n#_unpackMessageContent#0;n#Queue#0" />
+            <element signature="e#3692#3745#0" />
+            <element signature="n#!!doc;n#publish#0;n#Queue#0" />
+            <element signature="n#!!block;n#publish#0;n#Queue#0" />
+            <element signature="e#3995#4667#0" />
+            <element signature="e#4013#4100#0" />
+            <element signature="e#4113#4657#0" />
+            <element signature="e#4461#4642#0" />
+            <element signature="e#4739#4768#0" />
+            <element signature="n#!!block;n#send#0;n#Queue#0" />
+            <element signature="n#!!block;n#rpc#0;n#Queue#0" />
+            <element signature="e#5151#6397#0" />
+            <element signature="e#5190#6086#0" />
+            <element signature="e#5308#5554#0" />
+            <element signature="e#5586#6071#0" />
+            <element signature="e#5608#5632#0" />
+            <element signature="e#5662#5771#0" />
+            <element signature="e#5777#6053#0" />
+            <element signature="e#6188#6217#0" />
+            <element signature="n#!!block;n#prefetch#0;n#Queue#0" />
+            <element signature="e#6485#6581#0" />
+            <element signature="n#!!block;n#recover#0;n#Queue#0" />
+            <element signature="e#6682#6978#0" />
+            <element signature="e#6724#6967#0" />
+            <element signature="e#6777#6952#0" />
+            <element signature="e#6808#6867#0" />
+            <element signature="e#6873#6934#0" />
+            <element signature="n#!!doc;n#startConsumer#0;n#Queue#0" />
+            <element signature="n#!!block;n#startConsumer#0;n#Queue#0" />
+            <element signature="e#7289#7482#0" />
+            <element signature="e#7359#7471#0" />
+            <element signature="n#!!block;n#activateConsumer#0;n#Queue#0" />
+            <element signature="e#8033#8229#0" />
+            <element signature="e#8103#8218#0" />
+            <element signature="n#!!block;n#_initializeConsumer#0;n#Queue#0" />
+            <element signature="e#8494#9989#0" />
+            <element signature="e#8512#9784#0" />
+            <element signature="e#8530#8554#0" />
+            <element signature="e#8581#8662#0" />
+            <element signature="e#8873#9648#0" />
+            <element signature="e#8970#9434#0" />
+            <element signature="e#9025#9237#0" />
+            <element signature="e#9254#9411#0" />
+            <element signature="e#9440#9630#0" />
+            <element signature="e#9708#9770#0" />
+            <element signature="e#9797#9979#0" />
+            <element signature="e#9815#9841#0" />
+            <element signature="e#10048#10337#0" />
+            <element signature="e#10066#10132#0" />
+            <element signature="e#10145#10327#0" />
+            <element signature="e#10163#10189#0" />
+            <element signature="e#10405#12109#0" />
+            <element signature="e#10423#11902#0" />
+            <element signature="e#10773#11888#0" />
+            <element signature="e#10826#11498#0" />
+            <element signature="e#10881#11301#0" />
+            <element signature="e#10950#11056#0" />
+            <element signature="e#11318#11475#0" />
+            <element signature="e#11504#11870#0" />
+            <element signature="e#11564#11652#0" />
+            <element signature="e#11915#12099#0" />
+            <element signature="e#11933#11959#0" />
+            <element signature="e#12202#12955#0" />
+            <element signature="e#12244#12944#0" />
+            <element signature="e#12352#12468#0" />
+            <element signature="e#12620#12929#0" />
+            <element signature="e#12646#12670#0" />
+            <element signature="e#12704#12771#0" />
+            <element signature="e#12777#12907#0" />
+            <element signature="n#!!block;n#stopConsumer#0;n#Queue#0" />
+            <element signature="e#13073#13121#0" />
+            <element signature="e#13214#13792#0" />
+            <element signature="e#13265#13781#0" />
+            <element signature="e#13336#13766#0" />
+            <element signature="e#13358#13382#0" />
+            <element signature="e#13412#13471#0" />
+            <element signature="e#13477#13748#0" />
+            <element signature="n#!!block;n#delete#0;n#Queue#0" />
+            <element signature="e#13889#15270#0" />
+            <element signature="e#13968#15259#0" />
+            <element signature="e#14014#14099#0" />
+            <element signature="e#14112#14178#0" />
+            <element signature="e#14191#15176#0" />
+            <element signature="e#14275#15157#0" />
+            <element signature="e#14301#14325#0" />
+            <element signature="e#14359#14426#0" />
+            <element signature="e#14432#15135#0" />
+            <element signature="e#14676#15108#0" />
+            <element signature="e#14710#14734#0" />
+            <element signature="e#14774#14855#0" />
+            <element signature="e#14861#15078#0" />
+            <element signature="e#15193#15244#0" />
+            <element signature="n#!!block;n#close#0;n#Queue#0" />
+            <element signature="e#15385#16361#0" />
+            <element signature="e#15454#16350#0" />
+            <element signature="e#15500#15585#0" />
+            <element signature="e#15598#15664#0" />
+            <element signature="e#15677#16267#0" />
+            <element signature="e#15899#16248#0" />
+            <element signature="e#15925#15949#0" />
+            <element signature="e#15983#16050#0" />
+            <element signature="e#16056#16226#0" />
+            <element signature="e#16284#16335#0" />
+            <element signature="n#!!block;n#unbind#0;n#Queue#0" />
+            <element signature="n#!!block;n#connection#0;n#Queue#0" />
+            <element signature="n#!!block;n#channel#0;n#Queue#0" />
+            <element signature="n#!!block;n#name#0;n#Queue#0" />
+            <element signature="n#!!block;n#consumer#0;n#Queue#0" />
+            <element signature="n#!!block;n#consumerInitialized#0;n#Queue#0" />
+          </folding>
         </state>
       </provider>
     </entry>

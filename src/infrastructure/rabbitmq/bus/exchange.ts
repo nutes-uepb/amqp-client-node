@@ -7,6 +7,7 @@ import { Message } from './message'
 import * as path from 'path'
 import { IExchangeDeclarationOptions, IExchangeInitializeResult } from '../../port/bus/exchange.options.interface'
 import { IActivateConsumerOptions, IStartConsumerOptions } from '../../port/bus/queue.options.interface'
+import { IBinding } from '../../port/bus/binding.interface'
 
 const ApplicationName = process.env.AMQPTS_APPLICATIONNAME ||
     (path.parse ? path.parse(process.argv[1]).name : path.basename(process.argv[1]))
@@ -193,7 +194,7 @@ export class Exchange {
         return this._closing
     }
 
-    public bind(source: Exchange, pattern = '', args: any = {}): Promise<Binding> {
+    public bind(source: Exchange, pattern = '', args: any = {}): Promise<IBinding> {
         const binding = new Binding(this, source, pattern, args)
         return binding.initialized
     }
