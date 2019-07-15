@@ -5,13 +5,12 @@ export interface IConnectionBase {
     closeConnection(): Promise<boolean>
 }
 
-export interface IConfigurationParameters {
-    vhost: string,
+export interface IConfiguration {
     host: string,
     port: number,
     username: string,
     password: string,
-    options: IOptions
+    vhost: string,
 }
 
 export interface IOptions {
@@ -34,5 +33,8 @@ export const defaultOptions: IOptions = {
         enabled: false,
         ca: ''
     },
-    rcpTimeout: 5000
+    rcpTimeout: 5000,
+    queue: {},
+    exchange: {},
+    consumer: {}
 }

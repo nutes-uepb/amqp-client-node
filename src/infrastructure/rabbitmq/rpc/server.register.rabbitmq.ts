@@ -27,14 +27,18 @@ export class ServerRegisterRabbitmq implements IServerRegister {
 
                 if (!resources_handler) {
                     this.resource_handlers.set(queueName, [resource])
-                } else {
-                    for (const actualResource of resources_handler)
-                        if (actualResource.resourceName === resource.resourceName)
-                            return resolve(false)
-
-                    resources_handler.push(resource)
-                    this.resource_handlers.set(queueName, resources_handler)
+                    this._logger.info('Resource ' + queueName + ' registered!')
+                    return resolve(true)
                 }
+
+                for (const actualResource of resources_handler) {
+                    if (actualResource.resourceName === resource.resourceName) {
+                        return resolve(false)
+                    }
+                }
+
+                resources_handler.push(resource)
+                this.resource_handlers.set(queueName, resources_handler)
 
                 this._logger.info('Resource ' + queueName + ' registered!')
                 return resolve(true)
@@ -50,13 +54,13 @@ export class ServerRegisterRabbitmq implements IServerRegister {
 
             if (!resources_handler) {
                 return resolve(false)
-            } else {
-                for (const index in resources_handler) {
-                    if (resources_handler[index].resourceName === resourceName) {
-                        resources_handler.splice(Number(index), 1)
-                        this.resource_handlers.set(queueName, resources_handler)
-                        return resolve(true)
-                    }
+            }
+
+            for (const index in resources_handler) {
+                if (resources_handler[index].resourceName === resourceName) {
+                    resources_handler.splice(Number(index), 1)
+                    this.resource_handlers.set(queueName, resources_handler)
+                    return resolve(true)
                 }
             }
         })

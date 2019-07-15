@@ -19,6 +19,8 @@ import { CustomEventEmitter, ICustomEventEmitter } from '../utils/custom.event.e
 import { EventBus } from '../infrastructure/rabbitmq/event.bus'
 import { IEventBus } from '../infrastructure/port/event.bus.interface'
 import { ConnectionFactoryRabbitMQ } from '../infrastructure/rabbitmq/connection/connection.factory.rabbitmq'
+import { Direct } from '../application/communication/direct'
+import { Topic } from '../application/communication/topic'
 
 export class DependencyInject {
     private readonly container: Container
@@ -52,6 +54,10 @@ export class DependencyInject {
 
         this.container.bind<ITopicDirect>(Identifier.TOPIC_DIRECT)
             .to(TopicDirect)
+        this.container.bind<ITopicDirect>(Identifier.TOPIC)
+            .to(Topic)
+        this.container.bind<ITopicDirect>(Identifier.DIRECT)
+            .to(Direct)
 
         this.container.bind<IEventBus>(Identifier.EVENT_BUS)
             .to(EventBus)

@@ -11,41 +11,29 @@ export class RegisterResource {
         this.queueName = queueName
     }
 
-    public addResource(resourceName: string, resource: (...any: any) => any): Promise<boolean> {
-        return new Promise<boolean>(async (resolve, reject) => {
+    public async addResource(resourceName: string, resource: (...any: any) => any): Promise<boolean> {
 
-            const resourceHandler: IResourceHandler = {
-                resourceName,
-                handle: resource
-            }
+        const resourceHandler: IResourceHandler = {
+            resourceName,
+            handle: resource
+        }
 
-            try {
-                this.connection.registerResource(this.queueName,
-                    resourceHandler).then(result => {
-                    return resolve(result)
-                }).catch(err => {
-                    return reject(err)
-                })
-            } catch (e) {
-                return resolve(false)
-            }
-        })
+        try {
+            const result = await this.connection.registerResource(this.queueName, resourceHandler)
+            return Promise.resolve(result)
+        } catch (e) {
+            return Promise.reject(e)
+        }
     }
 
-    public removeResource(resourceName: string): Promise<boolean> {
-        return new Promise<boolean>(async (resolve, reject) => {
+    public async removeResource(resourceName: string): Promise<boolean> {
 
-            try {
-                this.connection.unregisterResource(this.queueName, resourceName)
-                    .then(result => {
-                        return resolve(result)
-                    }).catch(err => {
-                    return reject(err)
-                })
-            } catch (e) {
-                return resolve(false)
-            }
-        })
+        try {
+            const result = await this.connection.unregisterResource(this.queueName, resourceName)
+            return Promise.resolve(result)
+        } catch (e) {
+            return Promise.reject(e)
+        }
     }
 
     public getAllResource(): object {

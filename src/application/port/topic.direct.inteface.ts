@@ -1,14 +1,14 @@
-import { IOptions } from '../../infrastructure/port/configuration.inteface'
+import { IConfiguration, IOptions } from '../../infrastructure/port/configuration.inteface'
 import { ICommunication } from './communication.interface'
 import { RegisterResource } from '../communication/register.resource'
+import { TypeCommunication } from './type.communication'
 
 export interface ITopicDirect extends ICommunication {
-    setConfigurations(vhost: string,
-                      host: string,
-                      port: number,
-                      username: string,
-                      password: string,
-                      options: IOptions): void
+
+    typeConnection?: TypeCommunication
+
+    config: IConfiguration | string
+    options: IOptions
 
     receiveFromYourself(value: boolean): boolean
 

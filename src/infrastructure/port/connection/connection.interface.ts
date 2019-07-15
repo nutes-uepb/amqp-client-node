@@ -1,16 +1,17 @@
-import { IConfigurationParameters, IConnectionBase } from '../configuration.inteface'
+import { IConfiguration, IConnectionBase, IOptions } from '../configuration.inteface'
 import { ConnectionFactoryRabbitMQ } from '../../rabbitmq/connection/connection.factory.rabbitmq'
 import { Exchange } from '../../rabbitmq/bus/exchange'
 import { Queue } from '../../rabbitmq/bus/queue'
 
 export interface IConnection extends IConnectionBase {
-    setConfigurations: IConfigurationParameters
 
     idConnection: string
 
     isConnected: boolean
 
-    configurations: IConfigurationParameters
+    configurations: IConfiguration | string
+
+    options: IOptions
 
     startingConnection: boolean
 

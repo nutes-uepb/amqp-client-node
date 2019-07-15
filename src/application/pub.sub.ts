@@ -1,57 +1,35 @@
-import { IOptions } from '../infrastructure/port/configuration.inteface'
-import { TopicDirect } from './communication/topic.direct'
+import { IConfiguration, IOptions } from '../infrastructure/port/configuration.inteface'
 import { Identifier } from '../di/identifier'
 import { DependencyInject } from '../di/di'
-import { TypeCommunication } from './port/type.communication'
-
-// import { Direct, direct } from './communication/direct'
-
-/**
- * TESTADO e APROVADO!!!
- *
- *
- * ATENÇÃO!!!
- *  - remover do packege,json @types/bluebird, amqplib e when
- *    - @types sempre fica em dev dependencias, pois é uma dependencia de desenvolvimento.
- *  - Organizar as dependencias no package. O que for necessário apenas para o desenvolvimento como libraries de teset
- *  e @types fica em devDependencies.
- *  Acho que faltou conhecimento base de node
- *  https://pt.stackoverflow.com/questions/163785/qual-a-diferen%C3%A7a-entre-dependencies-e-devdependencies
- *
- *  LET'S GO BOY!!!
- */
+import { Topic } from './communication/topic'
+import { Direct } from './communication/direct'
 
 export class PubSub {
-    private readonly _topic: TopicDirect
-    private readonly _direct: TopicDirect
+    private readonly _topic: Topic
+    private readonly _direct: Direct
     private readonly _logger
 
     constructor(
-        private readonly vhost: string,
-        private readonly host: string,
-        private readonly port: number,
-        private readonly username: string,
-        private readonly password: string,
-        private readonly options?: IOptions) {
+        conf: IConfiguration | string, option?: IOptions) {
         const container = new DependencyInject().getContainer()
 
         this._logger = container.get(Identifier.CUSTOM_LOGGER)
 
-        this._topic = container.get(Identifier.TOPIC_DIRECT)
-        this._topic.typeConnection = TypeCommunication.TOPIC
-        this._topic.setConfigurations(this.vhost, this.host, this.port, this.username, this.password, this.options)
+        this._topic = container.get(Identifier.TOPIC)
+        this._topic.config = conf
+        this._topic.options = option
 
-        this._direct = container.get(Identifier.TOPIC_DIRECT)
-        this._direct.typeConnection = TypeCommunication.DIRECT
-        this._direct.setConfigurations(this.vhost, this.host, this.port, this.username, this.password, this.options)
+        this._direct = container.get(Identifier.DIRECT)
+        this._direct.config = conf
+        this._direct.options = option
 
     }
 
-    get topic(): TopicDirect {
+    get topic(): Topic {
         return this._topic
     }
 
-    get direct(): TopicDirect {
+    get direct(): Direct {
         return this._direct
     }
 

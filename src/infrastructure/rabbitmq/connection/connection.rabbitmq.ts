@@ -1,6 +1,5 @@
-// import { ConnectionFactoryRabbitMQ,Queue,Exchange } from '../amqp-ts'
 import { IConnection } from '../../port/connection/connection.interface'
-import { IConfigurationParameters } from '../../port/configuration.inteface'
+import { defaultOptions, IConfiguration, IOptions } from '../../port/configuration.inteface'
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../../di/identifier'
 import { IConnectionFactory } from '../../port/connection/connection.factory.interface'
@@ -24,7 +23,8 @@ export class ConnectionRabbitMQ implements IConnection {
 
     private _idConnection: string
     private _connection?: ConnectionFactoryRabbitMQ
-    private _configuration: IConfigurationParameters
+    private _configuration: IConfiguration | string
+    private _options: IOptions
 
     private _startingConnection
 
@@ -34,12 +34,19 @@ export class ConnectionRabbitMQ implements IConnection {
         this._startingConnection = false
     }
 
-    get configurations(): IConfigurationParameters {
-        return this._configuration
+    set configurations(config: IConfiguration | string) {
+        this._configuration = config
     }
 
-    set setConfigurations(config: IConfigurationParameters) {
-        this._configuration = config
+    set options(value: IOptions) {
+        this._options = value
+        if (!this._options) {
+            this._options = defaultOptions
+        }
+    }
+
+    get options(): IOptions {
+        return this._options
     }
 
     get startingConnection(): boolean {
@@ -72,32 +79,37 @@ export class ConnectionRabbitMQ implements IConnection {
      * @return Promise<void>
      */
     public tryConnect(): Promise<ConnectionFactoryRabbitMQ> {
-
         this._startingConnection = true
         return new Promise<ConnectionFactoryRabbitMQ>((resolve, reject) => {
             if (this.isConnected) return resolve(this._connection)
 
             let certAuth = {}
 
-            if (this._configuration.options.ssl.enabled) {
-                if (!this._configuration.options.ssl.ca)
-                    return Promise.reject(new Error('Paramater ca not found'))
-                certAuth = { ca: fs.readFileSync(this._configuration.options.ssl.ca) }
+            if (this._options.ssl.enabled) {
+                if (!this._options.ssl.ca)
+                    return reject(new Error('Paramater ca not found'))
+                certAuth = { ca: fs.readFileSync(this._options.ssl.ca) }
+            }
+
+            let uri: string = ''
+
+            if (typeof this._configuration === 'object') {
+                uri = 'protocol://username:password@host:port/vhost'
+                    .replace('protocol', this._options.ssl.enabled ? 'amqps' : 'amqp')
+                    .replace('host', this._configuration.host)
+                    .replace('port', (this._configuration.port).toString())
+                    .replace('vhost', this._configuration.vhost)
+                    .replace('username', this._configuration.username)
+                    .replace('password', this._configuration.password)
+            }else {
+                uri = this._configuration
             }
 
             this._connectionFactory
-                .createConnection('protocol://username:password@host:port/vhost'
-                        .replace('protocol', this._configuration.options.ssl.enabled ? 'amqps' : 'amqp')
-                        .replace('host', this._configuration.host)
-                        .replace('port', (this._configuration.port).toString())
-                        .replace('vhost', this._configuration.vhost)
-                        .replace('username', this._configuration.username)
-                        .replace('password', this._configuration.password)
-                    ,
-                    certAuth,
+                .createConnection(uri, certAuth,
                     {
-                        retries: this._configuration.options.retries,
-                        interval: this._configuration.options.interval
+                        retries: this._options.retries,
+                        interval: this._options.interval
                     })
                 .then(async (connection: ConnectionFactoryRabbitMQ) => {
                     this._connection = connection
@@ -114,12 +126,12 @@ export class ConnectionRabbitMQ implements IConnection {
     }
 
     public getExchange(exchangeName: string, type: string): Exchange {
-        return this._connection.declareExchange(exchangeName, type, this._configuration.options.exchange)
+        return this._connection.declareExchange(exchangeName, type, this._options.exchange)
     }
 
     public getQueue(queueName: string): Queue {
 
-        return this._connection.declareQueue(queueName, this._configuration.options.queue)
+        return this._connection.declareQueue(queueName, this._options.queue)
     }
 
     public closeConnection(): Promise<boolean> {
@@ -131,8 +143,9 @@ export class ConnectionRabbitMQ implements IConnection {
                 }).catch(err => {
                     return reject(err)
                 })
-            } else
-                return resolve(false)
+            }
+
+            return resolve(false)
         })
     }
 

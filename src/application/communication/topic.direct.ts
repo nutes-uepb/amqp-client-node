@@ -6,7 +6,7 @@ import { Identifier } from '../../di/identifier'
 import { IMessageSender } from '../../infrastructure/port/pubsub/message.sender.interface'
 import { IMessageReceiver } from '../../infrastructure/port/pubsub/message.receiver.interface'
 import { ICustomLogger } from '../../utils/custom.logger'
-import { IConfigurationParameters, IOptions } from '../../infrastructure/port/configuration.inteface'
+import { IConfiguration, IOptions } from '../../infrastructure/port/configuration.inteface'
 import { ITopicDirect } from '../port/topic.direct.inteface'
 import { IClientRegister } from '../../infrastructure/port/rpc/client.register.interface'
 import { IServerRegister } from '../../infrastructure/port/rpc/server.register.interface'
@@ -17,6 +17,8 @@ import { IEventBus } from '../../infrastructure/port/event.bus.interface'
 @injectable()
 export class TopicDirect implements ITopicDirect {
     private _typeConnection: TypeCommunication
+    private _config: IConfiguration | string
+    private _options: IOptions
 
     private readonly _pubConnection: IMessageSender
     private readonly _subConnection: IMessageReceiver
@@ -54,21 +56,14 @@ export class TopicDirect implements ITopicDirect {
         return this._serverConnection
     }
 
-    public setConfigurations(vhost: string,
-                             host: string,
-                             port: number,
-                             username: string,
-                             password: string,
-                             options: IOptions): void {
-        const config: IConfigurationParameters = {
-            vhost,
-            host,
-            port,
-            username,
-            password,
-            options
-        }
-        this._connection.setConfigurations(config)
+    set config(value: IConfiguration | string) {
+        this._config = value
+        this._connection.config = this._config
+    }
+
+    set options(value: IOptions) {
+        this._options = value
+        this._connection.options = this._options
     }
 
     public receiveFromYourself(value: boolean): boolean {

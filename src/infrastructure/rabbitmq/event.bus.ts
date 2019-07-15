@@ -1,5 +1,5 @@
 import { IEventBus } from '../port/event.bus.interface'
-import { IConfigurationParameters } from '../port/configuration.inteface'
+import { IConfiguration, IOptions } from '../port/configuration.inteface'
 import { IServerRegister } from '../port/rpc/server.register.interface'
 import { IMessageSender } from '../port/pubsub/message.sender.interface'
 import { IMessageReceiver } from '../port/pubsub/message.receiver.interface'
@@ -13,6 +13,8 @@ import { IConnection } from '../port/connection/connection.interface'
 @injectable()
 export class EventBus implements IEventBus {
 
+    private _config: IConfiguration | string
+    private _options: IOptions
     constructor(
         @inject(Identifier.RABBITMQ_CONNECTION) private readonly _connection: IConnection,
         @inject(Identifier.RABBITMQ_MENSSAGE_SENDER) private readonly _messageSender: IMessageSender,
@@ -22,6 +24,17 @@ export class EventBus implements IEventBus {
         @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: CustomEventEmitter,
         @inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger
     ) {
+    }
+
+    set config(value: IConfiguration) {
+        this._config = value
+        this._connection.configurations = this._config
+    }
+
+    set options(value: IOptions) {
+        this._options = value
+        this._connection.options = this._options
+
     }
 
     get clientRegister(): IClientRegister {
@@ -38,10 +51,6 @@ export class EventBus implements IEventBus {
 
     get serverRegister(): IServerRegister {
         return this._serverRegister
-    }
-
-    public setConfigurations(config: IConfigurationParameters): void {
-        this._connection.setConfigurations = config
     }
 
 }

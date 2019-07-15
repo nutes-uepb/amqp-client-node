@@ -6,13 +6,11 @@ import { Identifier } from '../../../di/identifier'
 import { IConnection } from '../../port/connection/connection.interface'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface'
-import { IConfigurationParameters } from '../../port/configuration.inteface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 import { IStartConsumerResult } from '../../port/bus/queue.options.interface'
 
 @injectable()
 export class MessageReceiverRabbitmq implements IMessageReceiver {
-    private event_handlers: Map<string, IEventHandler<any>> = new Map<string, IEventHandler<any>>()
     private consumersInitialized: Map<string, boolean> = new Map<string, boolean>()
     private routing_key_handlers: Map<string, IEventHandler<any>> = new Map<string, IEventHandler<any>>()
     private _receiveFromYourself: boolean
@@ -31,39 +29,38 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
         return this._receiveFromYourself
     }
 
-    public receiveMessageTopicOrDirect(type: string,
-                                       exchangeName: string,
-                                       topicKey: string,
-                                       queueName: string,
-                                       callback: IEventHandler<any>): Promise<boolean> {
-        return new Promise<boolean>(async (resolve, reject) => {
-            try {
+    public async receiveMessageTopicOrDirect(type: string,
+                                             exchangeName: string,
+                                             topicKey: string,
+                                             queueName: string,
+                                             callback: IEventHandler<any>): Promise<boolean> {
+        try {
 
-                if (!this._connection.startingConnection) {
-                    await this._connection.tryConnect()
-                }
-
-                if (!this._connection.isConnected)
-                    return resolve(false)
-
-                const exchange = this._connection.getExchange(exchangeName, type)
-
-                const queue = await this._connection.getQueue(queueName)
-
-                if (await exchange.initialized) {
-                    this.routing_key_handlers.set(topicKey, callback)
-                    this._logger.info('Callback message ' + topicKey + ' registered!')
-                    queue.bind(exchange, topicKey)
-                }
-
-                await this.activateConsumerTopicOrDirec(queue, queueName)
-
-                return resolve(true)
-
-            } catch (err) {
-                return reject(err)
+            if (!this._connection.startingConnection) {
+                await this._connection.tryConnect()
             }
-        })
+
+            if (!this._connection.isConnected) {
+                return Promise.resolve(false)
+            }
+
+            const exchange = this._connection.getExchange(exchangeName, type)
+
+            const queue = await this._connection.getQueue(queueName)
+
+            if (await exchange.initialized) {
+                this.routing_key_handlers.set(topicKey, callback)
+                this._logger.info('Callback message ' + topicKey + ' registered!')
+                queue.bind(exchange, topicKey)
+            }
+
+            await this.activateConsumerTopicOrDirec(queue, queueName)
+
+            return Promise.resolve(true)
+
+        } catch (err) {
+            return Promise.reject(err)
+        }
     }
 
     public closeConnection(): Promise<boolean> {
@@ -114,7 +111,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
             const regex = new RegExp(pattern)
             return regex.test(expression)
         } catch (e) {
-            console.log(e)
+            throw e
         }
     }
 
