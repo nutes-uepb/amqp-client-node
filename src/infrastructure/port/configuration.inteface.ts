@@ -23,7 +23,6 @@ export interface IOptions {
     rcpTimeout: number
     queue?: IQueueDeclarationOptions
     exchange?: IExchangeDeclarationOptions
-    consumer?: IActivateConsumerOptions
 }
 
 export const defaultOptions: IOptions = {
@@ -35,6 +34,5 @@ export const defaultOptions: IOptions = {
     },
     rcpTimeout: 5000,
     queue: {},
-    exchange: {},
-    consumer: {}
+    exchange: {}
 }
