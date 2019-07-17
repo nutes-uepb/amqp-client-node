@@ -11,4 +11,9 @@ export interface IEventBus {
     messageReceiver: IMessageReceiver
     clientRegister: IClientRegister
     serverRegister: IServerRegister
+
+    closeConnection(): Promise<boolean>
+
+    disposeConnection(): Promise<boolean>
+
 }

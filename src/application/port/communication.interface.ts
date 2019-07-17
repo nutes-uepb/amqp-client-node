@@ -1,4 +1,4 @@
-import { RegisterResource } from '../communication/register.resource'
+import { RegisterResource } from '../communication/base/register.resource'
 
 export interface ICommunication {
 

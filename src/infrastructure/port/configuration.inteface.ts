@@ -1,9 +1,5 @@
-import { IActivateConsumerOptions, IQueueDeclarationOptions } from './bus/queue.options.interface'
+import { IQueueDeclarationOptions } from './bus/queue.options.interface'
 import { IExchangeDeclarationOptions } from './bus/exchange.options.interface'
-
-export interface IConnectionBase {
-    closeConnection(): Promise<boolean>
-}
 
 export interface IConfiguration {
     host: string,
@@ -20,7 +16,7 @@ export interface IOptions {
         enabled: boolean,
         ca: string
     }
-    rcpTimeout: number
+    rcp_timeout: number
     queue?: IQueueDeclarationOptions
     exchange?: IExchangeDeclarationOptions
 }
@@ -32,7 +28,7 @@ export const defaultOptions: IOptions = {
         enabled: false,
         ca: ''
     },
-    rcpTimeout: 5000,
+    rcp_timeout: 5000,
     queue: {},
     exchange: {}
 }

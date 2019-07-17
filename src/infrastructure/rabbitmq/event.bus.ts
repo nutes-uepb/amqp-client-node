@@ -26,7 +26,7 @@ export class EventBus implements IEventBus {
     ) {
     }
 
-    set config(value: IConfiguration) {
+    set config(value: IConfiguration | string) {
         this._config = value
         this._connection.configurations = this._config
     }
@@ -34,7 +34,6 @@ export class EventBus implements IEventBus {
     set options(value: IOptions) {
         this._options = value
         this._connection.options = this._options
-
     }
 
     get clientRegister(): IClientRegister {
@@ -51,6 +50,14 @@ export class EventBus implements IEventBus {
 
     get serverRegister(): IServerRegister {
         return this._serverRegister
+    }
+
+    public closeConnection(): Promise<boolean> {
+        return this._connection.closeConnection()
+    }
+
+    public disposeConnection(): Promise<boolean> {
+        return this._connection.disposeConnection()
     }
 
 }

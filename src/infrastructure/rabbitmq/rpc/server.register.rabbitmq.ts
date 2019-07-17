@@ -132,8 +132,4 @@ export class ServerRegisterRabbitmq implements IServerRegister {
         })
     }
 
-    public closeConnection(): Promise<boolean> {
-        return this._connection.closeConnection()
-    }
-
 }

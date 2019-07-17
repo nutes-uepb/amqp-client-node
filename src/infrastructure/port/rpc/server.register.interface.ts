@@ -1,7 +1,6 @@
 import { IResourceHandler } from './resource.handler.interface'
-import { IConnectionBase } from '../configuration.inteface'
 
-export interface IServerRegister extends IConnectionBase {
+export interface IServerRegister {
 
     registerResource(queueName: string,
                      resource: IResourceHandler): Promise<boolean>

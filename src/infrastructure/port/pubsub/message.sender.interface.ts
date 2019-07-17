@@ -1,6 +1,4 @@
-import { IConnectionBase } from '../configuration.inteface'
-
-export interface IMessageSender extends IConnectionBase {
+export interface IMessageSender {
 
     sendMessageTopicOrDirec(type: string,
                             exchangeName: string,

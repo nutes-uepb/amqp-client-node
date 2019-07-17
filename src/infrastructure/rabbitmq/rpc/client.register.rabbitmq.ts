@@ -4,7 +4,6 @@ import { Identifier } from '../../../di/identifier'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IConnection } from '../../port/connection/connection.interface'
 import { IClientRegister } from '../../port/rpc/client.register.interface'
-import { IConfiguration } from '../../port/configuration.inteface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 
 @injectable()
@@ -33,7 +32,7 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 const exchange = this._connection.getExchange(exchangeName, type)
 
                 let time
-                const timeout = this._connection.options.rcpTimeout
+                const timeout = this._connection.options.rcp_timeout
 
                 if (timeout > 0) {
                     new Promise<any>((res) => {
@@ -62,10 +61,6 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 return reject(err)
             }
         })
-    }
-
-    public closeConnection(): Promise<boolean> {
-        return this._connection.closeConnection()
     }
 
 }

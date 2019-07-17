@@ -3,8 +3,10 @@ import { Identifier } from '../di/identifier'
 import { DependencyInject } from '../di/di'
 import { Topic } from './communication/topic'
 import { Direct } from './communication/direct'
+import { IEventBus } from '../infrastructure/port/event.bus.interface'
 
 export class PubSub {
+    private readonly _connection: IEventBus
     private readonly _topic: Topic
     private readonly _direct: Direct
     private readonly _logger
@@ -15,13 +17,13 @@ export class PubSub {
 
         this._logger = container.get(Identifier.CUSTOM_LOGGER)
 
+        this._connection = container.get(Identifier.EVENT_BUS)
+        this._connection.config = conf
+        this._connection.options = option
+
         this._topic = container.get(Identifier.TOPIC)
-        this._topic.config = conf
-        this._topic.options = option
 
         this._direct = container.get(Identifier.DIRECT)
-        this._direct.config = conf
-        this._direct.options = option
 
     }
 
@@ -38,4 +40,11 @@ export class PubSub {
         return
     }
 
+    public async close(): Promise<boolean> {
+        return this._connection.closeConnection()
+    }
+
+    public async dispose(): Promise<boolean> {
+        return this._connection.disposeConnection()
+    }
 }

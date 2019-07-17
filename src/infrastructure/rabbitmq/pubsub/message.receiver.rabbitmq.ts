@@ -63,10 +63,6 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
         }
     }
 
-    public closeConnection(): Promise<boolean> {
-        return this._connection.closeConnection()
-    }
-
     private async activateConsumerTopicOrDirec(queue: Queue, queueName: string): Promise<void> {
         if (!this.consumersInitialized.get(queueName)) {
             this.consumersInitialized.set(queueName, true)

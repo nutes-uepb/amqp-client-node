@@ -1,7 +1,6 @@
 import { IClientRequest } from './resource.handler.interface'
-import { IConnectionBase } from '../configuration.inteface'
 
-export interface IClientRegister extends IConnectionBase {
+export interface IClientRegister {
 
     registerClientDirectOrTopic(type: string,
                                 exchangeName: string,

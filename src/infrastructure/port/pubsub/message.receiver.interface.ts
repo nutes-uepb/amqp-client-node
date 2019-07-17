@@ -1,7 +1,6 @@
 import { IEventHandler } from './event.handler.interface'
-import { IConnectionBase } from '../configuration.inteface'
 
-export interface IMessageReceiver extends IConnectionBase {
+export interface IMessageReceiver {
 
     receiveFromYourself
 

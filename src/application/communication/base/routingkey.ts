@@ -1,24 +1,22 @@
-import { IEventHandler } from '../../infrastructure/port/pubsub/event.handler.interface'
-import { IClientRequest } from '../../infrastructure/port/rpc/resource.handler.interface'
+import { IEventHandler } from '../../../infrastructure/port/pubsub/event.handler.interface'
+import { IClientRequest } from '../../../infrastructure/port/rpc/resource.handler.interface'
 import { RegisterResource } from './register.resource'
+import { IMessageSender } from '../../../infrastructure/port/pubsub/message.sender.interface'
+import { IMessageReceiver } from '../../../infrastructure/port/pubsub/message.receiver.interface'
+import { ICustomLogger } from '../../../utils/custom.logger'
+import { IConfiguration, IOptions } from '../../../infrastructure/port/configuration.inteface'
+import { IRoutingKey } from '../../port/routing.key.interface'
+import { IClientRegister } from '../../../infrastructure/port/rpc/client.register.interface'
+import { IServerRegister } from '../../../infrastructure/port/rpc/server.register.interface'
+import { CustomEventEmitter } from '../../../utils/custom.event.emitter'
+import { ETypeCommunication } from '../../port/type.communication.enum'
+import { IEventBus } from '../../../infrastructure/port/event.bus.interface'
 import { inject, injectable } from 'inversify'
-import { Identifier } from '../../di/identifier'
-import { IMessageSender } from '../../infrastructure/port/pubsub/message.sender.interface'
-import { IMessageReceiver } from '../../infrastructure/port/pubsub/message.receiver.interface'
-import { ICustomLogger } from '../../utils/custom.logger'
-import { IConfiguration, IOptions } from '../../infrastructure/port/configuration.inteface'
-import { ITopicDirect } from '../port/topic.direct.inteface'
-import { IClientRegister } from '../../infrastructure/port/rpc/client.register.interface'
-import { IServerRegister } from '../../infrastructure/port/rpc/server.register.interface'
-import { CustomEventEmitter } from '../../utils/custom.event.emitter'
-import { TypeCommunication } from '../port/type.communication'
-import { IEventBus } from '../../infrastructure/port/event.bus.interface'
+import { Identifier } from '../../../di/identifier'
 
 @injectable()
-export class TopicDirect implements ITopicDirect {
-    private _typeConnection: TypeCommunication
-    private _config: IConfiguration | string
-    private _options: IOptions
+export class Routingkey implements IRoutingKey {
+    protected _typeConnection: ETypeCommunication
 
     private readonly _pubConnection: IMessageSender
     private readonly _subConnection: IMessageReceiver
@@ -26,9 +24,9 @@ export class TopicDirect implements ITopicDirect {
     private readonly _serverConnection: IServerRegister
 
     constructor(
-        @inject(Identifier.EVENT_BUS) private readonly _connection: IEventBus,
-        @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: CustomEventEmitter,
-        @inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger
+        @inject(Identifier.EVENT_BUS) private _connection: IEventBus,
+        @inject(Identifier.CUSTOM_EVENT_EMITTER) private  _emitter: CustomEventEmitter,
+        @inject(Identifier.CUSTOM_LOGGER) private  _logger: ICustomLogger
     ) {
         this._pubConnection = this._connection.messageSender
         this._subConnection = this._connection.messageReceiver
@@ -36,34 +34,8 @@ export class TopicDirect implements ITopicDirect {
         this._serverConnection = this._connection.serverRegister
     }
 
-    set typeConnection(value: TypeCommunication) {
+    set typeConnection(value: ETypeCommunication) {
         this._typeConnection = value
-    }
-
-    get getPubConnection() {
-        return this._pubConnection
-    }
-
-    get getSubConnection() {
-        return this._subConnection
-    }
-
-    get getServerConnection() {
-        return this._serverConnection
-    }
-
-    get getClientConnection() {
-        return this._serverConnection
-    }
-
-    set config(value: IConfiguration | string) {
-        this._config = value
-        this._connection.config = this._config
-    }
-
-    set options(value: IOptions) {
-        this._options = value
-        this._connection.options = this._options
     }
 
     public receiveFromYourself(value: boolean): boolean {
@@ -180,22 +152,6 @@ export class TopicDirect implements ITopicDirect {
                 .catch(err => {
                     return reject(err)
                 })
-        })
-    }
-
-    public dispose(): Promise<boolean> {
-        return new Promise<boolean>(async (resolve, reject) => {
-            try {
-                await this._pubConnection.closeConnection()
-                await this._subConnection.closeConnection()
-                await this._clientConnection.closeConnection()
-                await this._serverConnection.closeConnection()
-
-                return resolve(true)
-
-            } catch (err) {
-                return reject(err)
-            }
         })
     }
 

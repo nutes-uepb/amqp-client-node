@@ -5,7 +5,6 @@ import { IConnection } from '../../port/connection/connection.interface'
 import { Identifier } from '../../../di/identifier'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageSender } from '../../port/pubsub/message.sender.interface'
-import { IConfiguration } from '../../port/configuration.inteface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 
 @injectable()
@@ -42,10 +41,6 @@ export class MessageSenderRabbitmq implements IMessageSender {
         } catch (err) {
             return Promise.reject(err)
         }
-    }
-
-    public closeConnection(): Promise<boolean> {
-        return this._connection.closeConnection()
     }
 
     private createMessage(message: any,

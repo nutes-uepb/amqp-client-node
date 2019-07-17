@@ -28,10 +28,13 @@ export class ConnectionRabbitMQ implements IConnection {
 
     private _startingConnection
 
+    private _resourceBus: Map<string, Queue | Exchange>
+
     constructor(@inject(Identifier.RABBITMQ_CONNECTION_FACT) private readonly _connectionFactory: IConnectionFactory,
                 @inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger,
                 @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
         this._startingConnection = false
+        this._resourceBus = new Map<string, Queue | Exchange>()
     }
 
     set configurations(config: IConfiguration | string) {
@@ -101,7 +104,7 @@ export class ConnectionRabbitMQ implements IConnection {
                     .replace('vhost', this._configuration.vhost)
                     .replace('username', this._configuration.username)
                     .replace('password', this._configuration.password)
-            }else {
+            } else {
                 uri = this._configuration
             }
 
@@ -126,12 +129,19 @@ export class ConnectionRabbitMQ implements IConnection {
     }
 
     public getExchange(exchangeName: string, type: string): Exchange {
-        return this._connection.declareExchange(exchangeName, type, this._options.exchange)
+        const exchange = this._connection.declareExchange(exchangeName, type, this._options.exchange)
+        if (!this._resourceBus.get(exchangeName)) {
+            this._resourceBus.set(exchangeName, exchange)
+        }
+        return exchange
     }
 
     public getQueue(queueName: string): Queue {
-
-        return this._connection.declareQueue(queueName, this._options.queue)
+        const queue = this._connection.declareQueue(queueName, this._options.queue)
+        if (!this._resourceBus.get(queueName)) {
+            this._resourceBus.set(queueName, queue)
+        }
+        return queue
     }
 
     public closeConnection(): Promise<boolean> {
@@ -146,6 +156,23 @@ export class ConnectionRabbitMQ implements IConnection {
             }
 
             return resolve(false)
+        })
+    }
+
+    public disposeConnection(): Promise<boolean> {
+
+        return new Promise<boolean | undefined>(async (resolve, reject) => {
+            try {
+                for (const resource of this._resourceBus.keys()) {
+                    await this._resourceBus.get(resource).delete()
+                }
+                await this.closeConnection()
+                return resolve(true)
+            } catch (e) {
+                console.log(e)
+                return reject(e)
+            }
+
         })
     }
 

@@ -1,14 +1,11 @@
 import { IConfiguration, IOptions } from '../../infrastructure/port/configuration.inteface'
 import { ICommunication } from './communication.interface'
-import { RegisterResource } from '../communication/register.resource'
-import { TypeCommunication } from './type.communication'
+import { RegisterResource } from '../communication/base/register.resource'
+import { ETypeCommunication } from './type.communication.enum'
 
-export interface ITopicDirect extends ICommunication {
+export interface IRoutingKey extends ICommunication {
 
-    typeConnection?: TypeCommunication
-
-    config: IConfiguration | string
-    options: IOptions
+    typeConnection?: ETypeCommunication
 
     receiveFromYourself(value: boolean): boolean
 
