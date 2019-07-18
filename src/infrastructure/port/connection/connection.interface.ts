@@ -2,6 +2,7 @@ import { IConfiguration, IOptions } from '../configuration.inteface'
 import { ConnectionFactoryRabbitMQ } from '../../rabbitmq/connection/connection.factory.rabbitmq'
 import { Exchange } from '../../rabbitmq/bus/exchange'
 import { Queue } from '../../rabbitmq/bus/queue'
+import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
 
 export interface IConnection {
 
@@ -23,8 +24,8 @@ export interface IConnection {
 
     disposeConnection(): Promise<boolean>
 
-    getExchange(exchangeName: string, type: string): Exchange
+    getExchange(exchangeName: string, config: ICommunicationConfig): Exchange
 
-    getQueue(queueName: string): Queue
+    getQueue(queueName: string, config: ICommunicationConfig): Queue
 
 }

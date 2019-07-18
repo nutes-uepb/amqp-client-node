@@ -1,6 +1,3 @@
-import { IQueueDeclarationOptions } from './bus/queue.options.interface'
-import { IExchangeDeclarationOptions } from './bus/exchange.options.interface'
-
 export interface IConfiguration {
     host: string,
     port: number,
@@ -17,8 +14,6 @@ export interface IOptions {
         ca: string
     }
     rcp_timeout: number
-    queue?: IQueueDeclarationOptions
-    exchange?: IExchangeDeclarationOptions
 }
 
 export const defaultOptions: IOptions = {
@@ -29,6 +24,4 @@ export const defaultOptions: IOptions = {
         ca: ''
     },
     rcp_timeout: 5000,
-    queue: {},
-    exchange: {}
 }

@@ -4,7 +4,6 @@ import { RegisterResource } from './register.resource'
 import { IMessageSender } from '../../../infrastructure/port/pubsub/message.sender.interface'
 import { IMessageReceiver } from '../../../infrastructure/port/pubsub/message.receiver.interface'
 import { ICustomLogger } from '../../../utils/custom.logger'
-import { IConfiguration, IOptions } from '../../../infrastructure/port/configuration.inteface'
 import { IRoutingKey } from '../../port/routing.key.interface'
 import { IClientRegister } from '../../../infrastructure/port/rpc/client.register.interface'
 import { IServerRegister } from '../../../infrastructure/port/rpc/server.register.interface'
@@ -13,10 +12,13 @@ import { ETypeCommunication } from '../../port/type.communication.enum'
 import { IEventBus } from '../../../infrastructure/port/event.bus.interface'
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../../di/identifier'
+import { ICommunicationConfig, ICommunicationOptions } from '../../port/communications.options.interface'
 
 @injectable()
 export class Routingkey implements IRoutingKey {
-    protected _typeConnection: ETypeCommunication
+    private _typeConnection: ETypeCommunication
+    private _options: ICommunicationOptions
+    private _configurations: ICommunicationConfig
 
     private readonly _pubConnection: IMessageSender
     private readonly _subConnection: IMessageReceiver
@@ -34,19 +36,24 @@ export class Routingkey implements IRoutingKey {
         this._serverConnection = this._connection.serverRegister
     }
 
-    set typeConnection(value: ETypeCommunication) {
+    protected typeConnection(value: ETypeCommunication) {
         this._typeConnection = value
+        this._configurations = { type: this._typeConnection }
+    }
+
+    set options(value: ICommunicationOptions) {
+        this._options = value
+        this._configurations = { ...this._configurations, ...this._options }
     }
 
     public receiveFromYourself(value: boolean): boolean {
         this._subConnection.receiveFromYourself = value
         return this._subConnection.receiveFromYourself
-        return false
     }
 
     public pub(exchangeName: string, routingKey: string, message: any): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
-            this._pubConnection.sendMessageTopicOrDirec(this._typeConnection, exchangeName, routingKey, message)
+            this._pubConnection.sendRoutingKeyMessage(exchangeName, routingKey, message, this._configurations)
                 .then(result => {
                     return resolve(result)
                 })
@@ -59,20 +66,14 @@ export class Routingkey implements IRoutingKey {
     public sub(exchangeName: string,
                queueName: string,
                routingKey: string,
-               callback: (message: any) => void): Promise<boolean> {
+               callback: (err, message: any) => void): void {
         const eventCallback: IEventHandler<any> = {
             handle: callback
         }
 
-        return new Promise<boolean>(async (resolve, reject) => {
-            this._subConnection
-                .receiveMessageTopicOrDirect(this._typeConnection, exchangeName, routingKey,
-                    queueName, eventCallback).then(result => {
-                return resolve(result)
-            }).catch(err => {
-                return reject(err)
-            })
-        })
+        this._subConnection
+            .receiveRoutingKeyMessage(exchangeName, routingKey, queueName,
+                eventCallback, this._configurations)
     }
 
     public rpcClient(exchangeName: string,
@@ -89,33 +90,32 @@ export class Routingkey implements IRoutingKey {
                      parameters: any[],
                      callback?: (err, message: any) => void): any {
 
-        if (callback) {
-            this.rpcClientCallback(exchangeName, resourceName, parameters, callback)
-            return
+        if (!callback) {
+            return this.rpcClientPromise(exchangeName, resourceName, parameters)
         }
 
-        return this.rpcClientPromise(exchangeName, resourceName, parameters)
+        this.rpcClientCallback(exchangeName, resourceName, parameters, callback)
 
     }
 
-    private async rpcClientCallback(
+    private rpcClientCallback(
         exchangeName: string,
         resourceName: string,
         parameters: any[],
-        callback: (err, message: any) => void): Promise<void> {
+        callback: (err, message: any) => void): void {
         const clientRequest: IClientRequest = {
             resourceName,
             handle: parameters
         }
 
         this._clientConnection
-            .registerClientDirectOrTopic(this._typeConnection, exchangeName, clientRequest, callback)
+            .registerRoutingKeyClient(exchangeName, clientRequest, this._configurations)
             .then((result) => {
                 callback(undefined, result)
-            }).catch(err => {
-            callback(err, undefined)
-        })
-
+            })
+            .catch(err => {
+                callback(err, undefined)
+            })
     }
 
     private rpcClientPromise(
@@ -129,7 +129,7 @@ export class Routingkey implements IRoutingKey {
             }
 
             this._clientConnection
-                .registerClientDirectOrTopic(this._typeConnection, exchangeName, clientRequest)
+                .registerRoutingKeyClient(exchangeName, clientRequest, this._configurations)
                 .then(result => {
                     return resolve(result)
                 })
@@ -145,7 +145,7 @@ export class Routingkey implements IRoutingKey {
         return new Promise<RegisterResource>(async (resolve, reject) => {
 
             this._serverConnection
-                .registerServerDirectOrTopic(this._typeConnection, exchangeName, routingKey, queueName)
+                .registerRoutingKeyServer(exchangeName, routingKey, queueName, this._configurations)
                 .then(result => {
                     return resolve(new RegisterResource(this._serverConnection, queueName))
                 })

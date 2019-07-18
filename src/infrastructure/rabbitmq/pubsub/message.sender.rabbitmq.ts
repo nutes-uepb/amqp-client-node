@@ -6,6 +6,7 @@ import { Identifier } from '../../../di/identifier'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageSender } from '../../port/pubsub/message.sender.interface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
+import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
 
 @injectable()
 export class MessageSenderRabbitmq implements IMessageSender {
@@ -15,10 +16,10 @@ export class MessageSenderRabbitmq implements IMessageSender {
                 @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
     }
 
-    public async sendMessageTopicOrDirec(type: string,
-                                         exchangeName: string,
-                                         topicKey: string,
-                                         message: any): Promise<boolean> {
+    public async sendRoutingKeyMessage(exchangeName: string,
+                                       topicKey: string,
+                                       message: any,
+                                       config: ICommunicationConfig): Promise<boolean> {
         try {
             if (!this._connection.startingConnection) {
                 await this._connection.tryConnect()
@@ -30,7 +31,7 @@ export class MessageSenderRabbitmq implements IMessageSender {
 
             const msg = await this.createMessage(message)
 
-            const exchange = this._connection.getExchange(exchangeName, type)
+            const exchange = this._connection.getExchange(exchangeName, config)
 
             if (await exchange.initialized) {
                 exchange.send(msg, topicKey)

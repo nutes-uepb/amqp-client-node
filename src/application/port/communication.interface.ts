@@ -4,7 +4,7 @@ export interface ICommunication {
 
     pub(...any: any): Promise<boolean>
 
-    sub(...any: any): Promise<boolean>
+    sub(...any: any): void
 
     rpcClient(...any: any): Promise<boolean>
 

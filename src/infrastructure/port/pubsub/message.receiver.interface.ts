@@ -1,13 +1,15 @@
 import { IEventHandler } from './event.handler.interface'
+import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
+import { Message } from '../../rabbitmq/bus/message'
 
 export interface IMessageReceiver {
 
     receiveFromYourself
 
-    receiveMessageTopicOrDirect(type: string,
-                                exchangeName: string,
-                                topicKey: string,
-                                queueName: string,
-                                callback: IEventHandler<any>): Promise<boolean>
+    receiveRoutingKeyMessage(exchangeName: string,
+                             topicKey: string,
+                             queueName: string,
+                             callback: IEventHandler<any>,
+                             config: ICommunicationConfig): void
 
 }

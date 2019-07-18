@@ -5,8 +5,6 @@ import { ETypeCommunication } from './type.communication.enum'
 
 export interface IRoutingKey extends ICommunication {
 
-    typeConnection?: ETypeCommunication
-
     receiveFromYourself(value: boolean): boolean
 
     pub(exchangeName: string,
@@ -16,7 +14,7 @@ export interface IRoutingKey extends ICommunication {
     sub(exchangeName: string,
         queueName: string,
         routingKey: string,
-        callback: (message: any) => void): Promise<boolean>
+        callback: (message: any) => void): void
 
     rpcClient(exchangeName: string,
               resourceName: string,

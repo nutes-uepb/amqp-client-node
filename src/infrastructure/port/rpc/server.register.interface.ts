@@ -1,4 +1,5 @@
 import { IResourceHandler } from './resource.handler.interface'
+import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
 
 export interface IServerRegister {
 
@@ -9,8 +10,8 @@ export interface IServerRegister {
 
     getResource(): Map<string, any>
 
-    registerServerDirectOrTopic(type: string,
-                                exchangeName: string,
-                                routingKey: string,
-                                queueName: string): Promise<boolean>
+    registerRoutingKeyServer(exchangeName: string,
+                             routingKey: string,
+                             queueName: string,
+                             config: ICommunicationConfig): Promise<boolean>
 }

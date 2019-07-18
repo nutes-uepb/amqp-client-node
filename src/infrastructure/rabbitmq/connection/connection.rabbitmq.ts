@@ -10,6 +10,7 @@ import { Queue } from '../bus/queue'
 import { Exchange } from '../bus/exchange'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 import * as fs from 'fs'
+import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
 
 /**
  * Implementation of the interface that provides conn with RabbitMQ.
@@ -128,16 +129,16 @@ export class ConnectionRabbitMQ implements IConnection {
         })
     }
 
-    public getExchange(exchangeName: string, type: string): Exchange {
-        const exchange = this._connection.declareExchange(exchangeName, type, this._options.exchange)
+    public getExchange(exchangeName: string,  config: ICommunicationConfig): Exchange {
+        const exchange = this._connection.declareExchange(exchangeName, config.type, config.exchange)
         if (!this._resourceBus.get(exchangeName)) {
             this._resourceBus.set(exchangeName, exchange)
         }
         return exchange
     }
 
-    public getQueue(queueName: string): Queue {
-        const queue = this._connection.declareQueue(queueName, this._options.queue)
+    public getQueue(queueName: string, config: ICommunicationConfig): Queue {
+        const queue = this._connection.declareQueue(queueName, config.queue)
         if (!this._resourceBus.get(queueName)) {
             this._resourceBus.set(queueName, queue)
         }

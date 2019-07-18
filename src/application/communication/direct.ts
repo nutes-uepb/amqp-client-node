@@ -15,7 +15,7 @@ export class Direct extends Routingkey {
         @inject(Identifier.CUSTOM_LOGGER) logger: ICustomLogger
     ) {
         super(connection, emitter, logger)
-        super._typeConnection = ETypeCommunication.DIRECT
+        super.typeConnection(ETypeCommunication.DIRECT)
     }
 
 }

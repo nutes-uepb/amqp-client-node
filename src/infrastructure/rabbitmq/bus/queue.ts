@@ -293,7 +293,7 @@ export class Queue {
                 }
             } catch (err) {
                 /* istanbul ignore next */
-                log.log('error', 'Queue.onMessage33 consumer function returned error: ' + err.message, { module: 'amqp-ts' })
+                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.message, { module: 'amqp-ts' })
             }
         }
 

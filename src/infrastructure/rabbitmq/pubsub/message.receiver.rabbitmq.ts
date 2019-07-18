@@ -8,6 +8,7 @@ import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 import { IStartConsumerResult } from '../../port/bus/queue.options.interface'
+import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
 
 @injectable()
 export class MessageReceiverRabbitmq implements IMessageReceiver {
@@ -29,11 +30,11 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
         return this._receiveFromYourself
     }
 
-    public async receiveMessageTopicOrDirect(type: string,
-                                             exchangeName: string,
-                                             topicKey: string,
-                                             queueName: string,
-                                             callback: IEventHandler<any>): Promise<boolean> {
+    public async receiveRoutingKeyMessage(exchangeName: string,
+                                          topicKey: string,
+                                          queueName: string,
+                                          callback: IEventHandler<any>,
+                                          config: ICommunicationConfig): Promise<void> {
         try {
 
             if (!this._connection.startingConnection) {
@@ -41,12 +42,12 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
             }
 
             if (!this._connection.isConnected) {
-                return Promise.resolve(false)
+                return callback.handle(new Error('Connection Failed'), undefined)
             }
 
-            const exchange = this._connection.getExchange(exchangeName, type)
+            const exchange = this._connection.getExchange(exchangeName, config)
 
-            const queue = await this._connection.getQueue(queueName)
+            const queue = await this._connection.getQueue(queueName, config)
 
             if (await exchange.initialized) {
                 this.routing_key_handlers.set(topicKey, callback)
@@ -56,10 +57,10 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
 
             await this.activateConsumerTopicOrDirec(queue, queueName)
 
-            return Promise.resolve(true)
+            Promise.resolve()
 
         } catch (err) {
-            return Promise.reject(err)
+            return callback.handle(err, undefined)
         }
     }
 
@@ -83,7 +84,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                             this.routing_key_handlers.get(entry)
 
                         if (event_handler) {
-                            event_handler.handle(message.getContent())
+                            event_handler.handle(undefined, message.getContent())
                         }
                     }
                 }

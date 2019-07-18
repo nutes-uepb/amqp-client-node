@@ -6,6 +6,7 @@ import { IConnection } from '../../port/connection/connection.interface'
 import { IServerRegister } from '../../port/rpc/server.register.interface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 import { IStartConsumerResult } from '../../port/bus/queue.options.interface'
+import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
 
 @injectable()
 export class ServerRegisterRabbitmq implements IServerRegister {
@@ -70,10 +71,10 @@ export class ServerRegisterRabbitmq implements IServerRegister {
         return this.resource_handlers
     }
 
-    public registerServerDirectOrTopic(type: string,
-                                       exchangeName: string,
-                                       routingKey: string,
-                                       queueName: string): Promise<boolean> {
+    public registerRoutingKeyServer(exchangeName: string,
+                                    routingKey: string,
+                                    queueName: string,
+                                    config: ICommunicationConfig): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
             try {
 
@@ -84,10 +85,10 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                 if (!this._connection.isConnected)
                     return resolve(false)
 
-                const exchange = await this._connection.getExchange(exchangeName, type)
+                const exchange = await this._connection.getExchange(exchangeName, config)
                 this._logger.info('Exchange creation ' + exchange.name + ' realized with success!')
 
-                const queue = await this._connection.getQueue(queueName)
+                const queue = await this._connection.getQueue(queueName, config)
                 this._logger.info('Queue creation ' + queue.name + ' realized with success!')
 
                 if (await exchange.initialized) {
@@ -112,7 +113,8 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                                     try {
                                         return resource.handle.apply('', clientRequest.handle)
                                     } catch (err) {
-                                        this._logger.error('Consumer function returned error')
+                                        this._logger.error(`Consumer function returned error: ${err.message}`)
+                                        return  err
                                     }
                                 }
                             }

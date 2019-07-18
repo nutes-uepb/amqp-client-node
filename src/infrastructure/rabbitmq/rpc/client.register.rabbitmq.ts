@@ -5,6 +5,7 @@ import { ICustomLogger } from '../../../utils/custom.logger'
 import { IConnection } from '../../port/connection/connection.interface'
 import { IClientRegister } from '../../port/rpc/client.register.interface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
+import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
 
 @injectable()
 export class ClientRegisterRabbitmq implements IClientRegister {
@@ -15,10 +16,9 @@ export class ClientRegisterRabbitmq implements IClientRegister {
 
     }
 
-    public registerClientDirectOrTopic(type: string,
-                                       exchangeName: string,
-                                       resource: IClientRequest,
-                                       callback?: (err, message: any) => void): Promise<any> {
+    public registerRoutingKeyClient(exchangeName: string,
+                                    resource: IClientRequest,
+                                    config: ICommunicationConfig): Promise<any> {
         return new Promise<any>(async (resolve, reject) => {
             try {
 
@@ -26,10 +26,11 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                     await this._connection.tryConnect()
                 }
 
-                if (!this._connection.isConnected)
-                    return resolve(false)
+                if (!this._connection.isConnected) {
+                    return reject(new Error('Connection Failed'))
+                }
 
-                const exchange = this._connection.getExchange(exchangeName, type)
+                const exchange = this._connection.getExchange(exchangeName, config)
 
                 let time
                 const timeout = this._connection.options.rcp_timeout
@@ -46,13 +47,9 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                     clearTimeout(time)
 
                     const mensage = msg.getContent()
-
-                    if (err) {
-                        return reject(err)
-                    }
+                    if (msg.properties.type === 'error') return reject(new Error(mensage))
 
                     return resolve(mensage)
-
                 })
 
                 this._logger.info('Client registered in ' + exchangeName + ' exchange!')
