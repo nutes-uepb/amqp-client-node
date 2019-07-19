@@ -1,4 +1,3 @@
-
 export enum ETypeCommunication {
     DIRECT = 'direct',
     TOPIC = 'topic',

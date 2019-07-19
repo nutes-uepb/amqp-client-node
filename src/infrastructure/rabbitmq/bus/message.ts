@@ -22,9 +22,7 @@ export class Message implements IMessageInterface {
     set content(content: any) {
         if (content instanceof Error) {
             this.properties.type = 'error'
-            this._properties.contentType = ''
-            this.content = Buffer.from(JSON.stringify(content.message ))
-            return
+            content = content.message
         }
 
         if (typeof content === 'string') {

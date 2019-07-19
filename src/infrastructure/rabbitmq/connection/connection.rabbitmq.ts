@@ -1,5 +1,9 @@
 import { IConnection } from '../../port/connection/connection.interface'
-import { defaultOptions, IConfiguration, IOptions } from '../../port/configuration.inteface'
+import {
+    defaultOptions,
+    IConnConfiguration,
+    IConnOptions
+} from '../../../application/port/connection.configuration.inteface'
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../../di/identifier'
 import { IConnectionFactory } from '../../port/connection/connection.factory.interface'
@@ -24,8 +28,8 @@ export class ConnectionRabbitMQ implements IConnection {
 
     private _idConnection: string
     private _connection?: ConnectionFactoryRabbitMQ
-    private _configuration: IConfiguration | string
-    private _options: IOptions
+    private _configuration: IConnConfiguration | string
+    private _options: IConnOptions
 
     private _startingConnection
 
@@ -38,18 +42,18 @@ export class ConnectionRabbitMQ implements IConnection {
         this._resourceBus = new Map<string, Queue | Exchange>()
     }
 
-    set configurations(config: IConfiguration | string) {
+    set configurations(config: IConnConfiguration | string) {
         this._configuration = config
     }
 
-    set options(value: IOptions) {
+    set options(value: IConnOptions) {
         this._options = value
         if (!this._options) {
             this._options = defaultOptions
         }
     }
 
-    get options(): IOptions {
+    get options(): IConnOptions {
         return this._options
     }
 
@@ -83,9 +87,10 @@ export class ConnectionRabbitMQ implements IConnection {
      * @return Promise<void>
      */
     public tryConnect(): Promise<ConnectionFactoryRabbitMQ> {
-        this._startingConnection = true
         return new Promise<ConnectionFactoryRabbitMQ>((resolve, reject) => {
             if (this.isConnected) return resolve(this._connection)
+
+            this._startingConnection = true
 
             let certAuth = {}
 
@@ -129,7 +134,7 @@ export class ConnectionRabbitMQ implements IConnection {
         })
     }
 
-    public getExchange(exchangeName: string,  config: ICommunicationConfig): Exchange {
+    public getExchange(exchangeName: string, config: ICommunicationConfig): Exchange {
         const exchange = this._connection.declareExchange(exchangeName, config.type, config.exchange)
         if (!this._resourceBus.get(exchangeName)) {
             this._resourceBus.set(exchangeName, exchange)

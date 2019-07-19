@@ -22,10 +22,6 @@ export class ClientRegisterRabbitmq implements IClientRegister {
         return new Promise<any>(async (resolve, reject) => {
             try {
 
-                if (!this._connection.startingConnection) {
-                    await this._connection.tryConnect()
-                }
-
                 if (!this._connection.isConnected) {
                     return reject(new Error('Connection Failed'))
                 }
@@ -46,8 +42,9 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 exchange.rpc(resource, resource.resourceName, (err, msg) => {
                     clearTimeout(time)
 
+                    if (err) return reject(err)
+
                     const mensage = msg.getContent()
-                    if (msg.properties.type === 'error') return reject(new Error(mensage))
 
                     return resolve(mensage)
                 })

@@ -9,7 +9,7 @@ import { IClientRegister } from '../../../infrastructure/port/rpc/client.registe
 import { IServerRegister } from '../../../infrastructure/port/rpc/server.register.interface'
 import { CustomEventEmitter } from '../../../utils/custom.event.emitter'
 import { ETypeCommunication } from '../../port/type.communication.enum'
-import { IEventBus } from '../../../infrastructure/port/event.bus.interface'
+import { IEventBus } from '../../port/event.bus.interface'
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../../di/identifier'
 import { ICommunicationConfig, ICommunicationOptions } from '../../port/communications.options.interface'
@@ -46,21 +46,8 @@ export class Routingkey implements IRoutingKey {
         this._configurations = { ...this._configurations, ...this._options }
     }
 
-    public receiveFromYourself(value: boolean): boolean {
-        this._subConnection.receiveFromYourself = value
-        return this._subConnection.receiveFromYourself
-    }
-
-    public pub(exchangeName: string, routingKey: string, message: any): Promise<boolean> {
-        return new Promise<boolean>(async (resolve, reject) => {
-            this._pubConnection.sendRoutingKeyMessage(exchangeName, routingKey, message, this._configurations)
-                .then(result => {
-                    return resolve(result)
-                })
-                .catch(err => {
-                    return reject(err)
-                })
-        })
+    public pub(exchangeName: string, routingKey: string, message: any): Promise<void> {
+        return this._pubConnection.sendRoutingKeyMessage(exchangeName, routingKey, message, this._configurations)
     }
 
     public sub(exchangeName: string,

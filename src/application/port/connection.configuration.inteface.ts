@@ -1,4 +1,4 @@
-export interface IConfiguration {
+export interface IConnConfiguration {
     host: string,
     port: number,
     username: string,
@@ -6,7 +6,7 @@ export interface IConfiguration {
     vhost: string,
 }
 
-export interface IOptions {
+export interface IConnOptions {
     retries: number // number of retries, 0 is forever
     interval: number // retry interval in ms
     ssl: {
@@ -16,12 +16,12 @@ export interface IOptions {
     rcp_timeout: number
 }
 
-export const defaultOptions: IOptions = {
+export const defaultOptions: IConnOptions = {
     retries: 0,
     interval: 1000,
     ssl: {
         enabled: false,
         ca: ''
     },
-    rcp_timeout: 5000,
+    rcp_timeout: 5000
 }

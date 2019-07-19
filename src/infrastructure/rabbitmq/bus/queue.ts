@@ -4,7 +4,8 @@ import { Message } from './message'
 import { Exchange } from './exchange'
 import * as AmqpLib from 'amqplib/callback_api'
 import {
-    IActivateConsumerOptions, IDeleteResult,
+    IActivateConsumerOptions,
+    IDeleteResult,
     IQueueDeclarationOptions,
     IQueueInitializeResult,
     IStartConsumerOptions,

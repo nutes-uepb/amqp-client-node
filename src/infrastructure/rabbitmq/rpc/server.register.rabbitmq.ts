@@ -78,12 +78,8 @@ export class ServerRegisterRabbitmq implements IServerRegister {
         return new Promise<boolean>(async (resolve, reject) => {
             try {
 
-                if (!this._connection.startingConnection) {
-                    await this._connection.tryConnect()
-                }
-
                 if (!this._connection.isConnected)
-                    return resolve(false)
+                    return reject(new Error('Connection Failed'))
 
                 const exchange = await this._connection.getExchange(exchangeName, config)
                 this._logger.info('Exchange creation ' + exchange.name + ' realized with success!')
@@ -114,7 +110,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                                         return resource.handle.apply('', clientRequest.handle)
                                     } catch (err) {
                                         this._logger.error(`Consumer function returned error: ${err.message}`)
-                                        return  err
+                                        return err
                                     }
                                 }
                             }

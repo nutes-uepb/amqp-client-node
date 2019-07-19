@@ -5,8 +5,9 @@ import { ETypeCommunication } from './type.communication.enum'
 export interface ICommunicationOptions {
     exchange?: IExchangeDeclarationOptions,
     queue?: IQueueDeclarationOptions
+    receiveFromYourself?: boolean
 }
 
-export interface ICommunicationConfig extends ICommunicationOptions{
+export interface ICommunicationConfig extends ICommunicationOptions {
     type: ETypeCommunication
 }

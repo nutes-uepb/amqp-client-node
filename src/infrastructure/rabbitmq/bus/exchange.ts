@@ -1,7 +1,6 @@
 import * as os from 'os'
 import { ConnectionFactoryRabbitMQ, log } from '../connection/connection.factory.rabbitmq'
 import { Binding } from './binding'
-import { Queue } from './queue'
 import * as AmqpLib from 'amqplib/callback_api'
 import { Message } from './message'
 import * as path from 'path'
@@ -120,6 +119,11 @@ export class Exchange {
                     for (const handler of this._consumer_handlers) {
                         if (handler[0] === resultMsg.properties.correlationId) {
                             const func: (err, parameters) => void = handler[1]
+
+                            if (result.properties.type === 'error') {
+                                func.apply('', [new Error(result.getContent()), undefined])
+                                return
+                            }
                             func.apply('', [undefined, result])
                         }
                     }

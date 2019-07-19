@@ -16,7 +16,7 @@ import { ServerRegisterRabbitmq } from '../infrastructure/rabbitmq/rpc/server.re
 import { IServerRegister } from '../infrastructure/port/rpc/server.register.interface'
 import { CustomEventEmitter, ICustomEventEmitter } from '../utils/custom.event.emitter'
 import { EventBus } from '../infrastructure/rabbitmq/event.bus'
-import { IEventBus } from '../infrastructure/port/event.bus.interface'
+import { IEventBus } from '../application/port/event.bus.interface'
 import { ConnectionFactoryRabbitMQ } from '../infrastructure/rabbitmq/connection/connection.factory.rabbitmq'
 import { Direct } from '../application/communication/direct'
 import { Topic } from '../application/communication/topic'

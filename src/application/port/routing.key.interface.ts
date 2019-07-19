@@ -1,15 +1,11 @@
-import { IConfiguration, IOptions } from '../../infrastructure/port/configuration.inteface'
-import { ICommunication } from './communication.interface'
+import { IModeCommunication } from './mode.communication.interface'
 import { RegisterResource } from '../communication/base/register.resource'
-import { ETypeCommunication } from './type.communication.enum'
 
-export interface IRoutingKey extends ICommunication {
-
-    receiveFromYourself(value: boolean): boolean
+export interface IRoutingKey extends IModeCommunication {
 
     pub(exchangeName: string,
         routingKey: string,
-        message: any): Promise<boolean>
+        message: any): Promise<void>
 
     sub(exchangeName: string,
         queueName: string,

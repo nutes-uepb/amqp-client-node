@@ -19,14 +19,11 @@ export class MessageSenderRabbitmq implements IMessageSender {
     public async sendRoutingKeyMessage(exchangeName: string,
                                        topicKey: string,
                                        message: any,
-                                       config: ICommunicationConfig): Promise<boolean> {
+                                       config: ICommunicationConfig): Promise<void> {
         try {
-            if (!this._connection.startingConnection) {
-                await this._connection.tryConnect()
-            }
 
             if (!this._connection.isConnected) {
-                return Promise.resolve(false)
+                return Promise.reject(new Error('Connection Failed'))
             }
 
             const msg = await this.createMessage(message)
@@ -38,7 +35,7 @@ export class MessageSenderRabbitmq implements IMessageSender {
                 this._logger.info('Bus event message sent with success!')
             }
 
-            return Promise.resolve(true)
+            return Promise.resolve()
         } catch (err) {
             return Promise.reject(err)
         }

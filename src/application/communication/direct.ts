@@ -1,8 +1,8 @@
-import { decorate, inject, injectable } from 'inversify'
+import { inject, injectable } from 'inversify'
 import { Identifier } from '../../di/identifier'
 import { ETypeCommunication } from '../port/type.communication.enum'
 import { Routingkey } from './base/routingkey'
-import { IEventBus } from '../../infrastructure/port/event.bus.interface'
+import { IEventBus } from '../port/event.bus.interface'
 import { CustomEventEmitter } from '../../utils/custom.event.emitter'
 import { ICustomLogger } from '../../utils/custom.logger'
 

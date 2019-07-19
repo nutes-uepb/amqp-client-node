@@ -1,8 +1,8 @@
 import { RegisterResource } from '../communication/base/register.resource'
 
-export interface ICommunication {
+export interface IModeCommunication {
 
-    pub(...any: any): Promise<boolean>
+    pub(...any: any): Promise<void>
 
     sub(...any: any): void
 

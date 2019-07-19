@@ -1,4 +1,4 @@
-import { IConfiguration, IOptions } from '../configuration.inteface'
+import { IConnConfiguration, IConnOptions } from '../../../application/port/connection.configuration.inteface'
 import { ConnectionFactoryRabbitMQ } from '../../rabbitmq/connection/connection.factory.rabbitmq'
 import { Exchange } from '../../rabbitmq/bus/exchange'
 import { Queue } from '../../rabbitmq/bus/queue'
@@ -10,9 +10,9 @@ export interface IConnection {
 
     isConnected: boolean
 
-    configurations: IConfiguration | string
+    configurations: IConnConfiguration | string
 
-    options: IOptions
+    options: IConnOptions
 
     startingConnection: boolean
 

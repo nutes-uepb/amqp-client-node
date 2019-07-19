@@ -1,7 +1,8 @@
 export interface IConnectionFactory {
-    // createConnection(IConfiguration): Promise<any>
-    createConnection(url: string,  socketOptions: any, reconnectStrategy: any): Promise<any>
+    // createConnection(IConnConfiguration): Promise<any>
+    createConnection(url: string, socketOptions: any, reconnectStrategy: any): Promise<any>
 }
+
 export interface IReconnectStrategy {
     retries: number // number of retries, 0 is forever
     interval: number // retry interval in ms

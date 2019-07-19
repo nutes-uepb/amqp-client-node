@@ -14,20 +14,10 @@ import { ICommunicationConfig } from '../../../application/port/communications.o
 export class MessageReceiverRabbitmq implements IMessageReceiver {
     private consumersInitialized: Map<string, boolean> = new Map<string, boolean>()
     private routing_key_handlers: Map<string, IEventHandler<any>> = new Map<string, IEventHandler<any>>()
-    private _receiveFromYourself: boolean
 
     constructor(@inject(Identifier.RABBITMQ_CONNECTION) private readonly _connection: IConnection,
                 @inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger,
                 @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
-        this._receiveFromYourself = false
-    }
-
-    set receiveFromYourself(value: boolean) {
-        this._receiveFromYourself = value
-    }
-
-    get receiveFromYourself() {
-        return this._receiveFromYourself
     }
 
     public async receiveRoutingKeyMessage(exchangeName: string,
@@ -36,10 +26,6 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                                           callback: IEventHandler<any>,
                                           config: ICommunicationConfig): Promise<void> {
         try {
-
-            if (!this._connection.startingConnection) {
-                await this._connection.tryConnect()
-            }
 
             if (!this._connection.isConnected) {
                 return callback.handle(new Error('Connection Failed'), undefined)
@@ -55,16 +41,16 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                 queue.bind(exchange, topicKey)
             }
 
-            await this.activateConsumerTopicOrDirec(queue, queueName)
-
-            Promise.resolve()
+            await this.activateConsumerTopicOrDirec(queue, queueName, config.receiveFromYourself)
 
         } catch (err) {
             return callback.handle(err, undefined)
         }
     }
 
-    private async activateConsumerTopicOrDirec(queue: Queue, queueName: string): Promise<void> {
+    private async activateConsumerTopicOrDirec(queue: Queue,
+                                               queueName: string,
+                                               receiveFromYourself: boolean = false): Promise<void> {
         if (!this.consumersInitialized.get(queueName)) {
             this.consumersInitialized.set(queueName, true)
             this._logger.info('Queue creation ' + queueName + ' realized with success!')
@@ -73,7 +59,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                 message.ack() // acknowledge that the message has been received (and processed)
 
                 if (message.properties.appId === this._connection.idConnection &&
-                    !this._receiveFromYourself) return
+                    !receiveFromYourself) return
 
                 this._logger.info(`Bus event message received with success!`)
                 const routingKey: string = message.fields.routingKey

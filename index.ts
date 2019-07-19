@@ -1,3 +1,3 @@
+export { PubSub } from './src/application/pubSub'
 export { ICommunicationOptions } from './src/application/port/communications.options.interface'
-export { IOptions, IConfiguration } from './src/infrastructure/port/configuration.inteface'
-export { PubSub } from './src/application/pub.sub'
+export { IConnConfiguration, IConnOptions } from './src/application/port/connection.configuration.inteface'
