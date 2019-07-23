@@ -27,6 +27,10 @@ export class EventBus implements IEventBus {
     ) {
     }
 
+    get isConnected(): boolean {
+        return this._connection.isConnected
+    }
+
     set config(value: IConnConfiguration | string) {
         this._config = value
         this._connection.configurations = this._config

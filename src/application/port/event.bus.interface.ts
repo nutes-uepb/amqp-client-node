@@ -7,6 +7,7 @@ import { IConnConfiguration, IConnOptions } from './connection.configuration.int
 export interface IEventBus {
     config: IConnConfiguration | string
     options: IConnOptions
+    isConnected: boolean
     messageSender: IMessageSender
     messageReceiver: IMessageReceiver
     clientRegister: IClientRegister

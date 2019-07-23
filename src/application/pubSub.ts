@@ -4,17 +4,24 @@ import { DependencyInject } from '../di/di'
 import { Topic } from './communication/topic'
 import { Direct } from './communication/direct'
 import { IEventBus } from './port/event.bus.interface'
+import { Container, inject } from 'inversify'
+import { CustomEventEmitter } from '../utils/custom.event.emitter'
 
 export class PubSub {
+    private _container: Container
     private _connection: IEventBus
-    private _topic: Topic
-    private _direct: Direct
+    private readonly _topic: Topic
+    private readonly _direct: Direct
     private _logger
+    private _emitter
 
     private _initializedConnection: Promise<void>
 
-    constructor(private _container = new DependencyInject().getContainer()) {
+    constructor() {
+        this._container = new DependencyInject().getContainer()
         this._logger = this._container.get(Identifier.CUSTOM_LOGGER)
+        this._emitter = this._container.get(Identifier.CUSTOM_EVENT_EMITTER)
+
         this._connection = this._container.get(Identifier.EVENT_BUS)
         this._topic = this._container.get(Identifier.TOPIC)
         this._direct = this._container.get(Identifier.DIRECT)
@@ -29,7 +36,15 @@ export class PubSub {
         this._connection.config = conf
         this._connection.options = option
 
-        this._initializedConnection = this._connection.openConnection()
+        try {
+            this._initializedConnection = this._connection.openConnection()
+        } catch (err) {
+            this._initializedConnection = Promise.reject(err)
+        }
+    }
+
+    get isConnected(): boolean {
+        return this._connection.isConnected
     }
 
     public async close(): Promise<boolean> {
@@ -38,6 +53,10 @@ export class PubSub {
 
     public async dispose(): Promise<boolean> {
         return this._connection.disposeConnection()
+    }
+
+    public on(event: string | symbol, listener: (...args: any[]) => void): void {
+        this._emitter.on(event, listener)
     }
 
     get topic(): Topic {

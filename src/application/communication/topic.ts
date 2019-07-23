@@ -11,10 +11,9 @@ export class Topic extends Routingkey {
 
     constructor(
         @inject(Identifier.EVENT_BUS) connection: IEventBus,
-        @inject(Identifier.CUSTOM_EVENT_EMITTER) emitter: CustomEventEmitter,
         @inject(Identifier.CUSTOM_LOGGER) logger: ICustomLogger
     ) {
-        super(connection, emitter, logger)
+        super(connection, logger)
         super.typeConnection(ETypeCommunication.TOPIC)
     }
 

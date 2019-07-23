@@ -3,17 +3,17 @@ export interface IConnConfiguration {
     port: number,
     username: string,
     password: string,
-    vhost: string,
+    vhost?: string,
 }
 
 export interface IConnOptions {
-    retries: number // number of retries, 0 is forever
-    interval: number // retry interval in ms
-    ssl: {
+    retries?: number // number of retries, 0 is forever
+    interval?: number // retry interval in ms
+    ssl?: {
         enabled: boolean,
         ca: string
     }
-    rcp_timeout: number
+    rcp_timeout?: number
 }
 
 export const defaultOptions: IConnOptions = {

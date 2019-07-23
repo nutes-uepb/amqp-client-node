@@ -107,7 +107,7 @@ export class ConnectionRabbitMQ implements IConnection {
                     .replace('protocol', this._options.ssl.enabled ? 'amqps' : 'amqp')
                     .replace('host', this._configuration.host)
                     .replace('port', (this._configuration.port).toString())
-                    .replace('vhost', this._configuration.vhost)
+                    .replace('vhost', this._configuration.vhost ? this._configuration.vhost : '')
                     .replace('username', this._configuration.username)
                     .replace('password', this._configuration.password)
             } else {

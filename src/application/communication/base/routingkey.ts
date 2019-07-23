@@ -27,7 +27,6 @@ export class Routingkey implements IRoutingKey {
 
     constructor(
         @inject(Identifier.EVENT_BUS) private _connection: IEventBus,
-        @inject(Identifier.CUSTOM_EVENT_EMITTER) private  _emitter: CustomEventEmitter,
         @inject(Identifier.CUSTOM_LOGGER) private  _logger: ICustomLogger
     ) {
         this._pubConnection = this._connection.messageSender
@@ -140,10 +139,6 @@ export class Routingkey implements IRoutingKey {
                     return reject(err)
                 })
         })
-    }
-
-    public on(event: string | symbol, listener: (...args: any[]) => void): void {
-        this._emitter.on(event, listener)
     }
 
 }

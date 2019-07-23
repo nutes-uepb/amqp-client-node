@@ -10,6 +10,4 @@ export interface IModeCommunication {
 
     rpcServer(...any: any): Promise<RegisterResource>
 
-    on(event: string | symbol, listener: (...args: any[]) => void): void
-
 }
