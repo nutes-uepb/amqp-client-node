@@ -1,7 +1,6 @@
 import * as os from 'os'
 import { ConnectionFactoryRabbitMQ, log } from '../connection/connection.factory.rabbitmq'
 import { Binding } from './binding'
-import { Queue } from './queue'
 import * as AmqpLib from 'amqplib/callback_api'
 import { Message } from './message'
 import * as path from 'path'
@@ -102,37 +101,42 @@ export class Exchange {
 
     public rpc(requestParameters: any, routingKey = '', callback: (err, message: Message) => void): void {
 
-            function generateUuid(): string {
-                return Math.random().toString() +
-                    Math.random().toString() +
-                    Math.random().toString()
-            }
+        function generateUuid(): string {
+            return Math.random().toString() +
+                Math.random().toString() +
+                Math.random().toString()
+        }
 
-            const processRpc = () => {
-                const uuid: string = generateUuid()
-                if (!this._isConsumerInitializedRcp) {
-                    this._isConsumerInitializedRcp = true
-                    this._channel.consume(DIRECT_REPLY_TO_QUEUE, (resultMsg) => {
+        const processRpc = () => {
+            const uuid: string = generateUuid()
+            if (!this._isConsumerInitializedRcp) {
+                this._isConsumerInitializedRcp = true
+                this._channel.consume(DIRECT_REPLY_TO_QUEUE, (resultMsg) => {
 
-                        const result = new Message(resultMsg.content, resultMsg.fields)
-                        result.fields = resultMsg.fields
+                    const result = new Message(resultMsg.content, resultMsg.properties)
+                    result.fields = resultMsg.fields
 
-                        for (const handler of this._consumer_handlers) {
-                            if (handler[0] === resultMsg.properties.correlationId) {
-                                const func: (err, parameters) => void = handler[1]
-                                func.apply('', [undefined, result])
+                    for (const handler of this._consumer_handlers) {
+                        if (handler[0] === resultMsg.properties.correlationId) {
+                            const func: (err, parameters) => void = handler[1]
+
+                            if (result.properties.type === 'error') {
+                                func.apply('', [new Error(result.getContent()), undefined])
+                                return
                             }
+                            func.apply('', [undefined, result])
                         }
+                    }
 
-                    }, { noAck: true })
-                }
-                this._consumer_handlers.push([uuid, callback])
-                const message = new Message(requestParameters,
-                    { correlationId: uuid, replyTo: DIRECT_REPLY_TO_QUEUE })
-                message.sendTo(this, routingKey)
+                }, { noAck: true })
             }
+            this._consumer_handlers.push([uuid, callback])
+            const message = new Message(requestParameters,
+                { correlationId: uuid, replyTo: DIRECT_REPLY_TO_QUEUE })
+            message.sendTo(this, routingKey)
+        }
 
-            this._initialized.then(processRpc)
+        this._initialized.then(processRpc)
     }
 
     public delete(): Promise<void> {

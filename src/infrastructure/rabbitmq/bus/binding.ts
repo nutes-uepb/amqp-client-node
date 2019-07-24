@@ -3,7 +3,7 @@ import { Queue } from './queue'
 import { Exchange } from './exchange'
 import { IBinding } from '../../port/bus/binding.interface'
 
-export class Binding implements IBinding{
+export class Binding implements IBinding {
     private _initialized: Promise<Binding>
 
     private readonly _source: Exchange

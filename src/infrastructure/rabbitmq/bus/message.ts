@@ -20,10 +20,15 @@ export class Message implements IMessageInterface {
     }
 
     set content(content: any) {
+        if (content instanceof Error) {
+            this.properties.type = 'error'
+            content = content.message
+        }
+
         if (typeof content === 'string') {
             this._content = new Buffer(content)
         } else if (!(content instanceof Buffer)) {
-            this._content = new Buffer(JSON.stringify(content))
+            this._content = Buffer.from(JSON.stringify(content))
             this._properties.contentType = 'application/json'
         } else {
             this._content = content
@@ -36,9 +41,11 @@ export class Message implements IMessageInterface {
 
     public getContent(): any {
         let content = this._content.toString()
+
         if (this._properties.contentType === 'application/json') {
             content = JSON.parse(content)
         }
+
         return content
     }
 

@@ -1,10 +1,9 @@
 import { IClientRequest } from './resource.handler.interface'
-import { IConnectionBase } from '../configuration.inteface'
+import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
 
-export interface IClientRegister extends IConnectionBase {
+export interface IClientRegister {
 
-    registerClientDirectOrTopic(type: string,
-                                exchangeName: string,
-                                resource: IClientRequest,
-                                callback?: (err, message: any) => void): Promise<any>
+    registerRoutingKeyClient(exchangeName: string,
+                             resource: IClientRequest,
+                             config: ICommunicationConfig): Promise<any>
 }

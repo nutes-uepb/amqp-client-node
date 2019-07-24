@@ -4,7 +4,8 @@ import { Message } from './message'
 import { Exchange } from './exchange'
 import * as AmqpLib from 'amqplib/callback_api'
 import {
-    IActivateConsumerOptions, IDeleteResult,
+    IActivateConsumerOptions,
+    IDeleteResult,
     IQueueDeclarationOptions,
     IQueueInitializeResult,
     IStartConsumerOptions,
@@ -142,7 +143,7 @@ export class Queue {
                         reject(new Error('amqp-ts: Queue.rpc error: ' + err.message))
                     } else {
                         // send the rpc request
-                        consumerTag = ok.consumerTag
+                        consumerTag = ok.consumer_tag
                         const message = new Message(requestParameters, { replyTo: DIRECT_REPLY_TO_QUEUE })
                         message.sendTo(this)
                     }
@@ -293,7 +294,7 @@ export class Queue {
                 }
             } catch (err) {
                 /* istanbul ignore next */
-                log.log('error', 'Queue.onMessage33 consumer function returned error: ' + err.message, { module: 'amqp-ts' })
+                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.message, { module: 'amqp-ts' })
             }
         }
 
@@ -309,7 +310,7 @@ export class Queue {
                         if (err) {
                             reject(err)
                         } else {
-                            this._consumerTag = ok.consumerTag
+                            this._consumerTag = ok.consumer_tag
                             resolve(ok)
                         }
                     })

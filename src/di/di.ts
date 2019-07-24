@@ -5,8 +5,7 @@ import { IConnection } from '../infrastructure/port/connection/connection.interf
 import { ConnectionRabbitMQ } from '../infrastructure/rabbitmq/connection/connection.rabbitmq'
 import { IConnectionFactory } from '../infrastructure/port/connection/connection.factory.interface'
 import { CustomLogger, ICustomLogger } from '../utils/custom.logger'
-import { TopicDirect } from '../application/communication/topic.direct'
-import { ITopicDirect } from '../application/port/topic.direct.inteface'
+import { IRoutingKey } from '../application/port/routing.key.interface'
 import { IMessageReceiver } from '../infrastructure/port/pubsub/message.receiver.interface'
 import { MessageReceiverRabbitmq } from '../infrastructure/rabbitmq/pubsub/message.receiver.rabbitmq'
 import { IMessageSender } from '../infrastructure/port/pubsub/message.sender.interface'
@@ -17,7 +16,7 @@ import { ServerRegisterRabbitmq } from '../infrastructure/rabbitmq/rpc/server.re
 import { IServerRegister } from '../infrastructure/port/rpc/server.register.interface'
 import { CustomEventEmitter, ICustomEventEmitter } from '../utils/custom.event.emitter'
 import { EventBus } from '../infrastructure/rabbitmq/event.bus'
-import { IEventBus } from '../infrastructure/port/event.bus.interface'
+import { IEventBus } from '../application/port/event.bus.interface'
 import { ConnectionFactoryRabbitMQ } from '../infrastructure/rabbitmq/connection/connection.factory.rabbitmq'
 import { Direct } from '../application/communication/direct'
 import { Topic } from '../application/communication/topic'
@@ -52,11 +51,9 @@ export class DependencyInject {
      */
     private initDependencies(): void {
 
-        this.container.bind<ITopicDirect>(Identifier.TOPIC_DIRECT)
-            .to(TopicDirect)
-        this.container.bind<ITopicDirect>(Identifier.TOPIC)
+        this.container.bind<IRoutingKey>(Identifier.TOPIC)
             .to(Topic)
-        this.container.bind<ITopicDirect>(Identifier.DIRECT)
+        this.container.bind<IRoutingKey>(Identifier.DIRECT)
             .to(Direct)
 
         this.container.bind<IEventBus>(Identifier.EVENT_BUS)

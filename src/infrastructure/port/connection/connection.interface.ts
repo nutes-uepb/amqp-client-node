@@ -1,26 +1,31 @@
-import { IConfiguration, IConnectionBase, IOptions } from '../configuration.inteface'
+import { IConnConfiguration, IConnOptions } from '../../../application/port/connection.configuration.inteface'
 import { ConnectionFactoryRabbitMQ } from '../../rabbitmq/connection/connection.factory.rabbitmq'
 import { Exchange } from '../../rabbitmq/bus/exchange'
 import { Queue } from '../../rabbitmq/bus/queue'
+import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
 
-export interface IConnection extends IConnectionBase {
+export interface IConnection {
 
     idConnection: string
 
     isConnected: boolean
 
-    configurations: IConfiguration | string
+    configurations: IConnConfiguration | string
 
-    options: IOptions
+    options: IConnOptions
 
     startingConnection: boolean
 
     conn?: any
 
-    tryConnect(): Promise<ConnectionFactoryRabbitMQ>
+    tryConnect(): Promise<void>
 
-    getExchange(exchangeName: string, type: string): Exchange
+    closeConnection(): Promise<boolean>
 
-    getQueue(queueName: string): Queue
+    disposeConnection(): Promise<boolean>
+
+    getExchange(exchangeName: string, config: ICommunicationConfig): Exchange
+
+    getQueue(queueName: string, config: ICommunicationConfig): Queue
 
 }

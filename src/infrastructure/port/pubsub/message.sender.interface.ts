@@ -1,10 +1,10 @@
-import { IConnectionBase } from '../configuration.inteface'
+import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
 
-export interface IMessageSender extends IConnectionBase {
+export interface IMessageSender {
 
-    sendMessageTopicOrDirec(type: string,
-                            exchangeName: string,
-                            topicKey: string,
-                            message: any): Promise<boolean>
+    sendRoutingKeyMessage(exchangeName: string,
+                          topicKey: string,
+                          message: any,
+                          config: ICommunicationConfig): Promise<void>
 
 }

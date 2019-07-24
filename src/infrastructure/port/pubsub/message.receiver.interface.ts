@@ -1,14 +1,12 @@
 import { IEventHandler } from './event.handler.interface'
-import { IConnectionBase } from '../configuration.inteface'
+import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
 
-export interface IMessageReceiver extends IConnectionBase {
+export interface IMessageReceiver {
 
-    receiveFromYourself
-
-    receiveMessageTopicOrDirect(type: string,
-                                exchangeName: string,
-                                topicKey: string,
-                                queueName: string,
-                                callback: IEventHandler<any>): Promise<boolean>
+    receiveRoutingKeyMessage(exchangeName: string,
+                             topicKey: string,
+                             queueName: string,
+                             callback: IEventHandler<any>,
+                             config: ICommunicationConfig): Promise<void>
 
 }

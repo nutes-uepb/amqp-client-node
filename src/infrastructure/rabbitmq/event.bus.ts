@@ -1,5 +1,5 @@
-import { IEventBus } from '../port/event.bus.interface'
-import { IConfiguration, IOptions } from '../port/configuration.inteface'
+import { IEventBus } from '../../application/port/event.bus.interface'
+import { IConnConfiguration, IConnOptions } from '../../application/port/connection.configuration.inteface'
 import { IServerRegister } from '../port/rpc/server.register.interface'
 import { IMessageSender } from '../port/pubsub/message.sender.interface'
 import { IMessageReceiver } from '../port/pubsub/message.receiver.interface'
@@ -13,8 +13,6 @@ import { IConnection } from '../port/connection/connection.interface'
 @injectable()
 export class EventBus implements IEventBus {
 
-    private _config: IConfiguration | string
-    private _options: IOptions
     constructor(
         @inject(Identifier.RABBITMQ_CONNECTION) private readonly _connection: IConnection,
         @inject(Identifier.RABBITMQ_MENSSAGE_SENDER) private readonly _messageSender: IMessageSender,
@@ -24,17 +22,6 @@ export class EventBus implements IEventBus {
         @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: CustomEventEmitter,
         @inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger
     ) {
-    }
-
-    set config(value: IConfiguration) {
-        this._config = value
-        this._connection.configurations = this._config
-    }
-
-    set options(value: IOptions) {
-        this._options = value
-        this._connection.options = this._options
-
     }
 
     get clientRegister(): IClientRegister {
@@ -51,6 +38,38 @@ export class EventBus implements IEventBus {
 
     get serverRegister(): IServerRegister {
         return this._serverRegister
+    }
+
+    public isConnected(): boolean {
+        return this._connection.isConnected
+    }
+
+    public async openConnection(): Promise<void> {
+        try {
+            return await this._connection.tryConnect()
+        } catch (e) {
+            return Promise.reject(e)
+        }
+    }
+
+    public closeConnection(): Promise<boolean> {
+        return this._connection.closeConnection()
+    }
+
+    public disposeConnection(): Promise<boolean> {
+        return this._connection.disposeConnection()
+    }
+
+    public config(value: IConnConfiguration | string): void {
+        this._connection.configurations = value
+    }
+
+    public options(value: IConnOptions) {
+        this._connection.options = value
+    }
+
+    public serviceTag(tag: string): void {
+        this._connection.idConnection = tag
     }
 
 }

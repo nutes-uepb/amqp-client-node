@@ -1,5 +1,4 @@
-
-export enum TypeCommunication {
+export enum ETypeCommunication {
     DIRECT = 'direct',
     TOPIC = 'topic',
     FANOUT = 'fanout',

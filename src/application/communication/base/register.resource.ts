@@ -1,5 +1,5 @@
-import { IResourceHandler } from '../../infrastructure/port/rpc/resource.handler.interface'
-import { IServerRegister } from '../../infrastructure/port/rpc/server.register.interface'
+import { IResourceHandler } from '../../../infrastructure/port/rpc/resource.handler.interface'
+import { IServerRegister } from '../../../infrastructure/port/rpc/server.register.interface'
 
 export class RegisterResource {
 
