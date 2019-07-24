@@ -78,7 +78,7 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 delivery_tag: message.fields.deliveryTag,
                 redelivered: message.fields,
                 exchange: message.fields.exchange,
-                routing_key: message.fields.routing_key
+                routing_key: message.fields.routingKey
             } as IMessageField
         } as IMessage
 

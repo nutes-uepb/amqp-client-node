@@ -59,24 +59,24 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
 
             await queue.activateConsumer((message: Message) => {
                 // acknowledge that the message has been received (and processed)
+                message.ack()
 
                 if (message.properties.correlationId === this._connection.idConnection &&
                     !receiveFromYourself) {
-                    message.nack()
                     return
                 }
 
-                message.ack()
                 this._logger.info(`Bus event message received with success!`)
-                const routingKey: string = message.fields.routing_key
+
+                const msg: IMessage = this.createMessage(message)
+
+                const routingKey: string = msg.fields.routing_key
 
                 for (const entry of this.routing_key_handlers.keys()) {
                     if (this.regExpr(entry, routingKey)) {
                         const event_handler: IEventHandler<any> | undefined =
                             this.routing_key_handlers.get(entry)
-
                         if (event_handler) {
-                            const msg: IMessage = this.createMessage(message)
                             event_handler.handle(undefined, msg)
                         }
                     }
@@ -124,7 +124,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                 delivery_tag: message.fields.deliveryTag,
                 redelivered: message.fields,
                 exchange: message.fields.exchange,
-                routing_key: message.fields.routing_key
+                routing_key: message.fields.routingKey
             } as IMessageField
         } as IMessage
 

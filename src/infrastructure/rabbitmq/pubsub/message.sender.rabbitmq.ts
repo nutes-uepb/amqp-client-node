@@ -23,7 +23,6 @@ export class MessageSenderRabbitmq implements IMessageSender {
         try {
 
             if (!this._connection.isConnected) {
-                console.log('quebrou')
                 return Promise.reject(new Error('Connection Failed'))
             }
 

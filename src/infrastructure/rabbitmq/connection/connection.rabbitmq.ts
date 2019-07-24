@@ -123,6 +123,30 @@ export class ConnectionRabbitMQ implements IConnection {
                 .then(async (connection: ConnectionFactoryRabbitMQ) => {
                     this._connection = connection
 
+                    this._emitter.on('error_connection', (err: Error) => {
+                        this._logger.error('Error during connection ')
+                    })
+
+                    this._emitter.on('close_connection', () => {
+                        this._logger.info('Close connection with success! ')
+                    })
+
+                    this._emitter.on('open_connection', () => {
+                        this._logger.info('Connection established.')
+                    })
+
+                    this._emitter.on('lost_connection', () => {
+                        this._logger.warn('Lost connection ')
+                    })
+
+                    this._emitter.on('trying_connect', () => {
+                        this._logger.warn('Trying re-established connection')
+                    })
+
+                    this._emitter.on('re_established_connection', () => {
+                        this._logger.warn('Re-established connection')
+                    })
+
                     await this._connection.initialized
                     this._startingConnection = false
 
