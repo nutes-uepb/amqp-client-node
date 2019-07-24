@@ -24,7 +24,7 @@ import { IQueueOptions } from '../../../application/port/queue.options.interface
 // create a custom winston logger for amqp-ts
 const amqp_log = createLogger({
     level: 'silly', // Used by transports that do not have this configuration defined
-    silent: false,
+    silent: true,
     format: format.combine(
         format.timestamp(),
         format.json()
