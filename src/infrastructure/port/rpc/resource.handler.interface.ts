@@ -1,10 +1,10 @@
 export interface IResourceHandler {
-    resourceName: string,
+    resource_name: string,
 
     handle(...any: any): any
 }
 
 export interface IClientRequest {
-    resourceName: string,
+    resource_name: string,
     handle: any[]
 }

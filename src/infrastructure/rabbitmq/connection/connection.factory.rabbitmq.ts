@@ -18,8 +18,8 @@ import { inject, injectable } from 'inversify'
 import { Identifier } from '../../../di/identifier'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 import { IConnectionFactory, IReconnectStrategy, ITopology } from '../../port/connection/connection.factory.interface'
-import { IExchangeDeclarationOptions } from '../../port/bus/exchange.options.interface'
-import { IQueueDeclarationOptions } from '../../port/bus/queue.options.interface'
+import { IExchangeOptions } from '../../../application/port/exchange.options.interface'
+import { IQueueOptions } from '../../../application/port/queue.options.interface'
 
 // create a custom winston logger for amqp-ts
 const amqp_log = createLogger({
@@ -293,7 +293,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
         return Promise.all(promises)
     }
 
-    public declareExchange(name: string, type?: string, options?: IExchangeDeclarationOptions): Exchange {
+    public declareExchange(name: string, type?: string, options?: IExchangeOptions): Exchange {
         let exchange = this._exchanges[name]
         if (exchange === undefined) {
             exchange = new Exchange(this, name, type, options)
@@ -301,7 +301,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
         return exchange
     }
 
-    public declareQueue(name: string, options?: IQueueDeclarationOptions): Queue {
+    public declareQueue(name: string, options?: IQueueOptions): Queue {
         let queue = this._queues[name]
         if (queue === undefined) {
             queue = new Queue(this, name, options)

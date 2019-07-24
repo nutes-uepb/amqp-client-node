@@ -50,7 +50,15 @@ export class MessageSenderRabbitmq implements IMessageSender {
                 this._connection.idConnection = 'id-' + Math.random().toString(36).substr(2, 16)
 
             const rabbitMessage: Message = new Message(message.content, message.properties)
-            rabbitMessage.properties.correlationId = this._connection.idConnection
+
+            rabbitMessage.properties = {
+                ...message.properties,
+                correlationId: this._connection.idConnection,
+                messageId: message.properties.message_id,
+                userId: message.properties.user_id,
+                appId: message.properties.app_id,
+                clusterId: message.properties.cluster_id
+            }
 
             return Promise.resolve(rabbitMessage)
 

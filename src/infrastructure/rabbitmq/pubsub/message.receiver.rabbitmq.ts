@@ -7,9 +7,9 @@ import { IConnection } from '../../port/connection/connection.interface'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
-import { IStartConsumerResult } from '../../port/bus/queue.options.interface'
+import { IStartConsumerResult } from '../../../application/port/queue.options.interface'
 import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
-import { IMessage } from '../../../application/port/message.interface'
+import { IMessage, IMessageField, IMessageProperty } from '../../../application/port/message.interface'
 
 @injectable()
 export class MessageReceiverRabbitmq implements IMessageReceiver {
@@ -42,7 +42,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                 queue.bind(exchange, topicKey)
             }
 
-            await this.activateConsumerTopicOrDirec(queue, queueName, config.receiveFromYourself)
+            await this.activateConsumerTopicOrDirec(queue, queueName, config.receive_from_yourself)
 
         } catch (err) {
             return callback.handle(err, undefined)
@@ -58,13 +58,17 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
             this._logger.info('Queue creation ' + queueName + ' realized with success!')
 
             await queue.activateConsumer((message: Message) => {
-                message.ack() // acknowledge that the message has been received (and processed)
+                // acknowledge that the message has been received (and processed)
 
                 if (message.properties.correlationId === this._connection.idConnection &&
-                    !receiveFromYourself) return
+                    !receiveFromYourself) {
+                    message.nack()
+                    return
+                }
 
+                message.ack()
                 this._logger.info(`Bus event message received with success!`)
-                const routingKey: string = message.fields.routingKey
+                const routingKey: string = message.fields.routing_key
 
                 for (const entry of this.routing_key_handlers.keys()) {
                     if (this.regExpr(entry, routingKey)) {
@@ -72,11 +76,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                             this.routing_key_handlers.get(entry)
 
                         if (event_handler) {
-                            const msg = {
-                                properties: message.properties,
-                                content: message.getContent(),
-                                fields: message.fields
-                            } as IMessage
+                            const msg: IMessage = this.createMessage(message)
                             event_handler.handle(undefined, msg)
                         }
                     }
@@ -104,4 +104,31 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
             throw e
         }
     }
+
+    private createMessage(message: Message): IMessage {
+        const msg = {
+            properties: {
+                priority: message.properties.priority,
+                expiration: message.properties.expiration,
+                message_id: message.properties.messageId,
+                timestamp: message.properties.timestamp,
+                user_id: message.properties.userId,
+                app_id: message.properties.appId,
+                cluster_id: message.properties.clusterId,
+                cc: message.properties.cc,
+                bcc: message.properties.bcc
+            } as IMessageProperty,
+            content: message.getContent(),
+            fields: {
+                consumer_tag: message.fields.consumerTag,
+                delivery_tag: message.fields.deliveryTag,
+                redelivered: message.fields,
+                exchange: message.fields.exchange,
+                routing_key: message.fields.routing_key
+            } as IMessageField
+        } as IMessage
+
+        return msg
+    }
+
 }

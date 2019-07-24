@@ -94,17 +94,17 @@ export class ConnectionRabbitMQ implements IConnection {
 
             let certAuth = {}
 
-            if (this._options.sslOptions.enabled) {
-                if (!this._options.sslOptions.ca)
+            if (this._options.ssl_options.enabled) {
+                if (!this._options.ssl_options.ca)
                     return reject(new Error('Paramater ca not found'))
-                certAuth = { ca: fs.readFileSync(this._options.sslOptions.ca) }
+                certAuth = { ca: fs.readFileSync(this._options.ssl_options.ca) }
             }
 
             let uri: string = ''
 
             if (typeof this._configuration === 'object') {
                 uri = 'protocol://username:password@host:port/vhost'
-                    .replace('protocol', this._options.sslOptions.enabled ? 'amqps' : 'amqp')
+                    .replace('protocol', this._options.ssl_options.enabled ? 'amqps' : 'amqp')
                     .replace('host', this._configuration.host)
                     .replace('port', (this._configuration.port).toString())
                     .replace('vhost', this._configuration.vhost ? this._configuration.vhost : '')
@@ -135,7 +135,15 @@ export class ConnectionRabbitMQ implements IConnection {
     }
 
     public getExchange(exchangeName: string, config: ICommunicationConfig): Exchange {
-        const exchange = this._connection.declareExchange(exchangeName, config.type, config.exchange)
+
+        const exchangeOpetions = {
+            ...config.exchange,
+            autoDelete: config.exchange.auto_delete,
+            alternateExchange: config.exchange.alternate_exchange,
+            noCreate: config.exchange.no_create
+        }
+
+        const exchange = this._connection.declareExchange(exchangeName, config.type, exchangeOpetions)
         if (!this._resourceBus.get(exchangeName)) {
             this._resourceBus.set(exchangeName, exchange)
         }
@@ -143,7 +151,17 @@ export class ConnectionRabbitMQ implements IConnection {
     }
 
     public getQueue(queueName: string, config: ICommunicationConfig): Queue {
-        const queue = this._connection.declareQueue(queueName, config.queue)
+
+        const queueOpetions = {
+            ...config.queue,
+            autoDelete: config.queue.auto_delete,
+            messageTtl: config.queue.message_ttl,
+            deadLetterExchange: config.queue.dead_letter_exchange,
+            maxLength: config.queue.max_length,
+            noCreate: config.queue.no_create
+        }
+
+        const queue = this._connection.declareQueue(queueName, queueOpetions)
         if (!this._resourceBus.get(queueName)) {
             this._resourceBus.set(queueName, queue)
         }

@@ -5,7 +5,7 @@ import { ICustomLogger } from '../../../utils/custom.logger'
 import { IConnection } from '../../port/connection/connection.interface'
 import { IServerRegister } from '../../port/rpc/server.register.interface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
-import { IStartConsumerResult } from '../../port/bus/queue.options.interface'
+import { IStartConsumerResult } from '../../../application/port/queue.options.interface'
 import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
 
 @injectable()
@@ -33,7 +33,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                 }
 
                 for (const actualResource of resources_handler) {
-                    if (actualResource.resourceName === resource.resourceName) {
+                    if (actualResource.resource_name === resource.resource_name) {
                         return resolve(false)
                     }
                 }
@@ -58,7 +58,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
             }
 
             for (const index in resources_handler) {
-                if (resources_handler[index].resourceName === resourceName) {
+                if (resources_handler[index].resource_name === resourceName) {
                     resources_handler.splice(Number(index), 1)
                     this.resource_handlers.set(queueName, resources_handler)
                     return resolve(true)
@@ -105,7 +105,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
 
                         if (resources_handler) {
                             for (const resource of resources_handler) {
-                                if (resource.resourceName === clientRequest.resourceName) {
+                                if (resource.resource_name === clientRequest.resource_name) {
                                     try {
                                         return resource.handle.apply('', clientRequest.handle)
                                     } catch (err) {
@@ -115,7 +115,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                                 }
                             }
                         }
-                        return {}
+                        return new Error('Resource not registered in server')
                     }, { noAck: false }).then((result: IStartConsumerResult) => {
                         this._logger.info('Server registered in ' + exchangeName + ' exchange!')
                     })

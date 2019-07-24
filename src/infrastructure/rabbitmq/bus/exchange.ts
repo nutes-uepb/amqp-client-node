@@ -4,8 +4,8 @@ import { Binding } from './binding'
 import * as AmqpLib from 'amqplib/callback_api'
 import { Message } from './message'
 import * as path from 'path'
-import { IExchangeDeclarationOptions, IExchangeInitializeResult } from '../../port/bus/exchange.options.interface'
-import { IActivateConsumerOptions, IStartConsumerOptions } from '../../port/bus/queue.options.interface'
+import { IExchangeOptions, IExchangeInitializeResult } from '../../../application/port/exchange.options.interface'
+import { IActivateConsumerOptions, IStartConsumerOptions } from '../../../application/port/queue.options.interface'
 import { IBinding } from '../../port/bus/binding.interface'
 
 const ApplicationName = process.env.AMQPTS_APPLICATIONNAME ||
@@ -23,12 +23,12 @@ export class Exchange {
     private _channel: AmqpLib.Channel
     private _name: string
     private _type: string
-    private _options: IExchangeDeclarationOptions
+    private _options: IExchangeOptions
 
     private _deleting: Promise<void>
     private _closing: Promise<void>
 
-    constructor(connection: ConnectionFactoryRabbitMQ, name: string, type?: string, options: IExchangeDeclarationOptions = {}) {
+    constructor(connection: ConnectionFactoryRabbitMQ, name: string, type?: string, options: IExchangeOptions = {}) {
         this._connection = connection
         this._name = name
         this._type = type
@@ -55,7 +55,7 @@ export class Exchange {
                                 resolve(ok as IExchangeInitializeResult)
                             }
                         }
-                        if (this._options.noCreate) {
+                        if (this._options.no_create) {
                             this._channel.checkExchange(this._name, callback)
                         } else {
                             this._channel.assertExchange(this._name, this._type,

@@ -14,7 +14,7 @@ export class RegisterResource {
     public async addResource(resourceName: string, resource: (...any: any) => any): Promise<boolean> {
 
         const resourceHandler: IResourceHandler = {
-            resourceName,
+            resource_name: resourceName,
             handle: resource
         }
 

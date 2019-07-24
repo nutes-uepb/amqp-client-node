@@ -6,7 +6,8 @@ import { IConnection } from '../../port/connection/connection.interface'
 import { IClientRegister } from '../../port/rpc/client.register.interface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
-import { IMessage } from '../../../application/port/message.interface'
+import { IMessage, IMessageField, IMessageProperty } from '../../../application/port/message.interface'
+import { Message } from '../bus/message'
 
 @injectable()
 export class ClientRegisterRabbitmq implements IClientRegister {
@@ -30,7 +31,7 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 const exchange = this._connection.getExchange(exchangeName, config)
 
                 let time
-                const timeout = this._connection.options.rcpTimeout
+                const timeout = this._connection.options.rcp_timeout
 
                 if (timeout > 0) {
                     new Promise<any>((res) => {
@@ -40,18 +41,14 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                     })
                 }
 
-                exchange.rpc(resource, resource.resourceName, (err, msg) => {
+                exchange.rpc(resource, resource.resource_name, (err, msg) => {
                     clearTimeout(time)
 
                     if (err) return reject(err)
 
-                    const mensage = {
-                        content: msg.getContent(),
-                        fields: msg.fields,
-                        properties: msg.properties
-                    } as IMessage
+                    const message: IMessage = this.createMessage(msg)
 
-                    return resolve(mensage)
+                    return resolve(message)
                 })
 
                 this._logger.info('Client registered in ' + exchangeName + ' exchange!')
@@ -60,6 +57,32 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 return reject(err)
             }
         })
+    }
+
+    private createMessage(message: Message): IMessage {
+        const msg = {
+            properties: {
+                priority: message.properties.priority,
+                expiration: message.properties.expiration,
+                message_id: message.properties.messageId,
+                timestamp: message.properties.timestamp,
+                user_id: message.properties.userId,
+                app_id: message.properties.appId,
+                cluster_id: message.properties.clusterId,
+                cc: message.properties.cc,
+                bcc: message.properties.bcc
+            } as IMessageProperty,
+            content: message.getContent(),
+            fields: {
+                consumer_tag: message.fields.consumerTag,
+                delivery_tag: message.fields.deliveryTag,
+                redelivered: message.fields,
+                exchange: message.fields.exchange,
+                routing_key: message.fields.routing_key
+            } as IMessageField
+        } as IMessage
+
+        return msg
     }
 
 }

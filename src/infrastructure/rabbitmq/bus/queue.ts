@@ -6,11 +6,11 @@ import * as AmqpLib from 'amqplib/callback_api'
 import {
     IActivateConsumerOptions,
     IDeleteResult,
-    IQueueDeclarationOptions,
+    IQueueOptions,
     IQueueInitializeResult,
     IStartConsumerOptions,
     IStartConsumerResult
-} from '../../port/bus/queue.options.interface'
+} from '../../../application/port/queue.options.interface'
 import { IBinding } from '../../port/bus/binding.interface'
 
 const DIRECT_REPLY_TO_QUEUE = 'amq.rabbitmq.reply-to'
@@ -21,7 +21,7 @@ export class Queue {
     private _connection: ConnectionFactoryRabbitMQ
     private _channel: AmqpLib.Channel
     private _name: string
-    private _options: IQueueDeclarationOptions
+    private _options: IQueueOptions
 
     private _consumer: (msg: any, channel?: AmqpLib.Channel) => any
     private _isStartConsumer: boolean
@@ -33,7 +33,7 @@ export class Queue {
     private _deleting: Promise<IDeleteResult>
     private _closing: Promise<void>
 
-    constructor(connection: ConnectionFactoryRabbitMQ, name: string, options: IQueueDeclarationOptions = {}) {
+    constructor(connection: ConnectionFactoryRabbitMQ, name: string, options: IQueueOptions = {}) {
         this._connection = connection
         this._name = name
         this._options = options
@@ -64,7 +64,7 @@ export class Queue {
                             }
                         }
 
-                        if (this._options.noCreate) {
+                        if (this._options.no_create) {
                             this._channel.checkQueue(this._name, callback)
                         } else {
                             this._channel.assertQueue(this._name, this._options as AmqpLib.Options.AssertQueue, callback)

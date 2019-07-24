@@ -91,7 +91,7 @@ export class Routingkey implements IRoutingKey {
         parameters: any[],
         callback: (err, message: IMessage) => void): void {
         const clientRequest: IClientRequest = {
-            resourceName,
+            resource_name: resourceName,
             handle: parameters
         }
 
@@ -111,7 +111,7 @@ export class Routingkey implements IRoutingKey {
         parameters: any[]): Promise<IMessage> {
         return new Promise<any>(async (resolve, reject) => {
             const clientRequest: IClientRequest = {
-                resourceName,
+                resource_name: resourceName,
                 handle: parameters
             }
 
