@@ -1,5 +1,4 @@
 import { Message } from '../bus/message'
-import { IMessage } from '../../port/pubsub/message.interface'
 import { inject, injectable } from 'inversify'
 import { IConnection } from '../../port/connection/connection.interface'
 import { Identifier } from '../../../di/identifier'
@@ -7,6 +6,7 @@ import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageSender } from '../../port/pubsub/message.sender.interface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
+import { IMessage } from '../../../application/port/message.interface'
 
 @injectable()
 export class MessageSenderRabbitmq implements IMessageSender {
@@ -42,22 +42,15 @@ export class MessageSenderRabbitmq implements IMessageSender {
         }
     }
 
-    private createMessage(message: any,
+    private createMessage(message: IMessage,
                           eventName?: string): Promise<Message> {
         try {
-            const msg: IMessage = {
-                timestamp: new Date().toISOString(),
-                body: message
-            }
-
-            if (eventName)
-                msg.eventName = eventName
 
             if (!this._connection.idConnection)
                 this._connection.idConnection = 'id-' + Math.random().toString(36).substr(2, 16)
 
-            const rabbitMessage: Message = new Message(msg)
-            rabbitMessage.properties.appId = this._connection.idConnection
+            const rabbitMessage: Message = new Message(message.content, message.properties)
+            rabbitMessage.properties.correlationId = this._connection.idConnection
 
             return Promise.resolve(rabbitMessage)
 

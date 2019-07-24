@@ -6,6 +6,7 @@ import { IConnection } from '../../port/connection/connection.interface'
 import { IClientRegister } from '../../port/rpc/client.register.interface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
+import { IMessage } from '../../../application/port/message.interface'
 
 @injectable()
 export class ClientRegisterRabbitmq implements IClientRegister {
@@ -18,8 +19,8 @@ export class ClientRegisterRabbitmq implements IClientRegister {
 
     public registerRoutingKeyClient(exchangeName: string,
                                     resource: IClientRequest,
-                                    config: ICommunicationConfig): Promise<any> {
-        return new Promise<any>(async (resolve, reject) => {
+                                    config: ICommunicationConfig): Promise<IMessage> {
+        return new Promise<IMessage>(async (resolve, reject) => {
             try {
 
                 if (!this._connection.isConnected) {
@@ -29,7 +30,7 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 const exchange = this._connection.getExchange(exchangeName, config)
 
                 let time
-                const timeout = this._connection.options.rcp_timeout
+                const timeout = this._connection.options.rcpTimeout
 
                 if (timeout > 0) {
                     new Promise<any>((res) => {
@@ -44,7 +45,11 @@ export class ClientRegisterRabbitmq implements IClientRegister {
 
                     if (err) return reject(err)
 
-                    const mensage = msg.getContent()
+                    const mensage = {
+                        content: msg.getContent(),
+                        fields: msg.fields,
+                        properties: msg.properties
+                    } as IMessage
 
                     return resolve(mensage)
                 })

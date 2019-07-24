@@ -5,18 +5,23 @@ import { IServerRegister } from '../../infrastructure/port/rpc/server.register.i
 import { IConnConfiguration, IConnOptions } from './connection.configuration.inteface'
 
 export interface IEventBus {
-    config: IConnConfiguration | string
-    options: IConnOptions
-    isConnected: boolean
     messageSender: IMessageSender
     messageReceiver: IMessageReceiver
     clientRegister: IClientRegister
     serverRegister: IServerRegister
+
+    isConnected(): boolean
 
     openConnection(): Promise<void>
 
     closeConnection(): Promise<boolean>
 
     disposeConnection(): Promise<boolean>
+
+    config(value: IConnConfiguration | string): void
+
+    options(value: IConnOptions): void
+
+    serviceTag(tag: string): void
 
 }

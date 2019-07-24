@@ -9,6 +9,7 @@ import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 import { IStartConsumerResult } from '../../port/bus/queue.options.interface'
 import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
+import { IMessage } from '../../../application/port/message.interface'
 
 @injectable()
 export class MessageReceiverRabbitmq implements IMessageReceiver {
@@ -51,6 +52,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
     private async activateConsumerTopicOrDirec(queue: Queue,
                                                queueName: string,
                                                receiveFromYourself: boolean = false): Promise<void> {
+
         if (!this.consumersInitialized.get(queueName)) {
             this.consumersInitialized.set(queueName, true)
             this._logger.info('Queue creation ' + queueName + ' realized with success!')
@@ -58,7 +60,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
             await queue.activateConsumer((message: Message) => {
                 message.ack() // acknowledge that the message has been received (and processed)
 
-                if (message.properties.appId === this._connection.idConnection &&
+                if (message.properties.correlationId === this._connection.idConnection &&
                     !receiveFromYourself) return
 
                 this._logger.info(`Bus event message received with success!`)
@@ -70,7 +72,12 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                             this.routing_key_handlers.get(entry)
 
                         if (event_handler) {
-                            event_handler.handle(undefined, message.getContent())
+                            const msg = {
+                                properties: message.properties,
+                                content: message.getContent(),
+                                fields: message.fields
+                            } as IMessage
+                            event_handler.handle(undefined, msg)
                         }
                     }
                 }
@@ -97,5 +104,4 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
             throw e
         }
     }
-
 }

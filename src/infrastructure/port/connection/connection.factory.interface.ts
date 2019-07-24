@@ -1,5 +1,4 @@
 export interface IConnectionFactory {
-    // createConnection(IConnConfiguration): Promise<any>
     createConnection(url: string, socketOptions: any, reconnectStrategy: any): Promise<any>
 }
 

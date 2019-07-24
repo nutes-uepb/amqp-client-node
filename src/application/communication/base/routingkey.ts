@@ -13,6 +13,7 @@ import { IEventBus } from '../../port/event.bus.interface'
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../../di/identifier'
 import { ICommunicationConfig, ICommunicationOptions } from '../../port/communications.options.interface'
+import { IMessage } from '../../port/message.interface'
 
 @injectable()
 export class Routingkey implements IRoutingKey {
@@ -37,7 +38,7 @@ export class Routingkey implements IRoutingKey {
 
     protected typeConnection(value: ETypeCommunication) {
         this._typeConnection = value
-        this._configurations = { type: this._typeConnection }
+        this._configurations = { ...this._configurations, type: this._typeConnection }
     }
 
     set options(value: ICommunicationOptions) {
@@ -45,14 +46,14 @@ export class Routingkey implements IRoutingKey {
         this._configurations = { ...this._configurations, ...this._options }
     }
 
-    public pub(exchangeName: string, routingKey: string, message: any): Promise<void> {
+    public pub(exchangeName: string, routingKey: string, message: IMessage): Promise<void> {
         return this._pubConnection.sendRoutingKeyMessage(exchangeName, routingKey, message, this._configurations)
     }
 
     public sub(exchangeName: string,
                queueName: string,
                routingKey: string,
-               callback: (err, message: any) => void): void {
+               callback: (err, message: IMessage) => void): void {
         const eventCallback: IEventHandler<any> = {
             handle: callback
         }
@@ -64,17 +65,17 @@ export class Routingkey implements IRoutingKey {
 
     public rpcClient(exchangeName: string,
                      resourceName: string,
-                     parameters: any[]): Promise<any>
+                     parameters: any[]): Promise<IMessage>
 
     public rpcClient(exchangeName: string,
                      resourceName: string,
                      parameters: any[],
-                     callback: (err, message: any) => void): void
+                     callback: (err, message: IMessage) => void): void
 
     public rpcClient(exchangeName: string,
                      resourceName: string,
                      parameters: any[],
-                     callback?: (err, message: any) => void): any {
+                     callback?: (err, message: IMessage) => void): any {
 
         if (!callback) {
             return this.rpcClientPromise(exchangeName, resourceName, parameters)
@@ -88,7 +89,7 @@ export class Routingkey implements IRoutingKey {
         exchangeName: string,
         resourceName: string,
         parameters: any[],
-        callback: (err, message: any) => void): void {
+        callback: (err, message: IMessage) => void): void {
         const clientRequest: IClientRequest = {
             resourceName,
             handle: parameters
@@ -107,7 +108,7 @@ export class Routingkey implements IRoutingKey {
     private rpcClientPromise(
         exchangeName: string,
         resourceName: string,
-        parameters: any[]): Promise<any> {
+        parameters: any[]): Promise<IMessage> {
         return new Promise<any>(async (resolve, reject) => {
             const clientRequest: IClientRequest = {
                 resourceName,

@@ -4,8 +4,7 @@ import { DependencyInject } from '../di/di'
 import { Topic } from './communication/topic'
 import { Direct } from './communication/direct'
 import { IEventBus } from './port/event.bus.interface'
-import { Container, inject } from 'inversify'
-import { CustomEventEmitter } from '../utils/custom.event.emitter'
+import { Container } from 'inversify'
 
 export class PubSub {
     private _container: Container
@@ -14,8 +13,6 @@ export class PubSub {
     private readonly _direct: Direct
     private _logger
     private _emitter
-
-    private _initializedConnection: Promise<void>
 
     constructor() {
         this._container = new DependencyInject().getContainer()
@@ -27,24 +24,28 @@ export class PubSub {
         this._direct = this._container.get(Identifier.DIRECT)
     }
 
-    get initializedConnection(): Promise<void> {
-        return this._initializedConnection
+    get topic(): Topic {
+        return this._topic
     }
 
-    public connect(conf: IConnConfiguration | string, option?: IConnOptions): void {
+    get direct(): Direct {
+        return this._direct
+    }
 
-        this._connection.config = conf
-        this._connection.options = option
+    public connect(conf: IConnConfiguration | string, option?: IConnOptions): Promise<void> {
+
+        this._connection.config(conf)
+        this._connection.options(option)
 
         try {
-            this._initializedConnection = this._connection.openConnection()
+            return this._connection.openConnection()
         } catch (err) {
-            this._initializedConnection = Promise.reject(err)
+            return Promise.reject(err)
         }
     }
 
-    get isConnected(): boolean {
-        return this._connection.isConnected
+    public isConnected(): boolean {
+        return this._connection.isConnected()
     }
 
     public async close(): Promise<boolean> {
@@ -59,15 +60,11 @@ export class PubSub {
         this._emitter.on(event, listener)
     }
 
-    get topic(): Topic {
-        return this._topic
-    }
-
-    get direct(): Direct {
-        return this._direct
-    }
-
     public logger(enabled: boolean, level?: string): void {
         this._logger.changeLoggerConfiguration(enabled, level)
+    }
+
+    public serviceTag(tag: string): void {
+        this._connection.serviceTag(tag)
     }
 }

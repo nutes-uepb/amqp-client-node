@@ -9,19 +9,19 @@ export interface IConnConfiguration {
 export interface IConnOptions {
     retries?: number // number of retries, 0 is forever
     interval?: number // retry interval in ms
-    ssl?: {
+    sslOptions?: {
         enabled: boolean,
         ca: string
     }
-    rcp_timeout?: number
+    rcpTimeout?: number
 }
 
 export const defaultOptions: IConnOptions = {
     retries: 0,
     interval: 1000,
-    ssl: {
+    sslOptions: {
         enabled: false,
         ca: ''
     },
-    rcp_timeout: 5000
+    rcpTimeout: 5000
 }

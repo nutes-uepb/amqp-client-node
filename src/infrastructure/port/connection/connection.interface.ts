@@ -18,7 +18,7 @@ export interface IConnection {
 
     conn?: any
 
-    tryConnect(): Promise<ConnectionFactoryRabbitMQ>
+    tryConnect(): Promise<void>
 
     closeConnection(): Promise<boolean>
 

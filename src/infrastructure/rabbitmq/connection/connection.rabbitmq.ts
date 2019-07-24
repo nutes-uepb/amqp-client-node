@@ -86,25 +86,25 @@ export class ConnectionRabbitMQ implements IConnection {
      *
      * @return Promise<void>
      */
-    public tryConnect(): Promise<ConnectionFactoryRabbitMQ> {
-        return new Promise<ConnectionFactoryRabbitMQ>((resolve, reject) => {
-            if (this.isConnected) return resolve(this._connection)
+    public tryConnect(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            if (this.isConnected) return resolve()
 
             this._startingConnection = true
 
             let certAuth = {}
 
-            if (this._options.ssl.enabled) {
-                if (!this._options.ssl.ca)
+            if (this._options.sslOptions.enabled) {
+                if (!this._options.sslOptions.ca)
                     return reject(new Error('Paramater ca not found'))
-                certAuth = { ca: fs.readFileSync(this._options.ssl.ca) }
+                certAuth = { ca: fs.readFileSync(this._options.sslOptions.ca) }
             }
 
             let uri: string = ''
 
             if (typeof this._configuration === 'object') {
                 uri = 'protocol://username:password@host:port/vhost'
-                    .replace('protocol', this._options.ssl.enabled ? 'amqps' : 'amqp')
+                    .replace('protocol', this._options.sslOptions.enabled ? 'amqps' : 'amqp')
                     .replace('host', this._configuration.host)
                     .replace('port', (this._configuration.port).toString())
                     .replace('vhost', this._configuration.vhost ? this._configuration.vhost : '')
@@ -126,7 +126,7 @@ export class ConnectionRabbitMQ implements IConnection {
                     await this._connection.initialized
                     this._startingConnection = false
 
-                    return resolve(this._connection)
+                    return resolve()
                 })
                 .catch(err => {
                     return reject(err)
