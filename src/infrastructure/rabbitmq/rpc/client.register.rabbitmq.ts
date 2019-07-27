@@ -2,25 +2,30 @@ import { IClientRequest } from '../../port/rpc/resource.handler.interface'
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../../di/identifier'
 import { ICustomLogger } from '../../../utils/custom.logger'
-import { IConnection } from '../../port/connection/connection.interface'
+import { IBusConnection } from '../../port/connection/connection.interface'
 import { IClientRegister } from '../../port/rpc/client.register.interface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
-import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
+import { defClientOptions, IClientOptions } from '../../../application/port/communications.options.interface'
 import { IMessage, IMessageField, IMessageProperty } from '../../../application/port/message.interface'
 import { Message } from '../bus/message'
 
 @injectable()
 export class ClientRegisterRabbitmq implements IClientRegister {
 
-    constructor(@inject(Identifier.RABBITMQ_CONNECTION) private readonly _connection: IConnection,
-                @inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger,
+    private _connection: IBusConnection
+
+    constructor(@inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger,
                 @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
 
     }
 
+    set connection(value: IBusConnection) {
+        this._connection = value
+    }
+
     public registerRoutingKeyClient(exchangeName: string,
                                     resource: IClientRequest,
-                                    config: ICommunicationConfig): Promise<IMessage> {
+                                    options: IClientOptions = defClientOptions): Promise<IMessage> {
         return new Promise<IMessage>(async (resolve, reject) => {
             try {
 
@@ -28,10 +33,10 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                     return reject(new Error('Connection Failed'))
                 }
 
-                const exchange = this._connection.getExchange(exchangeName, config)
+                const exchange = this._connection.getExchange(exchangeName, options.exchange)
 
                 let time
-                const timeout = this._connection.options.rcp_timeout
+                const timeout = options.rcp_timeout
 
                 if (timeout > 0) {
                     new Promise<any>((res) => {
@@ -60,7 +65,7 @@ export class ClientRegisterRabbitmq implements IClientRegister {
     }
 
     private createMessage(message: Message): IMessage {
-        const msg = {
+        return {
             properties: {
                 priority: message.properties.priority,
                 expiration: message.properties.expiration,
@@ -81,8 +86,6 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 routing_key: message.fields.routingKey
             } as IMessageField
         } as IMessage
-
-        return msg
     }
 
 }

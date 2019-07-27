@@ -1,34 +1,42 @@
 import { Message } from '../bus/message'
 import { inject, injectable } from 'inversify'
-import { IConnection } from '../../port/connection/connection.interface'
+import { IBusConnection } from '../../port/connection/connection.interface'
 import { Identifier } from '../../../di/identifier'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageSender } from '../../port/pubsub/message.sender.interface'
-import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
-import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
 import { IMessage } from '../../../application/port/message.interface'
+import { IPubExchangeOptions } from '../../../application/port/communications.options.interface'
+import { ETypeCommunication } from '../../../application/port/type.communication.enum'
 
 @injectable()
 export class MessageSenderRabbitmq implements IMessageSender {
 
-    constructor(@inject(Identifier.RABBITMQ_CONNECTION) private readonly _connection: IConnection,
-                @inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger,
-                @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
+    private _connection: IBusConnection
+
+    constructor(@inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger) {
+    }
+
+    set connection(value: IBusConnection) {
+        this._connection = value
     }
 
     public async sendRoutingKeyMessage(exchangeName: string,
                                        topicKey: string,
                                        message: any,
-                                       config: ICommunicationConfig): Promise<void> {
+                                       options?: IPubExchangeOptions): Promise<void> {
         try {
 
             if (!this._connection.isConnected) {
                 return Promise.reject(new Error('Connection Failed'))
             }
 
+            let exchangeOptions
+
+            if (options) exchangeOptions = options.exchange
+
             const msg = await this.createMessage(message)
 
-            const exchange = this._connection.getExchange(exchangeName, config)
+            const exchange = this._connection.getExchange(exchangeName, exchangeOptions)
 
             if (await exchange.initialized) {
                 exchange.send(msg, topicKey)

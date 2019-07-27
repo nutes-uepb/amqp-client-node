@@ -1,12 +1,15 @@
 import { IEventHandler } from './event.handler.interface'
-import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
+import { ISubExchangeOptions } from '../../../application/port/communications.options.interface'
+import { IBusConnection } from '../connection/connection.interface'
 
 export interface IMessageReceiver {
 
-    receiveRoutingKeyMessage(exchangeName: string,
+    connection: IBusConnection
+
+    receiveRoutingKeyMessage(queueName: string,
+                             exchangeName: string,
                              topicKey: string,
-                             queueName: string,
                              callback: IEventHandler<any>,
-                             config: ICommunicationConfig): Promise<void>
+                             options?: ISubExchangeOptions): Promise<void>
 
 }

@@ -1,17 +1,10 @@
-import { IResourceHandler } from './resource.handler.interface'
-import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
-
 export interface IServerRegister {
 
-    registerResource(queueName: string,
-                     resource: IResourceHandler): Promise<boolean>
+    start(): Promise<void>
 
-    unregisterResource(queueName: string, resourceName: string): Promise<boolean>
+    addResource(resourceName: string, resource: (...any: any) => any): boolean
 
-    getResource(): Map<string, any>
+    removeResource(resourceName: string): boolean
 
-    registerRoutingKeyServer(exchangeName: string,
-                             routingKey: string,
-                             queueName: string,
-                             config: ICommunicationConfig): Promise<boolean>
+    getAllResource(): object
 }

@@ -1,9 +1,12 @@
 import { IClientRequest } from './resource.handler.interface'
-import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
+import { IClientOptions } from '../../../application/port/communications.options.interface'
+import { IBusConnection } from '../connection/connection.interface'
 
 export interface IClientRegister {
 
+    connection: IBusConnection
+
     registerRoutingKeyClient(exchangeName: string,
                              resource: IClientRequest,
-                             config: ICommunicationConfig): Promise<any>
+                             options?: IClientOptions): Promise<any>
 }

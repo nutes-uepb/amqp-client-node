@@ -20,11 +20,12 @@ import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 import { IConnectionFactory, IReconnectStrategy, ITopology } from '../../port/connection/connection.factory.interface'
 import { IExchangeOptions } from '../../../application/port/exchange.options.interface'
 import { IQueueOptions } from '../../../application/port/queue.options.interface'
+import { EventEmitter } from 'events'
 
 // create a custom winston logger for amqp-ts
 const amqp_log = createLogger({
     level: 'silly', // Used by transports that do not have this configuration defined
-    silent: true,
+    silent: false,
     format: format.combine(
         format.timestamp(),
         format.json()
@@ -38,7 +39,7 @@ export const log = amqp_log
 // ConnectionFactoryRabbitMQ class
 // ----------------------------------------------------------------------------------------------------
 @injectable()
-export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
+export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnectionFactory {
     public initialized: Promise<void>
     public isConnected: boolean = false
 
@@ -56,7 +57,8 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
     private _queues: { [id: string]: Queue }
     private _bindings: { [id: string]: Binding }
 
-    constructor(@inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
+    constructor() {
+        super()
     }
 
     /**
@@ -107,10 +109,10 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
                     this._rebuilding = false
                     if (this.connectedBefore) {
                         log.log('warn', 'ConnectionFactoryRabbitMQ re-established', { module: 'amqp-ts' })
-                        this._emitter.emit('re_established_connection')
+                        this.emit('re_established_connection')
                     } else {
                         log.log('info', 'ConnectionFactoryRabbitMQ established.', { module: 'amqp-ts' })
-                        this._emitter.emit('open_connection')
+                        this.emit('open_connection')
                         this.connectedBefore = true
                     }
                     resolve(null)
@@ -120,7 +122,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
         /* istanbul ignore next */
         this.initialized.catch((err) => {
             log.log('warn', 'Error creating connection!', { module: 'amqp-ts' })
-            this._emitter.emit('error_connection', err)
+            this.emit('error_connection', err)
 
             // throw (err)
         })
@@ -146,7 +148,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
                     log.log('warn', 'ConnectionFactoryRabbitMQ retry ' + (retry + 1) +
                         ' in ' + thisConnection.reconnectStrategy.interval + 'ms',
                         { module: 'amqp-ts' })
-                    thisConnection._emitter.emit('trying_connect')
+                    thisConnection.emit('trying_connect')
 
                     setTimeout(thisConnection.tryToConnect,
                         thisConnection.reconnectStrategy.interval,
@@ -170,7 +172,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
                 const onClose = () => {
                     connection.removeListener('close', onClose)
                     if (!this._isClosing) {
-                        thisConnection._emitter.emit('lost_connection')
+                        thisConnection.emit('lost_connection')
                         restart(new Error('ConnectionFactoryRabbitMQ closed by remote host'))
                     }
 
@@ -187,7 +189,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
     }
 
     public _rebuildAll(err: Error): Promise<void> {
-        log.log('warn', 'ConnectionFactoryRabbitMQ error: ' + err.message, { module: 'amqp-ts' })
+        log.log('warn', 'ConnectionFactoryRabbisssssstMQ error: ' + err.message, { module: 'amqp-ts' })
 
         log.log('debug', 'Rebuilding connection NOW.', { module: 'amqp-ts' })
         this.rebuildConnection()
@@ -237,7 +239,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
                         reject(err)
                     } else {
                         this.isConnected = false
-                        this._emitter.emit('close_connection')
+                        this.emit('close_connection')
                         resolve(null)
                     }
                 })

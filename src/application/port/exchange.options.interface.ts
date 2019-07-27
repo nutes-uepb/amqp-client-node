@@ -1,4 +1,7 @@
+import { ETypeCommunication } from './type.communication.enum'
+
 export interface IExchangeOptions {
+    type?: ETypeCommunication
     durable?: boolean
     internal?: boolean
     auto_delete?: boolean

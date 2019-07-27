@@ -3,38 +3,43 @@ import { Queue } from '../bus/queue'
 import { Message } from '../bus/message'
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../../di/identifier'
-import { IConnection } from '../../port/connection/connection.interface'
+import { IBusConnection } from '../../port/connection/connection.interface'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 import { IStartConsumerResult } from '../../../application/port/queue.options.interface'
-import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
 import { IMessage, IMessageField, IMessageProperty } from '../../../application/port/message.interface'
+import { defSubExchangeOptions, ISubExchangeOptions } from '../../../application/port/communications.options.interface'
+import { ETypeCommunication } from '../../../application/port/type.communication.enum'
 
 @injectable()
 export class MessageReceiverRabbitmq implements IMessageReceiver {
     private consumersInitialized: Map<string, boolean> = new Map<string, boolean>()
     private routing_key_handlers: Map<string, IEventHandler<any>> = new Map<string, IEventHandler<any>>()
 
-    constructor(@inject(Identifier.RABBITMQ_CONNECTION) private readonly _connection: IConnection,
-                @inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger,
+    private _connection: IBusConnection
+
+    constructor(@inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger,
                 @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
     }
 
-    public async receiveRoutingKeyMessage(exchangeName: string,
-                                          topicKey: string,
-                                          queueName: string,
-                                          callback: IEventHandler<any>,
-                                          config: ICommunicationConfig): Promise<void> {
-        try {
+    set connection(value: IBusConnection) {
+        this._connection = value
+    }
 
+    public async receiveRoutingKeyMessage(queueName: string,
+                                          exchangeName: string,
+                                          topicKey: string,
+                                          callback: IEventHandler<any>,
+                                          options: ISubExchangeOptions = defSubExchangeOptions): Promise<void> {
+        try {
             if (!this._connection.isConnected) {
                 return callback.handle(new Error('Connection Failed'), undefined)
             }
 
-            const exchange = this._connection.getExchange(exchangeName, config)
+            const exchange = this._connection.getExchange(exchangeName, options.exchange)
 
-            const queue = await this._connection.getQueue(queueName, config)
+            const queue = this._connection.getQueue(queueName, options.queue)
 
             if (await exchange.initialized) {
                 this.routing_key_handlers.set(topicKey, callback)
@@ -42,7 +47,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                 queue.bind(exchange, topicKey)
             }
 
-            await this.activateConsumerTopicOrDirec(queue, queueName, config.receive_from_yourself)
+            await this.activateConsumerTopicOrDirec(queue, queueName, options.receive_from_yourself)
 
         } catch (err) {
             return callback.handle(err, undefined)

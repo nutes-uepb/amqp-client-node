@@ -10,5 +10,4 @@ export abstract class Identifier {
     public static readonly TOPIC: any = Symbol.for('Topic')
     public static readonly DIRECT: any = Symbol.for('Direct')
     public static readonly CUSTOM_EVENT_EMITTER: any = Symbol.for('CustomEventEmitter')
-    public static readonly EVENT_BUS: any = Symbol.for('EventBus')
 }

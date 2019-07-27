@@ -99,6 +99,7 @@ export class Queue {
      * deprecated, use 'queue.send(message: Message)' instead
      */
     public publish(content: any, options: any = {}): void {
+        console.log('HERE0')
         // inline function to send the message
         const sendMessage = () => {
             try {

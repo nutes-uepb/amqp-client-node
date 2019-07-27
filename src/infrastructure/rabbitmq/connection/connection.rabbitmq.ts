@@ -1,4 +1,4 @@
-import { IConnection } from '../../port/connection/connection.interface'
+import { IBusConnection } from '../../port/connection/connection.interface'
 import {
     defaultOptions,
     IConnConfiguration,
@@ -14,17 +14,20 @@ import { Queue } from '../bus/queue'
 import { Exchange } from '../bus/exchange'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 import * as fs from 'fs'
-import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
+import { IExchangeOptions } from '../../../application/port/exchange.options.interface'
+import { ETypeCommunication } from '../../../application/port/type.communication.enum'
+import { IQueueOptions } from '../../../application/port/queue.options.interface'
+import { DI } from '../../../di/di'
 
 /**
  * Implementation of the interface that provides conn with RabbitMQ.
  * To implement the RabbitMQ abstraction the amqp-ts library was used.
  *
  * @see {@link https://github.com/abreits/amqp-ts} for more details.
- * @implements {IConnection}
+ * @implements {IBusConnection}
  */
 @injectable()
-export class ConnectionRabbitMQ implements IConnection {
+export class ConnectionRabbitMQ implements IBusConnection {
 
     private _idConnection: string
     private _connection?: ConnectionFactoryRabbitMQ
@@ -53,14 +56,6 @@ export class ConnectionRabbitMQ implements IConnection {
         }
     }
 
-    get options(): IConnOptions {
-        return this._options
-    }
-
-    get startingConnection(): boolean {
-        return this._startingConnection
-    }
-
     set idConnection(idConnection) {
         this._idConnection = idConnection
     }
@@ -86,25 +81,36 @@ export class ConnectionRabbitMQ implements IConnection {
      *
      * @return Promise<void>
      */
-    public tryConnect(): Promise<void> {
+    public connect(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             if (this.isConnected) return resolve()
 
-            this._startingConnection = true
-
-            let certAuth = {}
-
-            if (this._options.ssl_options.enabled) {
-                if (!this._options.ssl_options.ca)
-                    return reject(new Error('Paramater ca not found'))
-                certAuth = { ca: fs.readFileSync(this._options.ssl_options.ca) }
+            const sslParameters = {
+                cert: undefined,
+                key: undefined,
+                passphrase: undefined,
+                ca: []
+            }
+            if (this._options.ssl_options) {
+                if (this._options.ssl_options.cert) {
+                    sslParameters.cert = fs.readFileSync(this._options.ssl_options.cert)
+                }
+                if (this._options.ssl_options.key) {
+                    sslParameters.cert = fs.readFileSync(this._options.ssl_options.key)
+                }
+                sslParameters.passphrase = this._options.ssl_options.passphrase
+                if (this._options.ssl_options.ca) {
+                    for (const ca of this._options.ssl_options.ca) {
+                        sslParameters.ca.push(fs.readFileSync(ca))
+                    }
+                }
             }
 
             let uri: string = ''
 
             if (typeof this._configuration === 'object') {
                 uri = 'protocol://username:password@host:port/vhost'
-                    .replace('protocol', this._options.ssl_options.enabled ? 'amqps' : 'amqp')
+                    .replace('protocol', this._options.ssl_options ? 'amqps' : 'amqp')
                     .replace('host', this._configuration.host)
                     .replace('port', (this._configuration.port).toString())
                     .replace('vhost', this._configuration.vhost ? this._configuration.vhost : '')
@@ -114,75 +120,94 @@ export class ConnectionRabbitMQ implements IConnection {
                 uri = this._configuration
             }
 
-            this._connectionFactory
-                .createConnection(uri, certAuth,
-                    {
-                        retries: this._options.retries,
-                        interval: this._options.interval
+            if (!this._startingConnection) {
+                this._startingConnection = true
+                this._connectionFactory
+                    .createConnection(uri, sslParameters,
+                        {
+                            retries: this._options.retries,
+                            interval: this._options.interval
+                        })
+                    .then(async (connection: ConnectionFactoryRabbitMQ) => {
+                        this._connection = connection
+
+                        this._connection.on('error_connection', (err: Error) => {
+                            this._logger.error('Error during connection ')
+                            this._emitter.emit('error_connection', err)
+                        })
+
+                        this._connection.on('close_connection', () => {
+                            this._logger.info('Close connection with success! ')
+                            this._emitter.emit('close_connection')
+                        })
+
+                        this._connection.on('open_connection', () => {
+                            this._logger.info('Connection established.')
+                            this._emitter.emit('connected')
+                        })
+
+                        this._connection.on('lost_connection', () => {
+                            this._logger.warn('Lost connection ')
+                            this._emitter.emit('disconnected')
+                        })
+
+                        this._connection.on('trying_connect', () => {
+                            this._logger.warn('Trying re-established connection')
+                            this._emitter.emit('trying_connect')
+                        })
+
+                        this._connection.on('re_established_connection', () => {
+                            this._logger.warn('Re-established connection')
+                            this._emitter.emit('re_established_connection')
+                        })
+
+                        await this._connection.initialized
+                        this._startingConnection = false
+
+                        return resolve()
                     })
-                .then(async (connection: ConnectionFactoryRabbitMQ) => {
-                    this._connection = connection
-
-                    this._emitter.on('error_connection', (err: Error) => {
-                        this._logger.error('Error during connection ')
+                    .catch(err => {
+                        return reject(err)
                     })
-
-                    this._emitter.on('close_connection', () => {
-                        this._logger.info('Close connection with success! ')
-                    })
-
-                    this._emitter.on('open_connection', () => {
-                        this._logger.info('Connection established.')
-                    })
-
-                    this._emitter.on('lost_connection', () => {
-                        this._logger.warn('Lost connection ')
-                    })
-
-                    this._emitter.on('trying_connect', () => {
-                        this._logger.warn('Trying re-established connection')
-                    })
-
-                    this._emitter.on('re_established_connection', () => {
-                        this._logger.warn('Re-established connection')
-                    })
-
-                    await this._connection.initialized
-                    this._startingConnection = false
-
-                    return resolve()
-                })
-                .catch(err => {
-                    return reject(err)
-                })
+            }
         })
     }
 
-    public getExchange(exchangeName: string, config: ICommunicationConfig): Exchange {
+    public getExchange(exchangeName: string,
+                       option?: IExchangeOptions): Exchange {
 
-        const exchangeOpetions = {
-            ...config.exchange,
-            autoDelete: config.exchange.auto_delete,
-            alternateExchange: config.exchange.alternate_exchange,
-            noCreate: config.exchange.no_create
+        let typeCommunication = ETypeCommunication.TOPIC
+
+        let exchangeOptions = {}
+        if (option) {
+            exchangeOptions = {
+                ...option,
+                autoDelete: option.auto_delete,
+                alternateExchange: option.alternate_exchange,
+                noCreate: option.no_create
+            }
+            if (option.type) typeCommunication = option.type
         }
 
-        const exchange = this._connection.declareExchange(exchangeName, config.type, exchangeOpetions)
+        const exchange = this._connection.declareExchange(exchangeName, typeCommunication, exchangeOptions)
         if (!this._resourceBus.get(exchangeName)) {
             this._resourceBus.set(exchangeName, exchange)
         }
         return exchange
     }
 
-    public getQueue(queueName: string, config: ICommunicationConfig): Queue {
+    public getQueue(queueName: string, option?: IQueueOptions): Queue {
 
-        const queueOpetions = {
-            ...config.queue,
-            autoDelete: config.queue.auto_delete,
-            messageTtl: config.queue.message_ttl,
-            deadLetterExchange: config.queue.dead_letter_exchange,
-            maxLength: config.queue.max_length,
-            noCreate: config.queue.no_create
+        let queueOpetions = {}
+        if (option) {
+            queueOpetions = {
+                ...option,
+                autoDelete: option.auto_delete,
+                messageTtl: option.message_ttl,
+                deadLetterExchange: option.dead_letter_exchange,
+                maxLength: option.max_length,
+                noCreate: option.no_create
+            }
         }
 
         const queue = this._connection.declareQueue(queueName, queueOpetions)
@@ -210,18 +235,23 @@ export class ConnectionRabbitMQ implements IConnection {
     public disposeConnection(): Promise<boolean> {
 
         return new Promise<boolean | undefined>(async (resolve, reject) => {
-            try {
-                for (const resource of this._resourceBus.keys()) {
-                    await this._resourceBus.get(resource).delete()
+            if (this.isConnected) {
+                try {
+                    for (const resource of this._resourceBus.keys()) {
+                        await this._resourceBus.get(resource).delete()
+                    }
+                    await this.closeConnection()
+                    return resolve(true)
+                } catch (e) {
+                    return reject(e)
                 }
-                await this.closeConnection()
-                return resolve(true)
-            } catch (e) {
-                console.log(e)
-                return reject(e)
             }
-
+            return resolve(false)
         })
+    }
+
+    public on(event: string | symbol, listener: (...args: any[]) => void): void {
+        this._emitter.on(event, listener)
     }
 
 }

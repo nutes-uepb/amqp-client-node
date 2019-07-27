@@ -1,10 +1,11 @@
 import { IConnConfiguration, IConnOptions } from '../../../application/port/connection.configuration.inteface'
-import { ConnectionFactoryRabbitMQ } from '../../rabbitmq/connection/connection.factory.rabbitmq'
 import { Exchange } from '../../rabbitmq/bus/exchange'
 import { Queue } from '../../rabbitmq/bus/queue'
-import { ICommunicationConfig } from '../../../application/port/communications.options.interface'
+import { ETypeCommunication } from '../../../application/port/type.communication.enum'
+import { IExchangeOptions } from '../../../application/port/exchange.options.interface'
+import { IQueueOptions } from '../../../application/port/queue.options.interface'
 
-export interface IConnection {
+export interface IBusConnection {
 
     idConnection: string
 
@@ -14,18 +15,18 @@ export interface IConnection {
 
     options: IConnOptions
 
-    startingConnection: boolean
-
     conn?: any
 
-    tryConnect(): Promise<void>
+    connect(): Promise<void>
 
     closeConnection(): Promise<boolean>
 
     disposeConnection(): Promise<boolean>
 
-    getExchange(exchangeName: string, config: ICommunicationConfig): Exchange
+    getExchange(exchangeName: string, option?: IExchangeOptions): Exchange
 
-    getQueue(queueName: string, config: ICommunicationConfig): Queue
+    getQueue(queueName: string,  option?: IQueueOptions): Queue
+
+    on(event: string | symbol, listener: (...args: any[]) => void): void
 
 }
