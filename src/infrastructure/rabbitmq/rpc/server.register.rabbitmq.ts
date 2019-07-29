@@ -109,7 +109,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
         return new Promise<boolean>(async (resolve, reject) => {
             try {
 
-                if (!this._connection.isConnected)
+                if (this._connection && !this._connection.isConnected)
                     return reject(new Error('Connection Failed'))
 
                 let exchangeOptions

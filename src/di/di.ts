@@ -11,8 +11,6 @@ import { IMessageSender } from '../infrastructure/port/pubsub/message.sender.int
 import { MessageSenderRabbitmq } from '../infrastructure/rabbitmq/pubsub/message.sender.rabbitmq'
 import { IClientRegister } from '../infrastructure/port/rpc/client.register.interface'
 import { ClientRegisterRabbitmq } from '../infrastructure/rabbitmq/rpc/client.register.rabbitmq'
-import { ServerRegisterRabbitmq } from '../infrastructure/rabbitmq/rpc/server.register.rabbitmq'
-import { IServerRegister } from '../infrastructure/port/rpc/server.register.interface'
 import { CustomEventEmitter, ICustomEventEmitter } from '../utils/custom.event.emitter'
 import { ConnectionFactoryRabbitMQ } from '../infrastructure/rabbitmq/connection/connection.factory.rabbitmq'
 

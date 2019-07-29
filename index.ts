@@ -1,5 +1,5 @@
-export { Connection } from './src/application/connection'
-
+export { IConnection } from './src/application/port/connection.interface'
+export { pubSub } from './src/pub.sub'
 export {
     IMessage,
     IMessageProperty,
@@ -11,5 +11,4 @@ export {
     IClientOptions,
     IServerOptions
 } from './src/application/port/communications.options.interface'
-export { IConnConfiguration, IConnOptions } from './src/application/port/connection.configuration.inteface'
-
+export { IConnectionParams, IConnectionOptions } from './src/application/port/connection.config.inteface'

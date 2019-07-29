@@ -6,8 +6,8 @@ import * as AmqpLib from 'amqplib/callback_api'
 import {
     IActivateConsumerOptions,
     IDeleteResult,
-    IQueueOptions,
     IQueueInitializeResult,
+    IQueueOptions,
     IStartConsumerOptions,
     IStartConsumerResult
 } from '../../../application/port/queue.options.interface'

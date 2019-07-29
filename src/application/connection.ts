@@ -14,60 +14,56 @@ import {
     ISubExchangeOptions
 } from './port/communications.options.interface'
 import { IMessage } from './port/message.interface'
-import { CustomEventEmitter } from '../utils/custom.event.emitter'
 import { DI } from '../di/di'
-import { IConnConfiguration, IConnOptions } from './port/connection.configuration.inteface'
+import { IConnectionOptions, IConnectionParams } from './port/connection.config.inteface'
 import { IBusConnection } from '../infrastructure/port/connection/connection.interface'
-import { CustomLogger } from '../utils/custom.logger'
 
 export class Connection implements IConnection {
-    private _logger: CustomLogger
     private readonly _pub: IMessageSender
     private readonly _sub: IMessageReceiver
     private readonly _rpcClient: IClientRegister
-    private readonly _connection: IBusConnection
-    private readonly _emitter: CustomEventEmitter
+    private readonly _eventBusConnection: IBusConnection
 
-    constructor(parameters: IConnConfiguration | string, options?: IConnOptions) {
-        this._logger = DI.get(Identifier.CUSTOM_LOGGER)
-
-        this._emitter = DI.get(Identifier.CUSTOM_EVENT_EMITTER)
-        this._connection = DI.get(Identifier.RABBITMQ_CONNECTION)
-        this._connection.configurations = parameters
-        this._connection.options = options
+    constructor(parameters?: IConnectionParams | string, options?: IConnectionOptions) {
+        this._eventBusConnection = DI.get(Identifier.RABBITMQ_CONNECTION)
+        this._eventBusConnection.configurations = parameters
+        this._eventBusConnection.options = options
 
         this._pub = DI.get(Identifier.RABBITMQ_MENSSAGE_SENDER)
         this._sub = DI.get(Identifier.RABBITMQ_MENSSAGE_RECEIVER)
         this._rpcClient = DI.get(Identifier.RABBITMQ_CLIENT_REGISTER)
-
     }
 
-    public logger(enabled: boolean, level?: string): void {
-        this._logger.changeLoggerConfiguration(enabled, level)
+    get isOpen(): boolean {
+        return this._eventBusConnection.isConnected
     }
 
-    get isConnected(): boolean {
-        return this._connection.isConnected
-    }
+    public open(): Promise<this> {
+        return new Promise<this>(async (resolve, reject) => {
+            if (this._eventBusConnection && this._eventBusConnection.isConnected) return resolve(this)
 
-    public async connect(): Promise<void> {
-        return this._connection.connect().then(() => {
-            this._pub.connection = this._connection
-            this._sub.connection = this._connection
-            this._rpcClient.connection = this._connection
+            this._eventBusConnection
+                .connect()
+                .then(() => {
+                    this._pub.connection = this._eventBusConnection
+                    this._sub.connection = this._eventBusConnection
+                    this._rpcClient.connection = this._eventBusConnection
+                    return resolve(this)
+                })
+                .catch(reject)
         })
     }
 
     public async close(): Promise<boolean> {
-        return this._connection.closeConnection()
+        return this._eventBusConnection.closeConnection()
     }
 
     public async dispose(): Promise<boolean> {
-        return this._connection.disposeConnection()
+        return this._eventBusConnection.disposeConnection()
     }
 
     public on(event: string | symbol, listener: (...args: any[]) => void): void {
-        this._connection.on(event, listener)
+        this._eventBusConnection.on(event, listener)
     }
 
     public pub(exchangeName: string,
@@ -97,7 +93,7 @@ export class Connection implements IConnection {
                            routingKey: string,
                            options?: IServerOptions): IServerRegister {
 
-        return new ServerRegisterRabbitmq(this._connection, queueName, exchangeName, routingKey, options)
+        return new ServerRegisterRabbitmq(this._eventBusConnection, queueName, exchangeName, routingKey, options)
 
     }
 

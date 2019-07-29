@@ -14,18 +14,17 @@ import { Exchange } from '../bus/exchange'
 
 import * as AmqpLib from 'amqplib/callback_api'
 import { createLogger, format, transports } from 'winston'
-import { inject, injectable } from 'inversify'
-import { Identifier } from '../../../di/identifier'
-import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
-import { IConnectionFactory, IReconnectStrategy, ITopology } from '../../port/connection/connection.factory.interface'
+import { injectable } from 'inversify'
+import { IConnectionFactory, ITopology } from '../../port/connection/connection.factory.interface'
 import { IExchangeOptions } from '../../../application/port/exchange.options.interface'
 import { IQueueOptions } from '../../../application/port/queue.options.interface'
 import { EventEmitter } from 'events'
+import { IConnectionOptions } from '../../../application/port/connection.config.inteface'
 
 // create a custom winston logger for amqp-ts
 const amqp_log = createLogger({
     level: 'silly', // Used by transports that do not have this configuration defined
-    silent: false,
+    silent: true,
     format: format.combine(
         format.timestamp(),
         format.json()
@@ -45,7 +44,7 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
 
     private url: string
     private socketOptions: any
-    private reconnectStrategy: IReconnectStrategy
+    private reconnectStrategy: IConnectionOptions
     private connectedBefore = false
 
     private _connection: AmqpLib.Connection
@@ -63,19 +62,16 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
 
     /**
      * Create instance of {@link Connection} Class belonging
-     * to the amqp-ts library to connect to RabbitMQ.
+     * to the amqp-ts library to open to RabbitMQ.
      *
      * @return Promise<Connection>
      * @param url
      * @param socketOptions
      * @param reconnectStrategy
      */
-    public async createConnection(url = 'amqp://localhost',
+    public async createConnection(url,
                                   socketOptions: any = {},
-                                  reconnectStrategy: IReconnectStrategy = {
-                                      retries: 0,
-                                      interval: 1500
-                                  }): Promise<ConnectionFactoryRabbitMQ> {
+                                  reconnectStrategy: IConnectionOptions): Promise<ConnectionFactoryRabbitMQ> {
         this.url = url
         this.socketOptions = socketOptions
         this.reconnectStrategy = reconnectStrategy

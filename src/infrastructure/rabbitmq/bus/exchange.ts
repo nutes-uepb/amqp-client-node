@@ -4,7 +4,7 @@ import { Binding } from './binding'
 import * as AmqpLib from 'amqplib/callback_api'
 import { Message } from './message'
 import * as path from 'path'
-import { IExchangeOptions, IExchangeInitializeResult } from '../../../application/port/exchange.options.interface'
+import { IExchangeInitializeResult, IExchangeOptions } from '../../../application/port/exchange.options.interface'
 import { IActivateConsumerOptions, IStartConsumerOptions } from '../../../application/port/queue.options.interface'
 import { IBinding } from '../../port/bus/binding.interface'
 

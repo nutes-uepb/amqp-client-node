@@ -1,7 +1,6 @@
-import { IConnConfiguration, IConnOptions } from '../../../application/port/connection.configuration.inteface'
+import { IConnectionParams, IConnectionOptions } from '../../../application/port/connection.config.inteface'
 import { Exchange } from '../../rabbitmq/bus/exchange'
 import { Queue } from '../../rabbitmq/bus/queue'
-import { ETypeCommunication } from '../../../application/port/type.communication.enum'
 import { IExchangeOptions } from '../../../application/port/exchange.options.interface'
 import { IQueueOptions } from '../../../application/port/queue.options.interface'
 
@@ -11,9 +10,9 @@ export interface IBusConnection {
 
     isConnected: boolean
 
-    configurations: IConnConfiguration | string
+    configurations: IConnectionParams | string
 
-    options: IConnOptions
+    options: IConnectionOptions
 
     conn?: any
 

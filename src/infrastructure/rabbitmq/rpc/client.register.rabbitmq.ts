@@ -4,7 +4,6 @@ import { Identifier } from '../../../di/identifier'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IBusConnection } from '../../port/connection/connection.interface'
 import { IClientRegister } from '../../port/rpc/client.register.interface'
-import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 import { defClientOptions, IClientOptions } from '../../../application/port/communications.options.interface'
 import { IMessage, IMessageField, IMessageProperty } from '../../../application/port/message.interface'
 import { Message } from '../bus/message'
@@ -14,8 +13,7 @@ export class ClientRegisterRabbitmq implements IClientRegister {
 
     private _connection: IBusConnection
 
-    constructor(@inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger,
-                @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
+    constructor(@inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger) {
 
     }
 
@@ -29,7 +27,7 @@ export class ClientRegisterRabbitmq implements IClientRegister {
         return new Promise<IMessage>(async (resolve, reject) => {
             try {
 
-                if (!this._connection.isConnected) {
+                if (this._connection && !this._connection.isConnected) {
                     return reject(new Error('Connection Failed'))
                 }
 

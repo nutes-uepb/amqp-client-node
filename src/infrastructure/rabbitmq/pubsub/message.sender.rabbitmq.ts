@@ -6,7 +6,6 @@ import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageSender } from '../../port/pubsub/message.sender.interface'
 import { IMessage } from '../../../application/port/message.interface'
 import { IPubExchangeOptions } from '../../../application/port/communications.options.interface'
-import { ETypeCommunication } from '../../../application/port/type.communication.enum'
 
 @injectable()
 export class MessageSenderRabbitmq implements IMessageSender {
@@ -26,7 +25,7 @@ export class MessageSenderRabbitmq implements IMessageSender {
                                        options?: IPubExchangeOptions): Promise<void> {
         try {
 
-            if (!this._connection.isConnected) {
+            if (this._connection && !this._connection.isConnected) {
                 return Promise.reject(new Error('Connection Failed'))
             }
 

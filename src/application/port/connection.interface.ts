@@ -1,4 +1,3 @@
-import { ServerRegisterRabbitmq } from '../../infrastructure/rabbitmq/rpc/server.register.rabbitmq'
 import { IMessage } from './message.interface'
 import {
     IClientOptions,
@@ -10,9 +9,7 @@ import { IServerRegister } from '../../infrastructure/port/rpc/server.register.i
 
 export interface IConnection {
 
-    isConnected: boolean
-
-    connect(): Promise<void>
+    isOpen: boolean
 
     close(): Promise<boolean>
 
