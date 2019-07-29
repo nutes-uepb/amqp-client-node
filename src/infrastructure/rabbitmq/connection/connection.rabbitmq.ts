@@ -199,11 +199,17 @@ export class ConnectionRabbitMQ implements IBusConnection {
             if (option.type) typeCommunication = option.type
         }
 
-        const exchange = this._connection.declareExchange(exchangeName, typeCommunication, exchangeOptions)
-        if (!this._resourceBus.get(exchangeName)) {
-            this._resourceBus.set(exchangeName, exchange)
+        try {
+            const exchange = this._connection.declareExchange(exchangeName, typeCommunication, exchangeOptions)
+
+            if (!this._resourceBus.get(exchangeName)) {
+                this._resourceBus.set(exchangeName, exchange)
+            }
+            return exchange
+        } catch (e) {
+            throw e
         }
-        return exchange
+
     }
 
     public getQueue(queueName: string, option?: IQueueOptions): Queue {
@@ -220,11 +226,17 @@ export class ConnectionRabbitMQ implements IBusConnection {
             }
         }
 
-        const queue = this._connection.declareQueue(queueName, queueOpetions)
-        if (!this._resourceBus.get(queueName)) {
-            this._resourceBus.set(queueName, queue)
+        try {
+            const queue = this._connection.declareQueue(queueName, queueOpetions)
+
+            if (!this._resourceBus.get(queueName)) {
+                this._resourceBus.set(queueName, queue)
+            }
+            return queue
+        } catch (e) {
+            throw e
         }
-        return queue
+
     }
 
     public closeConnection(): Promise<boolean> {
