@@ -1,8 +1,5 @@
 import { IBusConnection } from '../../port/connection/connection.interface'
-import {
-    IConnectionParams,
-    IConnectionOptions
-} from '../../../application/port/connection.config.inteface'
+import { IConnectionOptions, IConnectionParams } from '../../../application/port/connection.config.inteface'
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../../di/identifier'
 import { IConnectionFactory } from '../../port/connection/connection.factory.interface'
@@ -12,9 +9,7 @@ import { ConnectionFactoryRabbitMQ } from './connection.factory.rabbitmq'
 import { Queue } from '../bus/queue'
 import { Exchange } from '../bus/exchange'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
-import * as fs from 'fs'
 import { IExchangeOptions } from '../../../application/port/exchange.options.interface'
-import { ETypeCommunication } from '../../../application/port/type.communication.enum'
 import { IQueueOptions } from '../../../application/port/queue.options.interface'
 
 const defaultOptions: IConnectionOptions = {
@@ -59,8 +54,11 @@ export class ConnectionRabbitMQ implements IBusConnection {
 
     set configurations(config: IConnectionParams | string) {
         this._configuration = config
-        if (!this._configuration) {
-            this._configuration = defaultParams
+
+        if (typeof config === 'object') {
+            for (const key of Object.keys(config)) {
+                if (!config[key]) this.configurations[key] = defaultParams[key]
+            }
         }
     }
 
@@ -100,43 +98,8 @@ export class ConnectionRabbitMQ implements IBusConnection {
         return new Promise<void>((resolve, reject) => {
             if (this.isConnected) return resolve()
 
-            const sslParameters = {
-                cert: undefined,
-                key: undefined,
-                passphrase: undefined,
-                ca: []
-            }
-            if (this._options.ssl_options) {
-                if (this._options.ssl_options.cert) {
-                    sslParameters.cert = fs.readFileSync(this._options.ssl_options.cert)
-                }
-                if (this._options.ssl_options.key) {
-                    sslParameters.cert = fs.readFileSync(this._options.ssl_options.key)
-                }
-                sslParameters.passphrase = this._options.ssl_options.passphrase
-                if (this._options.ssl_options.ca) {
-                    for (const ca of this._options.ssl_options.ca) {
-                        sslParameters.ca.push(fs.readFileSync(ca))
-                    }
-                }
-            }
-
-            // let uri: string = ''
-            //
-            // if (typeof this._configuration === 'object') {
-            //     uri = 'protocol://username:password@host:port/vhost'
-            //         .replace('protocol', this._configuration.protocol)
-            //         .replace('host', this._configuration.hostname)
-            //         .replace('port', (this._configuration.port).toString())
-            //         .replace('vhost', this._configuration.vhost ? this._configuration.vhost : '')
-            //         .replace('username', this._configuration.username)
-            //         .replace('password', this._configuration.password)
-            // } else {
-            //     uri = this._configuration
-            // }
-
             this._connectionFactory
-                .createConnection(this._configuration, sslParameters,
+                .createConnection(this._configuration, this._options.ssl_options,
                     {
                         retries: this._options.retries,
                         interval: this._options.interval
@@ -186,7 +149,7 @@ export class ConnectionRabbitMQ implements IBusConnection {
     public getExchange(exchangeName: string,
                        option?: IExchangeOptions): Exchange {
 
-        let typeCommunication = ETypeCommunication.TOPIC
+        let typeCommunication = 'topic'
 
         let exchangeOptions = {}
         if (option) {
@@ -199,17 +162,11 @@ export class ConnectionRabbitMQ implements IBusConnection {
             if (option.type) typeCommunication = option.type
         }
 
-        try {
-            const exchange = this._connection.declareExchange(exchangeName, typeCommunication, exchangeOptions)
-
-            if (!this._resourceBus.get(exchangeName)) {
-                this._resourceBus.set(exchangeName, exchange)
-            }
-            return exchange
-        } catch (e) {
-            throw e
+        const exchange = this._connection.declareExchange(exchangeName, typeCommunication, exchangeOptions)
+        if (!this._resourceBus.get(exchangeName)) {
+            this._resourceBus.set(exchangeName, exchange)
         }
-
+        return exchange
     }
 
     public getQueue(queueName: string, option?: IQueueOptions): Queue {
@@ -226,17 +183,11 @@ export class ConnectionRabbitMQ implements IBusConnection {
             }
         }
 
-        try {
-            const queue = this._connection.declareQueue(queueName, queueOpetions)
-
-            if (!this._resourceBus.get(queueName)) {
-                this._resourceBus.set(queueName, queue)
-            }
-            return queue
-        } catch (e) {
-            throw e
+        const queue = this._connection.declareQueue(queueName, queueOpetions)
+        if (!this._resourceBus.get(queueName)) {
+            this._resourceBus.set(queueName, queue)
         }
-
+        return queue
     }
 
     public closeConnection(): Promise<boolean> {

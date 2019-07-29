@@ -8,7 +8,11 @@ import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface'
 import { IStartConsumerResult } from '../../../application/port/queue.options.interface'
 import { IMessage, IMessageField, IMessageProperty } from '../../../application/port/message.interface'
-import { defSubExchangeOptions, ISubExchangeOptions } from '../../../application/port/communications.options.interface'
+import { ISubExchangeOptions } from '../../../application/port/communications.options.interface'
+
+const defSubExchangeOptions: ISubExchangeOptions = {
+    receive_from_yourself: false
+}
 
 @injectable()
 export class MessageReceiverRabbitmq implements IMessageReceiver {
@@ -31,23 +35,25 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                                           options: ISubExchangeOptions = defSubExchangeOptions): Promise<void> {
         try {
             if (this._connection && !this._connection.isConnected) {
-                return callback.handle(new Error('Connection Failed'), undefined)
+                return Promise.reject(new Error('Connection Failed'))
             }
 
             const exchange = this._connection.getExchange(exchangeName, options.exchange)
+            await exchange.initialized
 
             const queue = this._connection.getQueue(queueName, options.queue)
+            await queue.initialized
 
-            if (await exchange.initialized) {
-                this.routing_key_handlers.set(topicKey, callback)
-                this._logger.info('Callback message ' + topicKey + ' registered!')
-                queue.bind(exchange, topicKey)
-            }
+            this.routing_key_handlers.set(topicKey, callback)
+            this._logger.info('Callback message ' + topicKey + ' registered!')
+
+            await queue.bind(exchange, topicKey)
 
             await this.activateConsumerTopicOrDirec(queue, queueName, options.receive_from_yourself)
 
+            return Promise.resolve()
         } catch (err) {
-            return callback.handle(err, undefined)
+            return Promise.reject(err)
         }
     }
 
@@ -83,14 +89,14 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                         }
                     }
                 }
-
             }, { noAck: false }).then((result: IStartConsumerResult) => {
                 this._logger.info('Queue consumer ' + queue.name + ' successfully created! ')
             })
                 .catch(err => {
-                    throw err
+                    return Promise.reject(err)
                 })
         }
+        return Promise.resolve()
     }
 
     private regExpr(pattern: string,

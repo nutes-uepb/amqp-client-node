@@ -1,6 +1,5 @@
-import { ETypeCommunication } from './type.communication.enum';
 export interface IExchangeOptions {
-    type?: ETypeCommunication;
+    type?: string;
     durable?: boolean;
     internal?: boolean;
     auto_delete?: boolean;

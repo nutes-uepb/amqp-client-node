@@ -1,5 +1,5 @@
 import { IBusConnection } from '../../port/connection/connection.interface';
-import { IConnectionParams, IConnectionOptions } from '../../../application/port/connection.config.inteface';
+import { IConnectionOptions, IConnectionParams } from '../../../application/port/connection.config.inteface';
 import { IConnectionFactory } from '../../port/connection/connection.factory.interface';
 import { ICustomLogger } from '../../../utils/custom.logger';
 import { ConnectionFactoryRabbitMQ } from './connection.factory.rabbitmq';

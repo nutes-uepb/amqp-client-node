@@ -85,6 +85,9 @@ export class Connection implements IConnection {
         this._sub
             .receiveRoutingKeyMessage(queueName, exchangeName, routingKey,
                 eventCallback, options)
+            .catch(err => {
+                callback(err, undefined)
+            })
 
     }
 

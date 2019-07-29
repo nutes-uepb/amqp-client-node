@@ -37,10 +37,10 @@ export class MessageSenderRabbitmq implements IMessageSender {
 
             const exchange = this._connection.getExchange(exchangeName, exchangeOptions)
 
-            if (await exchange.initialized) {
-                exchange.send(msg, topicKey)
-                this._logger.info('Bus event message sent with success!')
-            }
+            await exchange.initialized
+
+            exchange.send(msg, topicKey)
+            this._logger.info('Bus event message sent with success!')
 
             return Promise.resolve()
         } catch (err) {

@@ -11,10 +11,10 @@ export interface IConnectionParams {
 }
 
 export interface ISSLOptions {
-    cert?: string,
-    key?: string,
+    cert?: Buffer,
+    key?: Buffer,
     passphrase?: string
-    ca?: string[]
+    ca?: Buffer[]
 }
 
 export interface IConnectionOptions {

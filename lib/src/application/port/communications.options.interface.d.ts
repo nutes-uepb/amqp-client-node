@@ -8,12 +8,10 @@ export interface ISubExchangeOptions {
     queue?: IQueueOptions;
     receive_from_yourself?: boolean;
 }
-export declare const defSubExchangeOptions: ISubExchangeOptions;
 export interface IClientOptions {
     exchange?: IExchangeOptions;
     rcp_timeout?: number;
 }
-export declare const defClientOptions: IClientOptions;
 export interface IServerOptions {
     exchange?: IExchangeOptions;
     queue?: IQueueOptions;

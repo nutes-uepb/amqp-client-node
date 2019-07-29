@@ -1,3 +1,4 @@
+/// <reference types="node" />
 export interface IConnectionParams {
     protocol?: string;
     hostname?: string;
@@ -10,10 +11,10 @@ export interface IConnectionParams {
     vhost?: string;
 }
 export interface ISSLOptions {
-    cert?: string;
-    key?: string;
+    cert?: Buffer;
+    key?: Buffer;
     passphrase?: string;
-    ca?: string[];
+    ca?: Buffer[];
 }
 export interface IConnectionOptions {
     retries?: number;

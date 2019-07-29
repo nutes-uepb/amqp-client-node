@@ -16,7 +16,7 @@ import { IBinding } from '../../port/bus/binding.interface'
 const DIRECT_REPLY_TO_QUEUE = 'amq.rabbitmq.reply-to'
 
 export class Queue {
-    public initialized: Promise<IQueueInitializeResult>
+    private _initialized: Promise<IQueueInitializeResult>
 
     private _connection: ConnectionFactoryRabbitMQ
     private _channel: AmqpLib.Channel
@@ -41,8 +41,12 @@ export class Queue {
         this._initialize()
     }
 
+    get initialized(): Promise<IQueueInitializeResult> {
+        return this._initialized
+    }
+
     public _initialize(): void {
-        this.initialized = new Promise<IQueueInitializeResult>((resolve, reject) => {
+        this._initialized = new Promise<IQueueInitializeResult>((resolve, reject) => {
             this._connection.initialized.then(() => {
                 this._connection.connection.createChannel((err, channel) => {
                     /* istanbul ignore if */
@@ -121,7 +125,7 @@ export class Queue {
         // if (this.initialized.isFulfilled()) {
         //   sendMessage()
         // } else {
-        this.initialized.then(sendMessage)
+        this._initialized.then(sendMessage)
         // }
     }
 
@@ -153,19 +157,19 @@ export class Queue {
 
             const sync: boolean = false
 
-            this.initialized.then(() => sync)
+            this._initialized.then(() => sync)
 
             // execute sync when possible
             // if (this.initialized.isFulfilled()) {
             //   processRpc()
             // } else {
-            this.initialized.then(processRpc)
+            this._initialized.then(processRpc)
             // }
         })
     }
 
     public prefetch(count: number): void {
-        this.initialized.then(() => {
+        this._initialized.then(() => {
             this._channel.prefetch(count)
             this._options.prefetch = count
         })
@@ -173,7 +177,7 @@ export class Queue {
 
     public recover(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            this.initialized.then(() => {
+            this._initialized.then(() => {
                 this._channel.recover((err, ok) => {
                     if (err) {
                         reject(err)
@@ -300,7 +304,7 @@ export class Queue {
         }
 
         this._consumerInitialized = new Promise<IStartConsumerResult>((resolve, reject) => {
-            this.initialized.then(() => {
+            this._initialized.then(() => {
                 let consumerFunction = activateConsumerWrapper
                 if (this._isStartConsumer) {
                     consumerFunction = this._rawConsumer ? rawMsgConsumer : processedMsgConsumer
@@ -345,7 +349,7 @@ export class Queue {
     public delete(): Promise<IDeleteResult> {
         if (this._deleting === undefined) {
             this._deleting = new Promise<IDeleteResult>((resolve, reject) => {
-                this.initialized.then(() => {
+                this._initialized.then(() => {
                     return Binding.removeBindingsContaining(this)
                 }).then(() => {
                     return this.stopConsumer()
@@ -355,7 +359,7 @@ export class Queue {
                         if (err) {
                             reject(err)
                         } else {
-                            delete this.initialized // invalidate queue
+                            delete this._initialized // invalidate queue
                             delete this._connection.queues[this._name] // remove the queue from our administration
                             this._channel.close((e) => {
                                 /* istanbul ignore if */
@@ -380,12 +384,12 @@ export class Queue {
     public close(): Promise<void> {
         if (this._closing === undefined) {
             this._closing = new Promise<void>((resolve, reject) => {
-                this.initialized.then(() => {
+                this._initialized.then(() => {
                     return Binding.removeBindingsContaining(this)
                 }).then(() => {
                     return this.stopConsumer()
                 }).then(() => {
-                    delete this.initialized // invalidate queue
+                    delete this._initialized // invalidate queue
                     delete this._connection.queues[this._name] // remove the queue from our administration
                     this._channel.close((err) => {
                         /* istanbul ignore if */

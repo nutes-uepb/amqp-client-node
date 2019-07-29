@@ -5,7 +5,7 @@ import * as AmqpLib from 'amqplib/callback_api';
 import { IActivateConsumerOptions, IDeleteResult, IQueueInitializeResult, IQueueOptions, IStartConsumerOptions, IStartConsumerResult } from '../../../application/port/queue.options.interface';
 import { IBinding } from '../../port/bus/binding.interface';
 export declare class Queue {
-    initialized: Promise<IQueueInitializeResult>;
+    private _initialized;
     private _connection;
     private _channel;
     private _name;
@@ -20,6 +20,7 @@ export declare class Queue {
     private _deleting;
     private _closing;
     constructor(connection: ConnectionFactoryRabbitMQ, name: string, options?: IQueueOptions);
+    readonly initialized: Promise<IQueueInitializeResult>;
     _initialize(): void;
     private static _packMessageContent;
     private static _unpackMessageContent;

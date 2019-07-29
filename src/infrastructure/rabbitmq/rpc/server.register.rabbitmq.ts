@@ -121,15 +121,15 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                 }
 
                 const exchange = await this._connection.getExchange(exchangeName, exchangeOptions)
+                await exchange.initialized
                 this._logger.info('Exchange creation ' + exchange.name + ' realized with success!')
 
                 const queue = this._connection.getQueue(queueName, queueOptions)
+                await queue.initialized
                 this._logger.info('Queue creation ' + queue.name + ' realized with success!')
 
-                if (await exchange.initialized) {
-                    this._logger.info('RoutingKey ' + routingKey + ' registered!')
-                    await queue.bind(exchange, routingKey)
-                }
+                this._logger.info('RoutingKey ' + routingKey + ' registered!')
+                await queue.bind(exchange, routingKey)
 
                 if (!this.consumersInitialized.get(queueName)) {
                     this.consumersInitialized.set(queueName, true)
@@ -159,7 +159,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                         this._logger.info('Server registered in ' + exchangeName + ' exchange!')
                     })
                         .catch(err => {
-                            console.log(err)
+                            return reject(err)
                         })
                 }
                 return resolve(true)

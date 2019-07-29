@@ -4,9 +4,13 @@ import { Identifier } from '../../../di/identifier'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IBusConnection } from '../../port/connection/connection.interface'
 import { IClientRegister } from '../../port/rpc/client.register.interface'
-import { defClientOptions, IClientOptions } from '../../../application/port/communications.options.interface'
+import { IClientOptions } from '../../../application/port/communications.options.interface'
 import { IMessage, IMessageField, IMessageProperty } from '../../../application/port/message.interface'
 import { Message } from '../bus/message'
+
+const defClientOptions: IClientOptions = {
+    rcp_timeout: 5000
+}
 
 @injectable()
 export class ClientRegisterRabbitmq implements IClientRegister {
@@ -32,6 +36,7 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 }
 
                 const exchange = this._connection.getExchange(exchangeName, options.exchange)
+                await exchange.initialized
 
                 let time
                 const timeout = options.rcp_timeout
