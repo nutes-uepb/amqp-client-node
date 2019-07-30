@@ -2,14 +2,13 @@ import { Exchange } from '../../rabbitmq/bus/exchange'
 import { Queue } from '../../rabbitmq/bus/queue'
 import { Channel, Message } from 'amqplib/callback_api'
 
-export interface IMessageInterface {
-    content: Buffer
+export interface IBusMessage {
+    contentBuffer: any
     fields: any
     properties: any
     channel: Channel
     message: Message
-
-    getContent(): any
+    content: any
 
     sendTo(destination: Exchange | Queue, routingKey: string): void
 

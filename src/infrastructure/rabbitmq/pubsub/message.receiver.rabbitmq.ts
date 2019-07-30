@@ -1,17 +1,16 @@
 import { IEventHandler } from '../../port/pubsub/event.handler.interface'
 import { Queue } from '../bus/queue'
-import { Message } from '../bus/message'
 import { inject, injectable } from 'inversify'
 import { Identifier } from '../../../di/identifier'
 import { IBusConnection } from '../../port/connection/connection.interface'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface'
-import { IStartConsumerResult } from '../../../application/port/queue.options.interface'
-import { IMessage, IMessageField, IMessageProperty } from '../../../application/port/message.interface'
+import { IActivateConsumerOptions, IStartConsumerResult } from '../../../application/port/queue.options.interface'
 import { ISubExchangeOptions } from '../../../application/port/communications.options.interface'
+import { IBusMessage } from '../../port/bus/bus.message.inteface'
 
 const defSubExchangeOptions: ISubExchangeOptions = {
-    receive_from_yourself: false
+    receiveFromYourself: false
 }
 
 @injectable()
@@ -30,7 +29,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
 
     public async receiveRoutingKeyMessage(queueName: string,
                                           exchangeName: string,
-                                          topicKey: string,
+                                          routingKey: string,
                                           callback: IEventHandler<any>,
                                           options: ISubExchangeOptions = defSubExchangeOptions): Promise<void> {
         try {
@@ -38,18 +37,18 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                 return Promise.reject(new Error('Connection Failed'))
             }
 
-            const exchange = this._connection.getExchange(exchangeName, options.exchange)
+            const exchange = this._connection.getExchange(exchangeName, options ? options.exchange : undefined)
             await exchange.initialized
 
-            const queue = this._connection.getQueue(queueName, options.queue)
+            const queue = this._connection.getQueue(queueName, options ? options.queue : undefined)
             await queue.initialized
 
-            this.routing_key_handlers.set(topicKey, callback)
-            this._logger.info('Callback message ' + topicKey + ' registered!')
+            this.routing_key_handlers.set(routingKey, callback)
+            this._logger.info('Callback message ' + routingKey + ' registered!')
 
-            await queue.bind(exchange, topicKey)
+            await queue.bind(exchange, routingKey)
 
-            await this.activateConsumerTopicOrDirec(queue, queueName, options.receive_from_yourself)
+            await this.routingKeySubscriberConsumer(queue, options.consumer, options.receiveFromYourself)
 
             return Promise.resolve()
         } catch (err) {
@@ -57,17 +56,17 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
         }
     }
 
-    private async activateConsumerTopicOrDirec(queue: Queue,
-                                               queueName: string,
+    private async routingKeySubscriberConsumer(queue: Queue,
+                                               consumer: IActivateConsumerOptions,
                                                receiveFromYourself: boolean = false): Promise<void> {
 
-        if (!this.consumersInitialized.get(queueName)) {
-            this.consumersInitialized.set(queueName, true)
-            this._logger.info('Queue creation ' + queueName + ' realized with success!')
+        if (!this.consumersInitialized.get(queue.name)) {
+            this.consumersInitialized.set(queue.name, true)
+            this._logger.info('Queue creation ' + queue.name + ' realized with success!')
 
-            await queue.activateConsumer((message: Message) => {
+            await queue.activateConsumer((message: IBusMessage) => {
                 // acknowledge that the message has been received (and processed)
-                message.ack()
+                if (!consumer || !consumer.noAck) message.ack()
 
                 if (message.properties.correlationId === this._connection.idConnection &&
                     !receiveFromYourself) {
@@ -76,20 +75,19 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
 
                 this._logger.info(`Bus event message received with success!`)
 
-                const msg: IMessage = this.createMessage(message)
-
-                const routingKey: string = msg.fields.routing_key
+                const routingKey: string = message.fields.routingKey
 
                 for (const entry of this.routing_key_handlers.keys()) {
                     if (this.regExpr(entry, routingKey)) {
                         const event_handler: IEventHandler<any> | undefined =
                             this.routing_key_handlers.get(entry)
                         if (event_handler) {
-                            event_handler.handle(undefined, msg)
+
+                            event_handler.handle(undefined, message)
                         }
                     }
                 }
-            }, { noAck: false }).then((result: IStartConsumerResult) => {
+            }, consumer).then((result: IStartConsumerResult) => {
                 this._logger.info('Queue consumer ' + queue.name + ' successfully created! ')
             })
                 .catch(err => {
@@ -111,32 +109,6 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
         } catch (e) {
             throw e
         }
-    }
-
-    private createMessage(message: Message): IMessage {
-        const msg = {
-            properties: {
-                priority: message.properties.priority,
-                expiration: message.properties.expiration,
-                message_id: message.properties.messageId,
-                timestamp: message.properties.timestamp,
-                user_id: message.properties.userId,
-                app_id: message.properties.appId,
-                cluster_id: message.properties.clusterId,
-                cc: message.properties.cc,
-                bcc: message.properties.bcc
-            } as IMessageProperty,
-            content: message.getContent(),
-            fields: {
-                consumer_tag: message.fields.consumerTag,
-                delivery_tag: message.fields.deliveryTag,
-                redelivered: message.fields,
-                exchange: message.fields.exchange,
-                routing_key: message.fields.routingKey
-            } as IMessageField
-        } as IMessage
-
-        return msg
     }
 
 }

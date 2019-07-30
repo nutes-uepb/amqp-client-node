@@ -1,6 +1,6 @@
 import { ConnectionFactoryRabbitMQ, log } from '../connection/connection.factory.rabbitmq'
 import { Binding } from './binding'
-import { Message } from './message'
+import { BusMessage } from './bus.message'
 import { Exchange } from './exchange'
 import * as AmqpLib from 'amqplib/callback_api'
 import {
@@ -68,7 +68,7 @@ export class Queue {
                             }
                         }
 
-                        if (this._options.no_create) {
+                        if (this._options.noCreate) {
                             this._channel.checkQueue(this._name, callback)
                         } else {
                             this._channel.assertQueue(this._name, this._options as AmqpLib.Options.AssertQueue, callback)
@@ -100,7 +100,7 @@ export class Queue {
     }
 
     /**
-     * deprecated, use 'queue.send(message: Message)' instead
+     * deprecated, use 'queue.send(message: MessageBus)' instead
      */
     public publish(content: any, options: any = {}): void {
         console.log('HERE0')
@@ -109,7 +109,7 @@ export class Queue {
             try {
                 this._channel.sendToQueue(this._name, content, options)
             } catch (err) {
-                log.log('debug', 'Queue publish error: ' + err.message, { module: 'amqp-ts' })
+                log.log('debug', 'Queue publish error: ' + err.messageBus, { module: 'amqp-ts' })
                 const queueName = this._name
                 const connection = this._connection
                 log.log('debug', 'Try to rebuild connection, before Call.', { module: 'amqp-ts' })
@@ -129,27 +129,27 @@ export class Queue {
         // }
     }
 
-    public send(message: Message, routingKey = ''): void {
+    public send(message: BusMessage, routingKey = ''): void {
         message.sendTo(this, routingKey)
     }
 
-    public rpc(requestParameters: any): Promise<Message> {
-        return new Promise<Message>((resolve, reject) => {
+    public rpc(requestParameters: any): Promise<BusMessage> {
+        return new Promise<BusMessage>((resolve, reject) => {
             const processRpc = () => {
                 let consumerTag: string
                 this._channel.consume(DIRECT_REPLY_TO_QUEUE, (resultMsg) => {
                     this._channel.cancel(consumerTag)
-                    const result = new Message(resultMsg.content, resultMsg.fields)
+                    const result = new BusMessage(resultMsg.content, resultMsg.fields)
                     result.fields = resultMsg.fields
                     resolve(result)
                 }, { noAck: true }, (err, ok) => {
                     /* istanbul ignore if */
                     if (err) {
-                        reject(new Error('amqp-ts: Queue.rpc error: ' + err.message))
+                        reject(new Error('amqp-ts: Queue.rpc error: ' + err.messageBus))
                     } else {
                         // send the rpc request
-                        consumerTag = ok.consumer_tag
-                        const message = new Message(requestParameters, { replyTo: DIRECT_REPLY_TO_QUEUE })
+                        consumerTag = ok.consumerTag
+                        const message = new BusMessage(requestParameters, { replyTo: DIRECT_REPLY_TO_QUEUE })
                         message.sendTo(this)
                     }
                 })
@@ -211,7 +211,7 @@ export class Queue {
         return this._consumerInitialized
     }
 
-    public activateConsumer(onMessage: (msg: Message) => any,
+    public activateConsumer(onMessage: (msg: BusMessage) => any,
                             options: IActivateConsumerOptions = {})
         : Promise<IStartConsumerResult> {
         if (this._consumerInitialized) {
@@ -244,7 +244,8 @@ export class Queue {
                             resultValue = Queue._packMessageContent(result, options)
                             this._channel.sendToQueue(msg.properties.replyTo, resultValue, options)
                         }).catch((err) => {
-                            log.log('error', 'Queue.onMessage RPC promise returned error: ' + err.message, { module: 'amqp-ts' })
+                            log.log('error', 'Queue.onMessage RPC promise returned error: '
+                                + err.messageBus, { module: 'amqp-ts' })
                         })
                     } else {
                         result = Queue._packMessageContent(result, options)
@@ -257,7 +258,7 @@ export class Queue {
                 }
             } catch (err) {
                 /* istanbul ignore next */
-                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.message, { module: 'amqp-ts' })
+                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.messageBus, { module: 'amqp-ts' })
             }
         }
 
@@ -266,13 +267,13 @@ export class Queue {
                 this._consumer(msg, this._channel)
             } catch (err) {
                 /* istanbul ignore next */
-                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.message, { module: 'amqp-ts' })
+                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.messageBus, { module: 'amqp-ts' })
             }
         }
 
         const activateConsumerWrapper = (msg: AmqpLib.Message) => {
             try {
-                const message = new Message(msg.content, msg.properties)
+                const message = new BusMessage(msg.content, msg.properties)
                 message.fields = msg.fields
                 message.message = msg
                 message.channel = this._channel
@@ -281,25 +282,26 @@ export class Queue {
                 if (msg.properties.replyTo) {
                     if (result instanceof Promise) {
                         result.then((resultValue) => {
-                            if (!(resultValue instanceof Message)) {
-                                resultValue = new Message(resultValue, {})
+                            if (!(resultValue instanceof BusMessage)) {
+                                resultValue = new BusMessage(resultValue, {})
                             }
                             resultValue.properties.correlationId = msg.properties.correlationId
-                            this._channel.sendToQueue(msg.properties.replyTo, resultValue.content, resultValue.properties)
+                            this._channel.sendToQueue(msg.properties.replyTo, resultValue.contentBuffer, resultValue.properties)
                         }).catch((err) => {
-                            log.log('error', 'Queue.onMessage RPC promise returned error: ' + err.message, { module: 'amqp-ts' })
+                            log.log('error', 'Queue.onMessage RPC promise returned error: '
+                                + err.messageBus, { module: 'amqp-ts' })
                         })
                     } else {
-                        if (!(result instanceof Message)) {
-                            result = new Message(result, {})
+                        if (!(result instanceof BusMessage)) {
+                            result = new BusMessage(result, {})
                         }
                         result.properties.correlationId = msg.properties.correlationId
-                        this._channel.sendToQueue(msg.properties.replyTo, result.content, result.properties)
+                        this._channel.sendToQueue(msg.properties.replyTo, result.contentBuffer, result.properties)
                     }
                 }
             } catch (err) {
                 /* istanbul ignore next */
-                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.message, { module: 'amqp-ts' })
+                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.messageBus, { module: 'amqp-ts' })
             }
         }
 
@@ -315,7 +317,7 @@ export class Queue {
                         if (err) {
                             reject(err)
                         } else {
-                            this._consumerTag = ok.consumer_tag
+                            this._consumerTag = ok.consumerTag
                             resolve(ok)
                         }
                     })

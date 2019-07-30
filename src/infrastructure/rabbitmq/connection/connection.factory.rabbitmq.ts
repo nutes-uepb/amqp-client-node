@@ -292,19 +292,11 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
     }
 
     public declareExchange(name: string, type?: string, options?: IExchangeOptions): Exchange {
-        let exchange = this._exchanges[name]
-        if (exchange === undefined) {
-            exchange = new Exchange(this, name, type, options)
-        }
-        return exchange
+        return new Exchange(this, name, type, options)
     }
 
     public declareQueue(name: string, options?: IQueueOptions): Queue {
-        let queue = this._queues[name]
-        if (queue === undefined) {
-            queue = new Queue(this, name, options)
-        }
-        return queue
+        return new Queue(this, name, options)
     }
 
     public declareTopology(topology: ITopology): Promise<any> {

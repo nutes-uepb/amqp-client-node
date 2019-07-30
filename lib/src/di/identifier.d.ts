@@ -1,6 +1,7 @@
 export declare abstract class Identifier {
     static readonly RABBITMQ_CONNECTION_FACT: any;
     static readonly RABBITMQ_CONNECTION: any;
+    static readonly BUS_MESSAGE: any;
     static readonly CUSTOM_LOGGER: any;
     static readonly RABBITMQ_MENSSAGE_SENDER: any;
     static readonly RABBITMQ_MENSSAGE_RECEIVER: any;

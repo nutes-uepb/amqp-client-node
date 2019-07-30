@@ -24,7 +24,7 @@ export declare class ConnectionRabbitMQ implements IBusConnection {
     readonly isConnected: boolean;
     readonly conn: ConnectionFactoryRabbitMQ | undefined;
     connect(): Promise<void>;
-    getExchange(exchangeName: string, option?: IExchangeOptions): Exchange;
+    getExchange(exchangeName: string, options?: IExchangeOptions): Exchange;
     getQueue(queueName: string, option?: IQueueOptions): Queue;
     closeConnection(): Promise<boolean>;
     disposeConnection(): Promise<boolean>;

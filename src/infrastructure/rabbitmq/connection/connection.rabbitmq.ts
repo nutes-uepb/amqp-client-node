@@ -99,7 +99,7 @@ export class ConnectionRabbitMQ implements IBusConnection {
             if (this.isConnected) return resolve()
 
             this._connectionFactory
-                .createConnection(this._configuration, this._options.ssl_options,
+                .createConnection(this._configuration, this._options.sslOptions,
                     {
                         retries: this._options.retries,
                         interval: this._options.interval
@@ -147,22 +147,9 @@ export class ConnectionRabbitMQ implements IBusConnection {
     }
 
     public getExchange(exchangeName: string,
-                       option?: IExchangeOptions): Exchange {
+                       options?: IExchangeOptions): Exchange {
 
-        let typeCommunication = 'topic'
-
-        let exchangeOptions = {}
-        if (option) {
-            exchangeOptions = {
-                ...option,
-                autoDelete: option.auto_delete,
-                alternateExchange: option.alternate_exchange,
-                noCreate: option.no_create
-            }
-            if (option.type) typeCommunication = option.type
-        }
-
-        const exchange = this._connection.declareExchange(exchangeName, typeCommunication, exchangeOptions)
+        const exchange = this._connection.declareExchange(exchangeName, options ? options.type : undefined, options)
         if (!this._resourceBus.get(exchangeName)) {
             this._resourceBus.set(exchangeName, exchange)
         }
@@ -171,19 +158,7 @@ export class ConnectionRabbitMQ implements IBusConnection {
 
     public getQueue(queueName: string, option?: IQueueOptions): Queue {
 
-        let queueOpetions = {}
-        if (option) {
-            queueOpetions = {
-                ...option,
-                autoDelete: option.auto_delete,
-                messageTtl: option.message_ttl,
-                deadLetterExchange: option.dead_letter_exchange,
-                maxLength: option.max_length,
-                noCreate: option.no_create
-            }
-        }
-
-        const queue = this._connection.declareQueue(queueName, queueOpetions)
+        const queue = this._connection.declareQueue(queueName, option)
         if (!this._resourceBus.get(queueName)) {
             this._resourceBus.set(queueName, queue)
         }

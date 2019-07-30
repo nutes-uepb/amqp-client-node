@@ -19,4 +19,5 @@ export declare class ServerRegisterRabbitmq implements IServerRegister {
     private unregisterResource;
     private getResource;
     private registerRoutingKeyServer;
+    private routingKeyServerConsumer;
 }

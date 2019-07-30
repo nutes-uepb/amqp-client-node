@@ -1,25 +1,25 @@
 export interface IMessage {
-    content: any
-    fields: IMessageField
-    properties: IMessageProperty
+    content?: any
+    fields?: IMessageField
+    properties?: IMessageProperty
 }
 
 export interface IMessageProperty {
     priority?: number
     expiration?: string
-    message_id?: string
+    messageId?: string
     timestamp?: number
-    user_id?: string
-    app_id?: string
-    cluster_id?: string
+    userId?: string
+    appId?: string
+    clusterId?: string
     cc?: string | string[]
     bcc?: string | string[]
 }
 
 export interface IMessageField {
-    consumer_tag?: string
-    delivery_tag?: string
+    consumerTag?: string
+    deliveryTag?: string
     redelivered?: boolean
     exchange?: string
-    routing_key?: string
+    routingKey?: string
 }

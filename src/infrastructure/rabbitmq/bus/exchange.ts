@@ -2,7 +2,7 @@ import * as os from 'os'
 import { ConnectionFactoryRabbitMQ, log } from '../connection/connection.factory.rabbitmq'
 import { Binding } from './binding'
 import * as AmqpLib from 'amqplib/callback_api'
-import { Message } from './message'
+import { BusMessage } from './bus.message'
 import * as path from 'path'
 import { IExchangeInitializeResult, IExchangeOptions } from '../../../application/port/exchange.options.interface'
 import { IActivateConsumerOptions, IStartConsumerOptions } from '../../../application/port/queue.options.interface'
@@ -17,7 +17,6 @@ export class Exchange {
     private _initialized: Promise<IExchangeInitializeResult>
 
     private _consumer_handlers: Array<[string, any]> = new Array<[string, any]>()
-    private _isConsumerInitializedRcp: boolean = false
 
     private _connection: ConnectionFactoryRabbitMQ
     private _channel: AmqpLib.Channel
@@ -55,7 +54,7 @@ export class Exchange {
                                 resolve(ok as IExchangeInitializeResult)
                             }
                         }
-                        if (this._options.no_create) {
+                        if (this._options.noCreate) {
                             this._channel.checkExchange(this._name, callback)
                         } else {
                             this._channel.assertExchange(this._name, this._type,
@@ -71,7 +70,7 @@ export class Exchange {
     }
 
     /**
-     * deprecated, use 'exchange.send(message: Message)' instead
+     * deprecated, use 'exchange.send(message: MessageBus)' instead
      */
     public publish(content: any, routingKey = '', options: any = {}): void {
         if (typeof content === 'string') {
@@ -84,7 +83,7 @@ export class Exchange {
             try {
                 this._channel.publish(this._name, routingKey, content, options)
             } catch (err) {
-                log.log('warn', 'Exchange publish error: ' + err.message, { module: 'amqp-ts' })
+                log.log('warn', 'Exchange publish error: ' + err.messageBus, { module: 'amqp-ts' })
                 const exchangeName = this._name
                 const connection = this._connection
                 connection._rebuildAll(err).then(() => {
@@ -95,11 +94,11 @@ export class Exchange {
         })
     }
 
-    public send(message: Message, routingKey = ''): void {
+    public send(message: BusMessage, routingKey = ''): void {
         message.sendTo(this, routingKey)
     }
 
-    public rpc(requestParameters: any, routingKey = '', callback: (err, message: Message) => void): void {
+    public rpc(requestParameters: any, routingKey = '', callback: (err, message: BusMessage) => void): void {
 
         function generateUuid(): string {
             return Math.random().toString() +
@@ -109,11 +108,10 @@ export class Exchange {
 
         const processRpc = () => {
             const uuid: string = generateUuid()
-            if (!this._isConsumerInitializedRcp) {
-                this._isConsumerInitializedRcp = true
+            if (Object.keys(this._channel.consumers).length === 0) {
                 this._channel.consume(DIRECT_REPLY_TO_QUEUE, (resultMsg) => {
 
-                    const result = new Message(resultMsg.content, resultMsg.properties)
+                    const result = new BusMessage(resultMsg.content, resultMsg.properties)
                     result.fields = resultMsg.fields
 
                     for (const handler of this._consumer_handlers) {
@@ -121,7 +119,7 @@ export class Exchange {
                             const func: (err, parameters) => void = handler[1]
 
                             if (result.properties.type === 'error') {
-                                func.apply('', [new Error(result.getContent()), undefined])
+                                func.apply('', [new Error(result.content()), undefined])
                                 return
                             }
                             func.apply('', [undefined, result])
@@ -131,7 +129,7 @@ export class Exchange {
                 }, { noAck: true })
             }
             this._consumer_handlers.push([uuid, callback])
-            const message = new Message(requestParameters,
+            const message = new BusMessage(requestParameters,
                 { correlationId: uuid, replyTo: DIRECT_REPLY_TO_QUEUE })
             message.sendTo(this, routingKey)
         }
@@ -234,7 +232,7 @@ export class Exchange {
         }
     }
 
-    public activateConsumer(onMessage: (msg: Message) => any, options?: IActivateConsumerOptions): Promise<any> {
+    public activateConsumer(onMessage: (msg: BusMessage) => any, options?: IActivateConsumerOptions): Promise<any> {
         const queueName = this.consumerQueueName()
         if (this._connection.queues[queueName]) {
             return new Promise<void>((_, reject) => {

@@ -10,5 +10,4 @@ export declare class ClientRegisterRabbitmq implements IClientRegister {
     constructor(_logger: ICustomLogger);
     connection: IBusConnection;
     registerRoutingKeyClient(exchangeName: string, resource: IClientRequest, options?: IClientOptions): Promise<IMessage>;
-    private createMessage;
 }

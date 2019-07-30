@@ -1,14 +1,14 @@
 export interface IQueueOptions {
     exclusive?: boolean
     durable?: boolean
-    auto_delete?: boolean
+    autoDelete?: boolean
     arguments?: any
     message_ttl?: number
     expires?: number
-    dead_letter_exchange?: string
-    max_length?: number
+    deadLetterExchange?: string
+    maxLength?: number
     prefetch?: number
-    no_create?: boolean
+    noCreate?: boolean
 }
 
 export interface IStartConsumerOptions {

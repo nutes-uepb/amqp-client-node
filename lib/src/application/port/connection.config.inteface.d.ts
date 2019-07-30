@@ -19,5 +19,5 @@ export interface ISSLOptions {
 export interface IConnectionOptions {
     retries?: number;
     interval?: number;
-    ssl_options?: ISSLOptions;
+    sslOptions?: ISSLOptions;
 }

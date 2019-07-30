@@ -2,10 +2,10 @@ export interface IExchangeOptions {
     type?: string
     durable?: boolean
     internal?: boolean
-    auto_delete?: boolean
+    autoDelete?: boolean
     alternate_exchange?: string
     arguments?: any
-    no_create?: boolean
+    noCreate?: boolean
 }
 
 export interface IExchangeInitializeResult {

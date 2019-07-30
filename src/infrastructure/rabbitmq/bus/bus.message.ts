@@ -2,12 +2,13 @@ import { log } from '../connection/connection.factory.rabbitmq'
 import { Exchange } from './exchange'
 import { Queue } from './queue'
 import * as AmqpLib from 'amqplib/callback_api'
-import { IMessageInterface } from '../../port/bus/message.interface'
+import { IBusMessage } from '../../port/bus/bus.message.inteface'
 
-export class Message implements IMessageInterface {
-    private _content: Buffer
+export class BusMessage implements IBusMessage {
+    private _contentBuffer: Buffer
     private _fields: any
     private _properties: any
+    private _content: any
 
     private _channel: AmqpLib.Channel // for received messages only: the channel it has been received on
     private _message: AmqpLib.Message // received messages only: original amqplib message
@@ -15,56 +16,58 @@ export class Message implements IMessageInterface {
     constructor(content?: any, options: any = {}) {
         this._properties = options
         if (content !== undefined) {
-            this.content = content
+            this.contentBuffer = content
         }
     }
 
-    set content(content: any) {
+    set contentBuffer(content: any) {
         if (content instanceof Error) {
             this.properties.type = 'error'
             content = content.message
         }
 
         if (typeof content === 'string') {
-            this._content = new Buffer(content)
+            this._contentBuffer = new Buffer(content)
         } else if (!(content instanceof Buffer)) {
-            this._content = Buffer.from(JSON.stringify(content))
+            this._contentBuffer = Buffer.from(JSON.stringify(content))
             this._properties.contentType = 'application/json'
         } else {
-            this._content = content
+            this._contentBuffer = content
         }
+
+        let parseContent = this._contentBuffer.toString()
+
+        if (this._properties.contentType === 'application/json') {
+            parseContent = JSON.parse(parseContent)
+        }
+
+        this._content = parseContent
+    }
+
+    get contentBuffer(): any {
+        return this._contentBuffer
     }
 
     get content(): any {
         return this._content
     }
 
-    public getContent(): any {
-        let content = this._content.toString()
-
-        if (this._properties.contentType === 'application/json') {
-            content = JSON.parse(content)
-        }
-
-        return content
-    }
-
     public sendTo(destination: Exchange | Queue, routingKey: string = ''): void {
         // inline function to send the message
         const sendMessage = () => {
             try {
-                destination.channel.publish(exchange, routingKey, this._content, this._properties)
+                destination.channel.publish(exchange, routingKey, this._contentBuffer, this._properties)
             } catch (err) {
-                log.log('debug', 'Publish error11: ' + err.message, { module: 'amqp-ts' })
+                log.log('debug', 'Publish error11: ' + err.messageBus, { module: 'amqp-ts' })
                 const destinationName = destination.name
                 const connection = destination.connection
                 log.log('debug', 'Try to rebuild connection, before Call.', { module: 'amqp-ts' })
                 connection._rebuildAll(err).then(() => {
                     log.log('debug', 'Retransmitting message.', { module: 'amqp-ts' })
                     if (destination instanceof Queue) {
-                        connection.queues[destinationName].publish(this._content, this._properties)
+                        connection.queues[destinationName].publish(this._contentBuffer, this._properties)
                     } else {
-                        connection.exchanges[destinationName].publish(this._content, routingKey, this._properties)
+                        connection.exchanges[destinationName].publish(this._contentBuffer, routingKey, this._properties)
                     }
 
                 })

@@ -1,5 +1,5 @@
 import { ConnectionFactoryRabbitMQ } from '../connection/connection.factory.rabbitmq';
-import { Message } from './message';
+import { BusMessage } from './bus.message';
 import { Exchange } from './exchange';
 import * as AmqpLib from 'amqplib/callback_api';
 import { IActivateConsumerOptions, IDeleteResult, IQueueInitializeResult, IQueueOptions, IStartConsumerOptions, IStartConsumerResult } from '../../../application/port/queue.options.interface';
@@ -25,12 +25,12 @@ export declare class Queue {
     private static _packMessageContent;
     private static _unpackMessageContent;
     publish(content: any, options?: any): void;
-    send(message: Message, routingKey?: string): void;
-    rpc(requestParameters: any): Promise<Message>;
+    send(message: BusMessage, routingKey?: string): void;
+    rpc(requestParameters: any): Promise<BusMessage>;
     prefetch(count: number): void;
     recover(): Promise<void>;
     startConsumer(onMessage: (msg: any, channel?: AmqpLib.Channel) => any, options?: IStartConsumerOptions): Promise<IStartConsumerResult>;
-    activateConsumer(onMessage: (msg: Message) => any, options?: IActivateConsumerOptions): Promise<IStartConsumerResult>;
+    activateConsumer(onMessage: (msg: BusMessage) => any, options?: IActivateConsumerOptions): Promise<IStartConsumerResult>;
     _initializeConsumer(): void;
     stopConsumer(): Promise<void>;
     delete(): Promise<IDeleteResult>;

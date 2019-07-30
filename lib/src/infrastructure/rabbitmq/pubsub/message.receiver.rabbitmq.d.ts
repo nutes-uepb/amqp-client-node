@@ -10,8 +10,7 @@ export declare class MessageReceiverRabbitmq implements IMessageReceiver {
     private _connection;
     constructor(_logger: ICustomLogger);
     connection: IBusConnection;
-    receiveRoutingKeyMessage(queueName: string, exchangeName: string, topicKey: string, callback: IEventHandler<any>, options?: ISubExchangeOptions): Promise<void>;
-    private activateConsumerTopicOrDirec;
+    receiveRoutingKeyMessage(queueName: string, exchangeName: string, routingKey: string, callback: IEventHandler<any>, options?: ISubExchangeOptions): Promise<void>;
+    private routingKeySubscriberConsumer;
     private regExpr;
-    private createMessage;
 }

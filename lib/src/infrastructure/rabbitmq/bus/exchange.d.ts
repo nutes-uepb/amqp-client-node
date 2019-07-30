@@ -1,13 +1,12 @@
 import { ConnectionFactoryRabbitMQ } from '../connection/connection.factory.rabbitmq';
 import * as AmqpLib from 'amqplib/callback_api';
-import { Message } from './message';
+import { BusMessage } from './bus.message';
 import { IExchangeInitializeResult, IExchangeOptions } from '../../../application/port/exchange.options.interface';
 import { IActivateConsumerOptions, IStartConsumerOptions } from '../../../application/port/queue.options.interface';
 import { IBinding } from '../../port/bus/binding.interface';
 export declare class Exchange {
     private _initialized;
     private _consumer_handlers;
-    private _isConsumerInitializedRcp;
     private _connection;
     private _channel;
     private _name;
@@ -18,15 +17,15 @@ export declare class Exchange {
     constructor(connection: ConnectionFactoryRabbitMQ, name: string, type?: string, options?: IExchangeOptions);
     _initialize(): void;
     publish(content: any, routingKey?: string, options?: any): void;
-    send(message: Message, routingKey?: string): void;
-    rpc(requestParameters: any, routingKey: string, callback: (err: any, message: Message) => void): void;
+    send(message: BusMessage, routingKey?: string): void;
+    rpc(requestParameters: any, routingKey: string, callback: (err: any, message: BusMessage) => void): void;
     delete(): Promise<void>;
     close(): Promise<void>;
     bind(source: Exchange, pattern?: string, args?: any): Promise<IBinding>;
     unbind(source: Exchange, pattern?: string, args?: any): Promise<void>;
     consumerQueueName(): string;
     startConsumer(onMessage: (msg: any, channel?: AmqpLib.Channel) => any, options?: IStartConsumerOptions): Promise<any>;
-    activateConsumer(onMessage: (msg: Message) => any, options?: IActivateConsumerOptions): Promise<any>;
+    activateConsumer(onMessage: (msg: BusMessage) => any, options?: IActivateConsumerOptions): Promise<any>;
     stopConsumer(): Promise<any>;
     readonly initialized: Promise<IExchangeInitializeResult>;
     readonly connection: ConnectionFactoryRabbitMQ;

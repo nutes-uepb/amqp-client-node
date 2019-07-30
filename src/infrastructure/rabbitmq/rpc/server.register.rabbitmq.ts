@@ -1,11 +1,13 @@
 import { IClientRequest, IResourceHandler } from '../../port/rpc/resource.handler.interface'
 import { IServerOptions } from '../../../application/port/communications.options.interface'
 import { IBusConnection } from '../../port/connection/connection.interface'
-import { IStartConsumerResult } from '../../../application/port/queue.options.interface'
+import { IActivateConsumerOptions, IStartConsumerResult } from '../../../application/port/queue.options.interface'
 import { Identifier } from '../../../di/identifier'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { DI } from '../../../di/di'
 import { IServerRegister } from '../../port/rpc/server.register.interface'
+import { Queue } from '../bus/queue'
+import { IBusMessage } from '../../port/bus/bus.message.inteface'
 
 export class ServerRegisterRabbitmq implements IServerRegister {
 
@@ -112,61 +114,60 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                 if (this._connection && !this._connection.isConnected)
                     return reject(new Error('Connection Failed'))
 
-                let exchangeOptions
-                let queueOptions
-
-                if (options) {
-                    exchangeOptions = options.exchange
-                    queueOptions = options.queue
-                }
-
-                const exchange = await this._connection.getExchange(exchangeName, exchangeOptions)
+                const exchange = await this._connection.getExchange(exchangeName, options ? options.exchange : undefined)
                 await exchange.initialized
                 this._logger.info('Exchange creation ' + exchange.name + ' realized with success!')
 
-                const queue = this._connection.getQueue(queueName, queueOptions)
+                const queue = this._connection.getQueue(queueName, options ? options.queue : undefined)
                 await queue.initialized
                 this._logger.info('Queue creation ' + queue.name + ' realized with success!')
 
                 this._logger.info('RoutingKey ' + routingKey + ' registered!')
                 await queue.bind(exchange, routingKey)
 
-                if (!this.consumersInitialized.get(queueName)) {
-                    this.consumersInitialized.set(queueName, true)
+                await this.routingKeyServerConsumer(queue, options.consumer)
 
-                    await queue.activateConsumer((message) => {
-                        message.ack() // acknowledge that the message has been received (and processed)
-
-                        const clientRequest: IClientRequest = message.getContent()
-
-                        const resources_handler: IResourceHandler[] | undefined =
-                            this.resource_handlers.get(queueName)
-
-                        if (resources_handler) {
-                            for (const resource of resources_handler) {
-                                if (resource.resource_name === clientRequest.resource_name) {
-                                    try {
-                                        return resource.handle.apply('', clientRequest.handle)
-                                    } catch (err) {
-                                        this._logger.error(`Consumer function returned error: ${err.message}`)
-                                        return err
-                                    }
-                                }
-                            }
-                        }
-                        return new Error('Resource not registered in server')
-                    }, { noAck: false }).then((result: IStartConsumerResult) => {
-                        this._logger.info('Server registered in ' + exchangeName + ' exchange!')
-                    })
-                        .catch(err => {
-                            return reject(err)
-                        })
-                }
-                return resolve(true)
             } catch (err) {
                 return reject(err)
             }
         })
+    }
+
+    private async routingKeyServerConsumer(queue: Queue,
+                                           consumer: IActivateConsumerOptions): Promise<void> {
+        if (!this.consumersInitialized.get(queue.name)) {
+            this.consumersInitialized.set(queue.name, true)
+
+            await queue.activateConsumer((message: IBusMessage) => {
+                // acknowledge that the message has been received (and processed)
+                if (!consumer || !consumer.noAck) message.ack()
+
+                const clientRequest: IClientRequest = message.content
+
+                const resources_handler: IResourceHandler[] | undefined =
+                    this.resource_handlers.get(queue.name)
+
+                if (resources_handler) {
+                    for (const resource of resources_handler) {
+                        if (resource.resource_name === clientRequest.resource_name) {
+                            try {
+                                return resource.handle.apply('', clientRequest.handle)
+                            } catch (err) {
+                                this._logger.error(`Consumer function returned error: ${err.messageBus}`)
+                                return err
+                            }
+                        }
+                    }
+                }
+                return new Error('Resource not registered in server')
+            }, consumer).then((result: IStartConsumerResult) => {
+                this._logger.info('Server registered in' + queue.name + 'queue! ')
+            })
+                .catch(err => {
+                    return Promise.reject(err)
+                })
+        }
+        return Promise.resolve()
     }
 
 }

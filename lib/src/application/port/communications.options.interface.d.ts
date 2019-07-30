@@ -1,18 +1,20 @@
 import { IExchangeOptions } from './exchange.options.interface';
-import { IQueueOptions } from './queue.options.interface';
+import { IActivateConsumerOptions, IQueueOptions } from './queue.options.interface';
 export interface IPubExchangeOptions {
     exchange?: IExchangeOptions;
 }
 export interface ISubExchangeOptions {
     exchange?: IExchangeOptions;
     queue?: IQueueOptions;
-    receive_from_yourself?: boolean;
+    consumer?: IActivateConsumerOptions;
+    receiveFromYourself?: boolean;
 }
 export interface IClientOptions {
     exchange?: IExchangeOptions;
-    rcp_timeout?: number;
+    rcpTimeout?: number;
 }
 export interface IServerOptions {
     exchange?: IExchangeOptions;
     queue?: IQueueOptions;
+    consumer?: IActivateConsumerOptions;
 }

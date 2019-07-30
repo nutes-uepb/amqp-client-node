@@ -5,11 +5,10 @@ import { ICustomLogger } from '../../../utils/custom.logger'
 import { IBusConnection } from '../../port/connection/connection.interface'
 import { IClientRegister } from '../../port/rpc/client.register.interface'
 import { IClientOptions } from '../../../application/port/communications.options.interface'
-import { IMessage, IMessageField, IMessageProperty } from '../../../application/port/message.interface'
-import { Message } from '../bus/message'
+import { IMessage } from '../../../application/port/message.interface'
 
 const defClientOptions: IClientOptions = {
-    rcp_timeout: 5000
+    rcpTimeout: 5000
 }
 
 @injectable()
@@ -35,11 +34,11 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                     return reject(new Error('Connection Failed'))
                 }
 
-                const exchange = this._connection.getExchange(exchangeName, options.exchange)
+                const exchange = this._connection.getExchange(exchangeName, options ? options.exchange : undefined)
                 await exchange.initialized
 
                 let time
-                const timeout = options.rcp_timeout
+                const timeout = options.rcpTimeout
 
                 if (timeout > 0) {
                     new Promise<any>((res) => {
@@ -54,9 +53,7 @@ export class ClientRegisterRabbitmq implements IClientRegister {
 
                     if (err) return reject(err)
 
-                    const message: IMessage = this.createMessage(msg)
-
-                    return resolve(message)
+                    return resolve(msg)
                 })
 
                 this._logger.info('Client registered in ' + exchangeName + ' exchange!')
@@ -65,30 +62,6 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 return reject(err)
             }
         })
-    }
-
-    private createMessage(message: Message): IMessage {
-        return {
-            properties: {
-                priority: message.properties.priority,
-                expiration: message.properties.expiration,
-                message_id: message.properties.messageId,
-                timestamp: message.properties.timestamp,
-                user_id: message.properties.userId,
-                app_id: message.properties.appId,
-                cluster_id: message.properties.clusterId,
-                cc: message.properties.cc,
-                bcc: message.properties.bcc
-            } as IMessageProperty,
-            content: message.getContent(),
-            fields: {
-                consumer_tag: message.fields.consumerTag,
-                delivery_tag: message.fields.deliveryTag,
-                redelivered: message.fields,
-                exchange: message.fields.exchange,
-                routing_key: message.fields.routingKey
-            } as IMessageField
-        } as IMessage
     }
 
 }
