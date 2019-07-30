@@ -15,6 +15,12 @@ export declare class Exchange {
     private _deleting;
     private _closing;
     constructor(connection: ConnectionFactoryRabbitMQ, name: string, type?: string, options?: IExchangeOptions);
+    readonly initialized: Promise<IExchangeInitializeResult>;
+    readonly connection: ConnectionFactoryRabbitMQ;
+    readonly channel: AmqpLib.Channel;
+    readonly name: string;
+    readonly options: IExchangeOptions;
+    readonly type: string;
     _initialize(): void;
     publish(content: any, routingKey?: string, options?: any): void;
     send(message: BusMessage, routingKey?: string): void;
@@ -27,9 +33,4 @@ export declare class Exchange {
     startConsumer(onMessage: (msg: any, channel?: AmqpLib.Channel) => any, options?: IStartConsumerOptions): Promise<any>;
     activateConsumer(onMessage: (msg: BusMessage) => any, options?: IActivateConsumerOptions): Promise<any>;
     stopConsumer(): Promise<any>;
-    readonly initialized: Promise<IExchangeInitializeResult>;
-    readonly connection: ConnectionFactoryRabbitMQ;
-    readonly channel: AmqpLib.Channel;
-    readonly name: string;
-    readonly type: string;
 }

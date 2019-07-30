@@ -20,6 +20,18 @@ export class Binding implements IBinding {
         this.initialize()
     }
 
+    get initialized(): Promise<IBinding> {
+        return this._initialized
+    }
+
+    get source(): Exchange {
+        return this._source
+    }
+
+    get destination(): Exchange | Queue {
+        return this._destination
+    }
+
     public initialize(): void {
         this._initialized = new Promise<Binding>((resolve, reject) => {
             if (this._destination instanceof Queue) {
@@ -119,15 +131,4 @@ export class Binding implements IBinding {
         return Promise.all(promises)
     }
 
-    get initialized(): Promise<IBinding> {
-        return this._initialized
-    }
-
-    get source(): Exchange {
-        return this._source
-    }
-
-    get destination(): Exchange | Queue {
-        return this._destination
-    }
 }

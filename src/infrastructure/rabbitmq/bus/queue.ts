@@ -41,6 +41,30 @@ export class Queue {
         this._initialize()
     }
 
+    get connection(): ConnectionFactoryRabbitMQ {
+        return this._connection
+    }
+
+    get channel(): AmqpLib.Channel {
+        return this._channel
+    }
+
+    get name() {
+        return this._name
+    }
+
+    get options(): IQueueOptions {
+        return this._options
+    }
+
+    get consumer(): (msg: any, channel?: AmqpLib.Channel) => any {
+        return this._consumer
+    }
+
+    get consumerInitialized(): Promise<IStartConsumerResult> {
+        return this._consumerInitialized
+    }
+
     get initialized(): Promise<IQueueInitializeResult> {
         return this._initialized
     }
@@ -420,23 +444,4 @@ export class Queue {
         return this._connection.bindings[Binding.id(this, source, pattern)].delete()
     }
 
-    get connection(): ConnectionFactoryRabbitMQ {
-        return this._connection
-    }
-
-    get channel(): AmqpLib.Channel {
-        return this._channel
-    }
-
-    get name() {
-        return this._name
-    }
-
-    get consumer(): (msg: any, channel?: AmqpLib.Channel) => any {
-        return this._consumer
-    }
-
-    get consumerInitialized(): Promise<IStartConsumerResult> {
-        return this._consumerInitialized
-    }
 }

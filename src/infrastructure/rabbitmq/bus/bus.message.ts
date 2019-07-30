@@ -52,6 +52,30 @@ export class BusMessage implements IBusMessage {
         return this._content
     }
 
+    get fields() {
+        return this._fields
+    }
+
+    set fields(value: any) {
+        this._fields = value
+    }
+
+    get properties(): any {
+        return this._properties
+    }
+
+    set properties(value: any) {
+        this._properties = value
+    }
+
+    set channel(value: AmqpLib.Channel) {
+        this._channel = value
+    }
+
+    set message(value: AmqpLib.Message) {
+        this._message = value
+    }
+
     public sendTo(destination: Exchange | Queue, routingKey: string = ''): void {
         // inline function to send the message
         const sendMessage = () => {
@@ -103,27 +127,4 @@ export class BusMessage implements IBusMessage {
         }
     }
 
-    get fields() {
-        return this._fields
-    }
-
-    set fields(value: any) {
-        this._fields = value
-    }
-
-    get properties(): any {
-        return this._properties
-    }
-
-    set properties(value: any) {
-        this._properties = value
-    }
-
-    set channel(value: AmqpLib.Channel) {
-        this._channel = value
-    }
-
-    set message(value: AmqpLib.Message) {
-        this._message = value
-    }
 }

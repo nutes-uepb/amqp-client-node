@@ -12,12 +12,12 @@ export declare class BusMessage implements IBusMessage {
     constructor(content?: any, options?: any);
     contentBuffer: any;
     readonly content: any;
-    sendTo(destination: Exchange | Queue, routingKey?: string): void;
-    ack(allUpTo?: boolean): void;
-    nack(allUpTo?: boolean, requeue?: boolean): void;
-    reject(requeue?: boolean): void;
     fields: any;
     properties: any;
     channel: AmqpLib.Channel;
     message: AmqpLib.Message;
+    sendTo(destination: Exchange | Queue, routingKey?: string): void;
+    ack(allUpTo?: boolean): void;
+    nack(allUpTo?: boolean, requeue?: boolean): void;
+    reject(requeue?: boolean): void;
 }

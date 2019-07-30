@@ -35,6 +35,30 @@ export class Exchange {
         this._initialize()
     }
 
+    get initialized(): Promise<IExchangeInitializeResult> {
+        return this._initialized
+    }
+
+    get connection(): ConnectionFactoryRabbitMQ {
+        return this._connection
+    }
+
+    get channel(): AmqpLib.Channel {
+        return this._channel
+    }
+
+    get name() {
+        return this._name
+    }
+
+    get options(): IExchangeOptions {
+        return this._options
+    }
+
+    get type() {
+        return this._type
+    }
+
     public _initialize() {
         this._initialized = new Promise<IExchangeInitializeResult>((resolve, reject) => {
             this._connection.initialized.then(() => {
@@ -260,23 +284,4 @@ export class Exchange {
         }
     }
 
-    get initialized(): Promise<IExchangeInitializeResult> {
-        return this._initialized
-    }
-
-    get connection(): ConnectionFactoryRabbitMQ {
-        return this._connection
-    }
-
-    get channel(): AmqpLib.Channel {
-        return this._channel
-    }
-
-    get name() {
-        return this._name
-    }
-
-    get type() {
-        return this._type
-    }
 }

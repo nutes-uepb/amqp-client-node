@@ -84,6 +84,22 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
         return Promise.resolve(this)
     }
 
+    get connection(): AmqpLib.Connection {
+        return this._connection
+    }
+
+    get exchanges(): { [p: string]: Exchange } {
+        return this._exchanges
+    }
+
+    get queues(): { [p: string]: Queue } {
+        return this._queues
+    }
+
+    get bindings(): { [p: string]: Binding } {
+        return this._bindings
+    }
+
     private rebuildConnection(): Promise<void> {
         if (this._rebuilding) { // only one rebuild process can be active at any time
             log.log('debug', 'ConnectionFactoryRabbitMQ rebuild already in progress, ' +
@@ -292,11 +308,19 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
     }
 
     public declareExchange(name: string, type?: string, options?: IExchangeOptions): Exchange {
-        return new Exchange(this, name, type, options)
+        let exchange = this._exchanges[name]
+        if (exchange === undefined || !this.isEqualOptions(exchange.options, options)) {
+            exchange = new Exchange(this, name, type, options)
+        }
+        return exchange
     }
 
     public declareQueue(name: string, options?: IQueueOptions): Queue {
-        return new Queue(this, name, options)
+        let queue = this._queues[name]
+        if (queue === undefined || !this.isEqualOptions(queue.options, options)) {
+            queue = new Queue(this, name, options)
+        }
+        return queue
     }
 
     public declareTopology(topology: ITopology): Promise<any> {
@@ -332,19 +356,12 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
         return Promise.all(promises)
     }
 
-    get connection(): AmqpLib.Connection {
-        return this._connection
-    }
+    private isEqualOptions(oldOptions: IQueueOptions | IExchangeOptions,
+                           newOptions: IQueueOptions | IExchangeOptions): boolean {
+        for (const key of Object.keys(oldOptions)) {
+            if (oldOptions[key] !== newOptions[key]) return false
+        }
 
-    get exchanges(): { [p: string]: Exchange } {
-        return this._exchanges
-    }
-
-    get queues(): { [p: string]: Queue } {
-        return this._queues
-    }
-
-    get bindings(): { [p: string]: Binding } {
-        return this._bindings
+        return true
     }
 }

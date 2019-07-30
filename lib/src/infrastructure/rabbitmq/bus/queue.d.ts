@@ -20,6 +20,12 @@ export declare class Queue {
     private _deleting;
     private _closing;
     constructor(connection: ConnectionFactoryRabbitMQ, name: string, options?: IQueueOptions);
+    readonly connection: ConnectionFactoryRabbitMQ;
+    readonly channel: AmqpLib.Channel;
+    readonly name: string;
+    readonly options: IQueueOptions;
+    readonly consumer: (msg: any, channel?: AmqpLib.Channel) => any;
+    readonly consumerInitialized: Promise<IStartConsumerResult>;
     readonly initialized: Promise<IQueueInitializeResult>;
     _initialize(): void;
     private static _packMessageContent;
@@ -37,9 +43,4 @@ export declare class Queue {
     close(): Promise<void>;
     bind(source: Exchange, pattern?: string, args?: any): Promise<IBinding>;
     unbind(source: Exchange, pattern?: string, args?: any): Promise<void>;
-    readonly connection: ConnectionFactoryRabbitMQ;
-    readonly channel: AmqpLib.Channel;
-    readonly name: string;
-    readonly consumer: (msg: any, channel?: AmqpLib.Channel) => any;
-    readonly consumerInitialized: Promise<IStartConsumerResult>;
 }

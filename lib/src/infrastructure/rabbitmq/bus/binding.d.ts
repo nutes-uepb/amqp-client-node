@@ -8,11 +8,11 @@ export declare class Binding implements IBinding {
     private readonly _pattern;
     private readonly _args;
     constructor(destination: Exchange | Queue, source: Exchange, pattern?: string, args?: any);
+    readonly initialized: Promise<IBinding>;
+    readonly source: Exchange;
+    readonly destination: Exchange | Queue;
     initialize(): void;
     delete(): Promise<void>;
     static id(destination: Exchange | Queue, source: Exchange, pattern?: string): string;
     static removeBindingsContaining(connectionPoint: Exchange | Queue): Promise<any>;
-    readonly initialized: Promise<IBinding>;
-    readonly source: Exchange;
-    readonly destination: Exchange | Queue;
 }

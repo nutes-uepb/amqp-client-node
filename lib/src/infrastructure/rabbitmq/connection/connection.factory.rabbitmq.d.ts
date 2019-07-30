@@ -25,15 +25,6 @@ export declare class ConnectionFactoryRabbitMQ extends EventEmitter implements I
     private _bindings;
     constructor();
     createConnection(url: any, socketOptions: any, reconnectStrategy: IConnectionOptions): Promise<ConnectionFactoryRabbitMQ>;
-    private rebuildConnection;
-    private tryToConnect;
-    _rebuildAll(err: Error): Promise<void>;
-    close(): Promise<void>;
-    completeConfiguration(): Promise<any>;
-    deleteConfiguration(): Promise<any>;
-    declareExchange(name: string, type?: string, options?: IExchangeOptions): Exchange;
-    declareQueue(name: string, options?: IQueueOptions): Queue;
-    declareTopology(topology: ITopology): Promise<any>;
     readonly connection: AmqpLib.Connection;
     readonly exchanges: {
         [p: string]: Exchange;
@@ -44,4 +35,14 @@ export declare class ConnectionFactoryRabbitMQ extends EventEmitter implements I
     readonly bindings: {
         [p: string]: Binding;
     };
+    private rebuildConnection;
+    private tryToConnect;
+    _rebuildAll(err: Error): Promise<void>;
+    close(): Promise<void>;
+    completeConfiguration(): Promise<any>;
+    deleteConfiguration(): Promise<any>;
+    declareExchange(name: string, type?: string, options?: IExchangeOptions): Exchange;
+    declareQueue(name: string, options?: IQueueOptions): Queue;
+    declareTopology(topology: ITopology): Promise<any>;
+    private isEqualOptions;
 }
