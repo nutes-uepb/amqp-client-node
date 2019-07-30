@@ -9,8 +9,8 @@ import { ConnectionFactoryRabbitMQ } from './connection.factory.rabbitmq'
 import { Queue } from '../bus/queue'
 import { Exchange } from '../bus/exchange'
 import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
-import { IExchangeOptions } from '../../../application/port/exchange.options.interface'
-import { IQueueOptions } from '../../../application/port/queue.options.interface'
+import { IExchangeOptions } from '../../../application/port/exchange.option.interface'
+import { IQueueOptions } from '../../../application/port/queue.option.interface'
 
 const defaultOptions: IConnectionOptions = {
     retries: 0,

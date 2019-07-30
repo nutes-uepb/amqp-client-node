@@ -1,4 +1,4 @@
-import { IPubExchangeOptions } from '../../../application/port/communications.options.interface';
+import { IPubExchangeOptions } from '../../../application/port/communication.option.interface';
 import { IBusConnection } from '../connection/connection.interface';
 export interface IMessageSender {
     connection: IBusConnection;

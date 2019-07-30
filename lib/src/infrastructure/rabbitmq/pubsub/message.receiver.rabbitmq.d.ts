@@ -2,7 +2,7 @@ import { IEventHandler } from '../../port/pubsub/event.handler.interface';
 import { IBusConnection } from '../../port/connection/connection.interface';
 import { ICustomLogger } from '../../../utils/custom.logger';
 import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface';
-import { ISubExchangeOptions } from '../../../application/port/communications.options.interface';
+import { ISubExchangeOptions } from '../../../application/port/communication.option.interface';
 export declare class MessageReceiverRabbitmq implements IMessageReceiver {
     private readonly _logger;
     private consumersInitialized;

@@ -1,8 +1,8 @@
 import { ConnectionFactoryRabbitMQ } from '../connection/connection.factory.rabbitmq';
 import * as AmqpLib from 'amqplib/callback_api';
 import { BusMessage } from './bus.message';
-import { IExchangeInitializeResult, IExchangeOptions } from '../../../application/port/exchange.options.interface';
-import { IActivateConsumerOptions, IStartConsumerOptions } from '../../../application/port/queue.options.interface';
+import { IExchangeInitializeResult, IExchangeOptions } from '../../../application/port/exchange.option.interface';
+import { IActivateConsumerOptions, IStartConsumerOptions } from '../../../application/port/queue.option.interface';
 import { IBinding } from '../../port/bus/binding.interface';
 export declare class Exchange {
     private _initialized;

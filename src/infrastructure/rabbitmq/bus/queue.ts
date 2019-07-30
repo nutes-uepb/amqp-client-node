@@ -10,7 +10,7 @@ import {
     IQueueOptions,
     IStartConsumerOptions,
     IStartConsumerResult
-} from '../../../application/port/queue.options.interface'
+} from '../../../application/port/queue.option.interface'
 import { IBinding } from '../../port/bus/binding.interface'
 
 const DIRECT_REPLY_TO_QUEUE = 'amq.rabbitmq.reply-to'

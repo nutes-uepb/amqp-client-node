@@ -1,5 +1,5 @@
-import { IExchangeOptions } from './exchange.options.interface'
-import { IActivateConsumerOptions, IQueueOptions } from './queue.options.interface'
+import { IExchangeOptions } from './exchange.option.interface'
+import { IActivateConsumerOptions, IQueueOptions } from './queue.option.interface'
 
 export interface IPubExchangeOptions {
     exchange?: IExchangeOptions,

@@ -1,3 +1,7 @@
+export { IServerRegister } from './src/infrastructure/port/rpc/server.register.interface'
+export { IExchangeOptions } from './src/application/port/exchange.option.interface'
+export { IQueueOptions, IActivateConsumerOptions } from './src/application/port/queue.option.interface'
+
 export { IConnection } from './src/application/port/connection.interface'
 export { pubSub } from './src/pub.sub'
 export {
@@ -10,5 +14,5 @@ export {
     ISubExchangeOptions,
     IClientOptions,
     IServerOptions
-} from './src/application/port/communications.options.interface'
+} from './src/application/port/communication.option.interface'
 export { IConnectionParams, IConnectionOptions } from './src/application/port/connection.config.inteface'

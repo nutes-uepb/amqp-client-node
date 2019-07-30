@@ -12,7 +12,7 @@ import {
     IPubExchangeOptions,
     IServerOptions,
     ISubExchangeOptions
-} from './port/communications.options.interface'
+} from './port/communication.option.interface'
 import { IMessage } from './port/message.interface'
 import { DI } from '../di/di'
 import { IConnectionOptions, IConnectionParams } from './port/connection.config.inteface'

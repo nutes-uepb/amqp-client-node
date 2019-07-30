@@ -4,8 +4,8 @@ import { Binding } from './binding'
 import * as AmqpLib from 'amqplib/callback_api'
 import { BusMessage } from './bus.message'
 import * as path from 'path'
-import { IExchangeInitializeResult, IExchangeOptions } from '../../../application/port/exchange.options.interface'
-import { IActivateConsumerOptions, IStartConsumerOptions } from '../../../application/port/queue.options.interface'
+import { IExchangeInitializeResult, IExchangeOptions } from '../../../application/port/exchange.option.interface'
+import { IActivateConsumerOptions, IStartConsumerOptions } from '../../../application/port/queue.option.interface'
 import { IBinding } from '../../port/bus/binding.interface'
 
 const ApplicationName = process.env.AMQPTS_APPLICATIONNAME ||

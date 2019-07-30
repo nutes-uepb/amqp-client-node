@@ -1,4 +1,4 @@
-import { IServerOptions } from '../../../application/port/communications.options.interface';
+import { IServerOptions } from '../../../application/port/communication.option.interface';
 import { IBusConnection } from '../../port/connection/connection.interface';
 import { IServerRegister } from '../../port/rpc/server.register.interface';
 export declare class ServerRegisterRabbitmq implements IServerRegister {

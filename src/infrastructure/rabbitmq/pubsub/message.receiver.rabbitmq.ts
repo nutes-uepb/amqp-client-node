@@ -5,8 +5,8 @@ import { Identifier } from '../../../di/identifier'
 import { IBusConnection } from '../../port/connection/connection.interface'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface'
-import { IActivateConsumerOptions, IStartConsumerResult } from '../../../application/port/queue.options.interface'
-import { ISubExchangeOptions } from '../../../application/port/communications.options.interface'
+import { IActivateConsumerOptions, IStartConsumerResult } from '../../../application/port/queue.option.interface'
+import { ISubExchangeOptions } from '../../../application/port/communication.option.interface'
 import { IBusMessage } from '../../port/bus/bus.message.inteface'
 
 const defSubExchangeOptions: ISubExchangeOptions = {

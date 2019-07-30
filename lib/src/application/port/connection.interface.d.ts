@@ -1,5 +1,5 @@
 import { IMessage } from './message.interface';
-import { IClientOptions, IPubExchangeOptions, IServerOptions, ISubExchangeOptions } from './communications.options.interface';
+import { IClientOptions, IPubExchangeOptions, IServerOptions, ISubExchangeOptions } from './communication.option.interface';
 import { IServerRegister } from '../../infrastructure/port/rpc/server.register.interface';
 export interface IConnection {
     isOpen: boolean;

@@ -4,7 +4,7 @@ import {
     IPubExchangeOptions,
     IServerOptions,
     ISubExchangeOptions
-} from './communications.options.interface'
+} from './communication.option.interface'
 import { IServerRegister } from '../../infrastructure/port/rpc/server.register.interface'
 
 export interface IConnection {

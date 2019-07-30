@@ -1,8 +1,8 @@
 import { IConnectionParams, IConnectionOptions } from '../../../application/port/connection.config.inteface'
 import { Exchange } from '../../rabbitmq/bus/exchange'
 import { Queue } from '../../rabbitmq/bus/queue'
-import { IExchangeOptions } from '../../../application/port/exchange.options.interface'
-import { IQueueOptions } from '../../../application/port/queue.options.interface'
+import { IExchangeOptions } from '../../../application/port/exchange.option.interface'
+import { IQueueOptions } from '../../../application/port/queue.option.interface'
 
 export interface IBusConnection {
 

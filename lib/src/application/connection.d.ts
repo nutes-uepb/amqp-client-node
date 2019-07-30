@@ -1,6 +1,6 @@
 import { IConnection } from './port/connection.interface';
 import { IServerRegister } from '../infrastructure/port/rpc/server.register.interface';
-import { IClientOptions, IPubExchangeOptions, IServerOptions, ISubExchangeOptions } from './port/communications.options.interface';
+import { IClientOptions, IPubExchangeOptions, IServerOptions, ISubExchangeOptions } from './port/communication.option.interface';
 import { IMessage } from './port/message.interface';
 import { IConnectionOptions, IConnectionParams } from './port/connection.config.inteface';
 export declare class Connection implements IConnection {

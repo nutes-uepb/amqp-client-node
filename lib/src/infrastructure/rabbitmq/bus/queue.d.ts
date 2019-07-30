@@ -2,7 +2,7 @@ import { ConnectionFactoryRabbitMQ } from '../connection/connection.factory.rabb
 import { BusMessage } from './bus.message';
 import { Exchange } from './exchange';
 import * as AmqpLib from 'amqplib/callback_api';
-import { IActivateConsumerOptions, IDeleteResult, IQueueInitializeResult, IQueueOptions, IStartConsumerOptions, IStartConsumerResult } from '../../../application/port/queue.options.interface';
+import { IActivateConsumerOptions, IDeleteResult, IQueueInitializeResult, IQueueOptions, IStartConsumerOptions, IStartConsumerResult } from '../../../application/port/queue.option.interface';
 import { IBinding } from '../../port/bus/binding.interface';
 export declare class Queue {
     private _initialized;

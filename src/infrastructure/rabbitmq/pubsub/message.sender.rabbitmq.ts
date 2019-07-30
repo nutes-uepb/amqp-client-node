@@ -3,7 +3,7 @@ import { IBusConnection } from '../../port/connection/connection.interface'
 import { Identifier } from '../../../di/identifier'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageSender } from '../../port/pubsub/message.sender.interface'
-import { IPubExchangeOptions } from '../../../application/port/communications.options.interface'
+import { IPubExchangeOptions } from '../../../application/port/communication.option.interface'
 import { IMessage } from '../../../application/port/message.interface'
 import { BusMessage } from '../bus/bus.message'
 
