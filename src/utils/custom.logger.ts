@@ -72,17 +72,14 @@ export class CustomLogger implements ICustomLogger {
         this._logger.silly(message)
     }
 
-    public changeLoggerConfiguration(enabled: boolean, level?: string): void {
+    public changeLoggerConfiguration(level: string): void {
 
-        this._options.silent = !enabled
-
-        if (level)
-            this._options.level = level
+        this._options.silent = false
+        this._options.level = level
 
         this._logger.clear()
         this._logger.add(new transports.Console(this._options))
 
-        return
     }
 }
 
@@ -115,5 +112,5 @@ export interface ICustomLogger {
 
     addTransport(transport: any): Logger
 
-    changeLoggerConfiguration(enabled: boolean, level?: string): void
+    changeLoggerConfiguration(level: string): void
 }

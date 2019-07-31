@@ -13,7 +13,7 @@ export declare class CustomLogger implements ICustomLogger {
     verbose(message: string): void;
     debug(message: string): void;
     silly(message: string): void;
-    changeLoggerConfiguration(enabled: boolean, level?: string): void;
+    changeLoggerConfiguration(level: string): void;
 }
 export interface ICustomLogger {
     logger: Logger;
@@ -24,5 +24,5 @@ export interface ICustomLogger {
     debug(message: string): void;
     silly(message: string): void;
     addTransport(transport: any): Logger;
-    changeLoggerConfiguration(enabled: boolean, level?: string): void;
+    changeLoggerConfiguration(level: string): void;
 }

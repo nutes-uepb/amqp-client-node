@@ -2,6 +2,9 @@ export interface IMessage {
     content?: any;
     fields?: IMessageField;
     properties?: IMessageProperty;
+    ack?(allUpTo?: boolean): void;
+    nack?(allUpTo?: boolean, requeue?: boolean): void;
+    reject?(requeue: any): void;
 }
 export interface IMessageProperty {
     priority?: number;

@@ -140,7 +140,6 @@ export class ServerRegisterRabbitmq implements IServerRegister {
 
             await queue.activateConsumer((message: IBusMessage) => {
                 // acknowledge that the message has been received (and processed)
-                if (!consumer || !consumer.noAck) message.ack()
 
                 const clientRequest: IClientRequest = message.content
 
@@ -160,7 +159,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                     }
                 }
                 return new Error('Resource not registered in server')
-            }, consumer).then((result: IStartConsumerResult) => {
+            }, { ...consumer, ...{ noAck: true } }).then((result: IStartConsumerResult) => {
                 this._logger.info('Server registered in' + queue.name + 'queue! ')
             })
                 .catch(err => {

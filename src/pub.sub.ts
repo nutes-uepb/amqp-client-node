@@ -13,8 +13,8 @@ class PubSub {
         this._logger = DI.get(Identifier.CUSTOM_LOGGER)
     }
 
-    public logger(enabled: boolean, level?: string): void {
-        this._logger.changeLoggerConfiguration(enabled, level)
+    public logger(level: string): void {
+        this._logger.changeLoggerConfiguration(level)
     }
 
     public createConnetion(params?: IConnectionParams | string, options?: IConnectionOptions): Promise<IConnection> {

@@ -66,7 +66,6 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
 
             await queue.activateConsumer((message: IBusMessage) => {
                 // acknowledge that the message has been received (and processed)
-                if (!consumer || !consumer.noAck) message.ack()
 
                 if (message.properties.correlationId === this._connection.idConnection &&
                     !receiveFromYourself) {

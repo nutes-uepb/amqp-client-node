@@ -15,4 +15,4 @@ export {
     IClientOptions,
     IServerOptions
 } from './src/application/port/communication.option.interface'
-export { IConnectionParams, IConnectionOptions } from './src/application/port/connection.config.inteface'
+export { IConnectionParams, IConnectionOptions, ISSLOptions } from './src/application/port/connection.config.inteface'
