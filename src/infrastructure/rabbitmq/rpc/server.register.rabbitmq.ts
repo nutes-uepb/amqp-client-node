@@ -18,7 +18,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
     constructor(private readonly _connection: IBusConnection,
                 private readonly _queueName: string,
                 private readonly _exchangeName: string,
-                private readonly _routingKey: string[],
+                private readonly _routingKeys: string[],
                 private readonly _options?: IServerOptions) {
         this._logger = DI.get(Identifier.CUSTOM_LOGGER)
     }
@@ -26,7 +26,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
     public async start(): Promise<void> {
         try {
             await this
-                .registerRoutingKeyServer(this._queueName, this._exchangeName, this._routingKey, this._options)
+                .registerRoutingKeyServer(this._queueName, this._exchangeName, this._routingKeys, this._options)
             return Promise.resolve()
         } catch (err) {
             return Promise.reject(err)
@@ -124,10 +124,9 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                 this._logger.info('RoutingKey ' + routingKey + ' registered!')
 
                 if (routingKey.length > 0) for (const key of routingKey) await queue.bind(exchange, key)
-                else for (const key of this.resource_handlers.keys()) await queue.bind(exchange, key)
+                else for (const value of this.resource_handlers.get(queueName)) await queue.bind(exchange, value.resource_name)
 
                 await this.routingKeyServerConsumer(queue, options.consumer)
-
             } catch (err) {
                 return reject(err)
             }

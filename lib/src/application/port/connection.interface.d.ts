@@ -1,6 +1,6 @@
 import { IMessage } from './message.interface';
 import { IClientOptions, IPubExchangeOptions, IServerOptions, ISubExchangeOptions } from './communication.option.interface';
-import { IServerRegister } from '../../infrastructure/port/rpc/server.register.interface';
+import { IServerRegister } from './server.register.interface';
 export interface IConnection {
     isOpen: boolean;
     close(): Promise<boolean>;
@@ -8,6 +8,6 @@ export interface IConnection {
     on(event: string | symbol, listener: (...args: any[]) => void): void;
     pub(exchangeName: string, routingKey: string, message: IMessage, options?: IPubExchangeOptions): Promise<void>;
     sub(queueName: string, exchangeName: string, routingKey: string, callback: (message: IMessage) => void, options?: ISubExchangeOptions): Promise<void>;
-    createRpcServer(queueName: string, exchangeName: string, routingKey: string[], options?: IServerOptions): IServerRegister;
+    createRpcServer(queueName: string, exchangeName: string, routingKeys: string[], options?: IServerOptions): IServerRegister;
     rpcClient(exchangeName: string, resourceName: string, parameters: any[], optOrCall?: IClientOptions | ((err: any, message: IMessage) => void), options?: IClientOptions): any;
 }

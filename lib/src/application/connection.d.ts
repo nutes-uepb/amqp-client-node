@@ -1,5 +1,5 @@
 import { IConnection } from './port/connection.interface';
-import { IServerRegister } from '../infrastructure/port/rpc/server.register.interface';
+import { IServerRegister } from './port/server.register.interface';
 import { IClientOptions, IPubExchangeOptions, IServerOptions, ISubExchangeOptions } from './port/communication.option.interface';
 import { IMessage } from './port/message.interface';
 import { IConnectionOptions, IConnectionParams } from './port/connection.config.inteface';
@@ -17,7 +17,7 @@ export declare class Connection implements IConnection {
     on(event: string | symbol, listener: (...args: any[]) => void): void;
     pub(exchangeName: string, routingKey: string, message: IMessage, options?: IPubExchangeOptions): Promise<void>;
     sub(queueName: string, exchangeName: string, routingKey: string, callback: (message: IMessage) => void, options?: ISubExchangeOptions): Promise<void>;
-    createRpcServer(queueName: string, exchangeName: string, routingKey: string[], options?: IServerOptions): IServerRegister;
+    createRpcServer(queueName: string, exchangeName: string, routingKeys: string[], options?: IServerOptions): IServerRegister;
     rpcClient(exchangeName: string, resourceName: string, parameters: any[], options?: IClientOptions): Promise<IMessage>;
     rpcClient(exchangeName: string, resourceName: string, parameters: any[], callback: (err: any, message: IMessage) => void, options?: IClientOptions): void;
     private rpcClientCallback;

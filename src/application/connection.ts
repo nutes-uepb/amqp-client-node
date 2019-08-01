@@ -92,13 +92,13 @@ export class Connection implements IConnection {
 
     public createRpcServer(queueName: string,
                            exchangeName: string,
-                           routingKey: string[],
+                           routingKeys: string[],
                            options?: IServerOptions): IServerRegister {
 
         let server: IServerRegister = this._rpcServers.get(queueName)
 
         if (!server) {
-            server = new ServerRegisterRabbitmq(this._eventBusConnection, queueName, exchangeName, routingKey, options)
+            server = new ServerRegisterRabbitmq(this._eventBusConnection, queueName, exchangeName, routingKeys, options)
             this._rpcServers.set(queueName, server)
         }
 

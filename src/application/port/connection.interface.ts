@@ -30,7 +30,7 @@ export interface IConnection {
 
     createRpcServer(queueName: string,
                     exchangeName: string,
-                    routingKey: string[],
+                    routingKeys: string[],
                     options?: IServerOptions): IServerRegister
 
     rpcClient(exchangeName: string,
