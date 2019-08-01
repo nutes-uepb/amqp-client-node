@@ -1,3 +1,3 @@
 export interface IEventHandler<T> {
-    handle(err: any, event: T): void;
+    handle(event: T): void;
 }

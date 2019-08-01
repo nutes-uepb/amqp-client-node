@@ -1,25 +1,24 @@
 import { IClientRequest, IResourceHandler } from '../../port/rpc/resource.handler.interface'
 import { IServerOptions } from '../../../application/port/communication.option.interface'
 import { IBusConnection } from '../../port/connection/connection.interface'
-import { IActivateConsumerOptions, IStartConsumerResult } from '../../../application/port/queue.option.interface'
+import { IActivateConsumerOptions } from '../../../application/port/queue.option.interface'
 import { Identifier } from '../../../di/identifier'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { DI } from '../../../di/di'
-import { IServerRegister } from '../../port/rpc/server.register.interface'
+import { IServerRegister } from '../../../application/port/server.register.interface'
 import { Queue } from '../bus/queue'
 import { IBusMessage } from '../../port/bus/bus.message.inteface'
 
 export class ServerRegisterRabbitmq implements IServerRegister {
 
     private resource_handlers: Map<string, IResourceHandler[]> = new Map<string, IResourceHandler[]>()
-    private consumersInitialized: Map<string, boolean> = new Map<string, boolean>()
 
     private readonly _logger: ICustomLogger
 
     constructor(private readonly _connection: IBusConnection,
                 private readonly _queueName: string,
                 private readonly _exchangeName: string,
-                private readonly _routingKey: string,
+                private readonly _routingKey: string[],
                 private readonly _options?: IServerOptions) {
         this._logger = DI.get(Identifier.CUSTOM_LOGGER)
     }
@@ -66,7 +65,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
 
         if (!resources_handler) {
             this.resource_handlers.set(queueName, [resource])
-            this._logger.info('Resource ' + queueName + ' registered!')
+            this._logger.info('Resource ' + resource.resource_name + ' registered!')
             return true
         }
 
@@ -79,7 +78,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
         resources_handler.push(resource)
         this.resource_handlers.set(queueName, resources_handler)
 
-        this._logger.info('Resource ' + queueName + ' registered!')
+        this._logger.info('Resource ' + resource.resource_name + ' registered!')
         return true
 
     }
@@ -106,7 +105,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
 
     private registerRoutingKeyServer(queueName: string,
                                      exchangeName: string,
-                                     routingKey: string,
+                                     routingKey: string[],
                                      options: IServerOptions): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
             try {
@@ -123,7 +122,9 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                 this._logger.info('Queue creation ' + queue.name + ' realized with success!')
 
                 this._logger.info('RoutingKey ' + routingKey + ' registered!')
-                await queue.bind(exchange, routingKey)
+
+                if (routingKey.length > 0) for (const key of routingKey) await queue.bind(exchange, key)
+                else for (const key of this.resource_handlers.keys()) await queue.bind(exchange, key)
 
                 await this.routingKeyServerConsumer(queue, options.consumer)
 
@@ -135,36 +136,34 @@ export class ServerRegisterRabbitmq implements IServerRegister {
 
     private async routingKeyServerConsumer(queue: Queue,
                                            consumer: IActivateConsumerOptions): Promise<void> {
-        if (!this.consumersInitialized.get(queue.name)) {
-            this.consumersInitialized.set(queue.name, true)
+        if (!queue.consumerInitialized) {
+            try {
+                await queue.activateConsumer((message: IBusMessage) => {
+                    // acknowledge that the message has been received (and processed)
+                    const clientRequest: IClientRequest = message.content
 
-            await queue.activateConsumer((message: IBusMessage) => {
-                // acknowledge that the message has been received (and processed)
+                    const resources_handler: IResourceHandler[] | undefined =
+                        this.resource_handlers.get(queue.name)
 
-                const clientRequest: IClientRequest = message.content
-
-                const resources_handler: IResourceHandler[] | undefined =
-                    this.resource_handlers.get(queue.name)
-
-                if (resources_handler) {
-                    for (const resource of resources_handler) {
-                        if (resource.resource_name === clientRequest.resource_name) {
-                            try {
-                                return resource.handle.apply('', clientRequest.handle)
-                            } catch (err) {
-                                this._logger.error(`Consumer function returned error: ${err.messageBus}`)
-                                return err
+                    if (resources_handler) {
+                        for (const resource of resources_handler) {
+                            if (resource.resource_name === clientRequest.resource_name) {
+                                try {
+                                    return resource.handle.apply('', clientRequest.handle)
+                                } catch (err) {
+                                    this._logger.error(`Consumer function returned error: ${err.messageBus}`)
+                                    return err
+                                }
                             }
                         }
                     }
-                }
-                return new Error('Resource not registered in server')
-            }, { ...consumer, ...{ noAck: true } }).then((result: IStartConsumerResult) => {
+                    return new Error('Resource not registered in server')
+                }, { ...consumer, ...{ noAck: true } })
                 this._logger.info('Server registered in' + queue.name + 'queue! ')
-            })
-                .catch(err => {
-                    return Promise.reject(err)
-                })
+
+            } catch (err) {
+                return Promise.reject(err)
+            }
         }
         return Promise.resolve()
     }

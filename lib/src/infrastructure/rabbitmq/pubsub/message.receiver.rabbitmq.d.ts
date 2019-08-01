@@ -5,7 +5,6 @@ import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface';
 import { ISubExchangeOptions } from '../../../application/port/communication.option.interface';
 export declare class MessageReceiverRabbitmq implements IMessageReceiver {
     private readonly _logger;
-    private consumersInitialized;
     private routing_key_handlers;
     private _connection;
     constructor(_logger: ICustomLogger);

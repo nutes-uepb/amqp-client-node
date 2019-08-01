@@ -5,7 +5,7 @@ import { Identifier } from '../../../di/identifier'
 import { IBusConnection } from '../../port/connection/connection.interface'
 import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface'
-import { IActivateConsumerOptions, IStartConsumerResult } from '../../../application/port/queue.option.interface'
+import { IActivateConsumerOptions } from '../../../application/port/queue.option.interface'
 import { ISubExchangeOptions } from '../../../application/port/communication.option.interface'
 import { IBusMessage } from '../../port/bus/bus.message.inteface'
 
@@ -15,7 +15,6 @@ const defSubExchangeOptions: ISubExchangeOptions = {
 
 @injectable()
 export class MessageReceiverRabbitmq implements IMessageReceiver {
-    private consumersInitialized: Map<string, boolean> = new Map<string, boolean>()
     private routing_key_handlers: Map<string, IEventHandler<any>> = new Map<string, IEventHandler<any>>()
 
     private _connection: IBusConnection
@@ -60,38 +59,37 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                                                consumer: IActivateConsumerOptions,
                                                receiveFromYourself: boolean = false): Promise<void> {
 
-        if (!this.consumersInitialized.get(queue.name)) {
-            this.consumersInitialized.set(queue.name, true)
+        if (!queue.consumerInitialized) {
             this._logger.info('Queue creation ' + queue.name + ' realized with success!')
 
-            await queue.activateConsumer((message: IBusMessage) => {
-                // acknowledge that the message has been received (and processed)
+            try {
+                await queue.activateConsumer((message: IBusMessage) => {
+                    // acknowledge that the message has been received (and processed)
 
-                if (message.properties.correlationId === this._connection.idConnection &&
-                    !receiveFromYourself) {
-                    return
-                }
+                    if (message.properties.correlationId === this._connection.idConnection &&
+                        !receiveFromYourself) {
+                        return
+                    }
 
-                this._logger.info(`Bus event message received with success!`)
+                    this._logger.info(`Bus event message received with success!`)
 
-                const routingKey: string = message.fields.routingKey
+                    const routingKey: string = message.fields.routingKey
 
-                for (const entry of this.routing_key_handlers.keys()) {
-                    if (this.regExpr(entry, routingKey)) {
-                        const event_handler: IEventHandler<any> | undefined =
-                            this.routing_key_handlers.get(entry)
-                        if (event_handler) {
-
-                            event_handler.handle(undefined, message)
+                    for (const entry of this.routing_key_handlers.keys()) {
+                        if (this.regExpr(entry, routingKey)) {
+                            const event_handler: IEventHandler<any> | undefined =
+                                this.routing_key_handlers.get(entry)
+                            if (event_handler) {
+                                event_handler.handle(message)
+                            }
                         }
                     }
-                }
-            }, consumer).then((result: IStartConsumerResult) => {
+                }, consumer)
+
                 this._logger.info('Queue consumer ' + queue.name + ' successfully created! ')
-            })
-                .catch(err => {
-                    return Promise.reject(err)
-                })
+            } catch (err) {
+                return Promise.reject(err)
+            }
         }
         return Promise.resolve()
     }

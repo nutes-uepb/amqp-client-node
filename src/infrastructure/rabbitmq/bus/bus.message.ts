@@ -10,10 +10,13 @@ export class BusMessage implements IBusMessage {
     private _properties: any
     private _content: any
 
+    private readonly _acked: boolean
+
     private _channel: AmqpLib.Channel // for received messages only: the channel it has been received on
     private _message: AmqpLib.Message // received messages only: original amqplib message
 
     constructor(content?: any, options: any = {}) {
+        this._acked = false
         this._properties = options
         if (content !== undefined) {
             this.contentBuffer = content
@@ -110,7 +113,7 @@ export class BusMessage implements IBusMessage {
     }
 
     public ack(allUpTo?: boolean): void {
-        if (this._channel !== undefined) {
+        if (this._channel !== undefined && this._acked) {
             this._channel.ack(this._message, allUpTo)
         }
     }

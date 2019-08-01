@@ -5,7 +5,7 @@ import {
     IServerOptions,
     ISubExchangeOptions
 } from './communication.option.interface'
-import { IServerRegister } from '../../infrastructure/port/rpc/server.register.interface'
+import { IServerRegister } from './server.register.interface'
 
 export interface IConnection {
 
@@ -25,12 +25,12 @@ export interface IConnection {
     sub(queueName: string,
         exchangeName: string,
         routingKey: string,
-        callback: (err, message: IMessage) => void,
-        options?: ISubExchangeOptions): void
+        callback: (message: IMessage) => void,
+        options?: ISubExchangeOptions): Promise<void>
 
     createRpcServer(queueName: string,
                     exchangeName: string,
-                    routingKey: string,
+                    routingKey: string[],
                     options?: IServerOptions): IServerRegister
 
     rpcClient(exchangeName: string,

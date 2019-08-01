@@ -7,7 +7,7 @@ export interface IConnection {
     dispose(): Promise<boolean>;
     on(event: string | symbol, listener: (...args: any[]) => void): void;
     pub(exchangeName: string, routingKey: string, message: IMessage, options?: IPubExchangeOptions): Promise<void>;
-    sub(queueName: string, exchangeName: string, routingKey: string, callback: (err: any, message: IMessage) => void, options?: ISubExchangeOptions): void;
-    createRpcServer(queueName: string, exchangeName: string, routingKey: string, options?: IServerOptions): IServerRegister;
+    sub(queueName: string, exchangeName: string, routingKey: string, callback: (message: IMessage) => void, options?: ISubExchangeOptions): Promise<void>;
+    createRpcServer(queueName: string, exchangeName: string, routingKey: string[], options?: IServerOptions): IServerRegister;
     rpcClient(exchangeName: string, resourceName: string, parameters: any[], optOrCall?: IClientOptions | ((err: any, message: IMessage) => void), options?: IClientOptions): any;
 }

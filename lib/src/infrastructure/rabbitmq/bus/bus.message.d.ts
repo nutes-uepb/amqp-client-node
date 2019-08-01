@@ -7,6 +7,7 @@ export declare class BusMessage implements IBusMessage {
     private _fields;
     private _properties;
     private _content;
+    private readonly _acked;
     private _channel;
     private _message;
     constructor(content?: any, options?: any);

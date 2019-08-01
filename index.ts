@@ -1,4 +1,4 @@
-export { IServerRegister } from './src/infrastructure/port/rpc/server.register.interface'
+export { IServerRegister } from './src/application/port/server.register.interface'
 export { IExchangeOptions } from './src/application/port/exchange.option.interface'
 export { IQueueOptions, IActivateConsumerOptions } from './src/application/port/queue.option.interface'
 

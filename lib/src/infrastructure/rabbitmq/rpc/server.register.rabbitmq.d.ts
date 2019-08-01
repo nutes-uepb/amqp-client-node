@@ -8,9 +8,8 @@ export declare class ServerRegisterRabbitmq implements IServerRegister {
     private readonly _routingKey;
     private readonly _options?;
     private resource_handlers;
-    private consumersInitialized;
     private readonly _logger;
-    constructor(_connection: IBusConnection, _queueName: string, _exchangeName: string, _routingKey: string, _options?: IServerOptions);
+    constructor(_connection: IBusConnection, _queueName: string, _exchangeName: string, _routingKey: string[], _options?: IServerOptions);
     start(): Promise<void>;
     addResource(resourceName: string, resource: (...any: any) => any): boolean;
     removeResource(resourceName: string): boolean;

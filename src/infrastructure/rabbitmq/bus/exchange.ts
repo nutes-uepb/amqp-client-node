@@ -17,6 +17,7 @@ export class Exchange {
     private _initialized: Promise<IExchangeInitializeResult>
 
     private _consumer_handlers: Array<[string, any]> = new Array<[string, any]>()
+    private _isConsumerInitializedRcp: boolean = false
 
     private _connection: ConnectionFactoryRabbitMQ
     private _channel: AmqpLib.Channel
@@ -68,6 +69,7 @@ export class Exchange {
                         reject(err)
                     } else {
                         this._channel = channel
+                        this._isConsumerInitializedRcp = false
                         const callback = (e, ok) => {
                             /* istanbul ignore if */
                             if (e) {
@@ -132,7 +134,8 @@ export class Exchange {
 
         const processRpc = () => {
             const uuid: string = generateUuid()
-            if (Object.keys(this._channel.consumers).length === 0) {
+            if (Object.keys(this._channel.consumers).length === 0 && !this._isConsumerInitializedRcp) {
+                this._isConsumerInitializedRcp = true
                 this._channel.consume(DIRECT_REPLY_TO_QUEUE, (resultMsg) => {
 
                     const result = new BusMessage(resultMsg.content, resultMsg.properties)

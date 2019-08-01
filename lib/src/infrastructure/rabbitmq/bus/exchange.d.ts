@@ -7,6 +7,7 @@ import { IBinding } from '../../port/bus/binding.interface';
 export declare class Exchange {
     private _initialized;
     private _consumer_handlers;
+    private _isConsumerInitializedRcp;
     private _connection;
     private _channel;
     private _name;

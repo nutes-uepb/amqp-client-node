@@ -5,7 +5,7 @@ import { IMessageSender } from '../infrastructure/port/pubsub/message.sender.int
 import { IMessageReceiver } from '../infrastructure/port/pubsub/message.receiver.interface'
 import { IConnection } from './port/connection.interface'
 import { IClientRegister } from '../infrastructure/port/rpc/client.register.interface'
-import { IServerRegister } from '../infrastructure/port/rpc/server.register.interface'
+import { IServerRegister } from './port/server.register.interface'
 import { Identifier } from '../di/identifier'
 import {
     IClientOptions,
@@ -22,6 +22,7 @@ export class Connection implements IConnection {
     private readonly _pub: IMessageSender
     private readonly _sub: IMessageReceiver
     private readonly _rpcClient: IClientRegister
+    private readonly _rpcServers: Map<string, IServerRegister>
     private readonly _eventBusConnection: IBusConnection
 
     constructor(parameters?: IConnectionParams | string, options?: IConnectionOptions) {
@@ -32,6 +33,8 @@ export class Connection implements IConnection {
         this._pub = DI.get(Identifier.RABBITMQ_MENSSAGE_SENDER)
         this._sub = DI.get(Identifier.RABBITMQ_MENSSAGE_RECEIVER)
         this._rpcClient = DI.get(Identifier.RABBITMQ_CLIENT_REGISTER)
+        this._rpcServers = new Map<string, IServerRegister>()
+
     }
 
     get isOpen(): boolean {
@@ -76,28 +79,30 @@ export class Connection implements IConnection {
     public sub(queueName: string,
                exchangeName: string,
                routingKey: string,
-               callback: (err, message: IMessage) => void,
-               options?: ISubExchangeOptions): void {
+               callback: (message: IMessage) => void,
+               options?: ISubExchangeOptions): Promise<void> {
         const eventCallback: IEventHandler<any> = {
             handle: callback
         }
 
-        this._sub
-            .receiveRoutingKeyMessage(queueName, exchangeName, routingKey,
-                eventCallback, options)
-            .catch(err => {
-                callback(err, undefined)
-            })
+        return this._sub.receiveRoutingKeyMessage(queueName, exchangeName, routingKey,
+            eventCallback, options)
 
     }
 
     public createRpcServer(queueName: string,
                            exchangeName: string,
-                           routingKey: string,
+                           routingKey: string[],
                            options?: IServerOptions): IServerRegister {
 
-        return new ServerRegisterRabbitmq(this._eventBusConnection, queueName, exchangeName, routingKey, options)
+        let server: IServerRegister = this._rpcServers.get(queueName)
 
+        if (!server) {
+            server = new ServerRegisterRabbitmq(this._eventBusConnection, queueName, exchangeName, routingKey, options)
+            this._rpcServers.set(queueName, server)
+        }
+
+        return server
     }
 
     public rpcClient(exchangeName: string,

@@ -7,6 +7,7 @@ export declare class Connection implements IConnection {
     private readonly _pub;
     private readonly _sub;
     private readonly _rpcClient;
+    private readonly _rpcServers;
     private readonly _eventBusConnection;
     constructor(parameters?: IConnectionParams | string, options?: IConnectionOptions);
     readonly isOpen: boolean;
@@ -15,8 +16,8 @@ export declare class Connection implements IConnection {
     dispose(): Promise<boolean>;
     on(event: string | symbol, listener: (...args: any[]) => void): void;
     pub(exchangeName: string, routingKey: string, message: IMessage, options?: IPubExchangeOptions): Promise<void>;
-    sub(queueName: string, exchangeName: string, routingKey: string, callback: (err: any, message: IMessage) => void, options?: ISubExchangeOptions): void;
-    createRpcServer(queueName: string, exchangeName: string, routingKey: string, options?: IServerOptions): IServerRegister;
+    sub(queueName: string, exchangeName: string, routingKey: string, callback: (message: IMessage) => void, options?: ISubExchangeOptions): Promise<void>;
+    createRpcServer(queueName: string, exchangeName: string, routingKey: string[], options?: IServerOptions): IServerRegister;
     rpcClient(exchangeName: string, resourceName: string, parameters: any[], options?: IClientOptions): Promise<IMessage>;
     rpcClient(exchangeName: string, resourceName: string, parameters: any[], callback: (err: any, message: IMessage) => void, options?: IClientOptions): void;
     private rpcClientCallback;
