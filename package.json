@@ -1,5 +1,5 @@
 {
-  "name": "pubsubts",
+  "name": "amqp-client-node",
   "version": "1.0.0-beta.0",
   "description": "Library for publish and subscribe events on message bus. In addition, it is possible to perform resource requests from the use of the standard commonly known as RPC.",
   "main": "lib/index.js",
@@ -14,6 +14,7 @@
     "url": "git+https://github.com/nutes-uepb/pubsubts.git"
   },
   "keywords": [
+    "amqp",
     "publish",
     "subscribe",
     "rpc",
@@ -22,7 +23,6 @@
     "event-bus",
     "channel",
     "queue",
-    "exchange",
     "exchange",
     "async",
     "communication"
