@@ -1,3 +1,6 @@
+#ignore auto-generate files
+/lib
+
 # Logs
 logs
 *.log
@@ -59,3 +62,19 @@ typings/
 
 # next.js build output
 .next
+
+# IDE
+.idea
+
+# Directory files dist
+dist
+
+# Docs
+docs
+
+# certificates and keys directories and files
+*.pem
+*.crt
+*.key
+*.csr
+*.cert
