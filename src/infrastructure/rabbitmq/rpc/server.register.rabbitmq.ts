@@ -1,13 +1,13 @@
-import { IClientRequest, IResourceHandler } from '../../port/rpc/resource.handler.interface'
-import { IServerOptions } from '../../../application/port/communication.option.interface'
-import { IBusConnection } from '../../port/connection/connection.interface'
-import { IActivateConsumerOptions } from '../../../application/port/queue.option.interface'
-import { Identifier } from '../../../di/identifier'
-import { ICustomLogger } from '../../../utils/custom.logger'
-import { DI } from '../../../di/di'
-import { IServerRegister } from '../../../application/port/server.register.interface'
-import { Queue } from '../bus/queue'
-import { IBusMessage } from '../../port/bus/bus.message.inteface'
+import {IClientRequest, IResourceHandler} from '../../port/rpc/resource.handler.interface'
+import {IServerOptions} from '../../../application/port/communication.option.interface'
+import {IBusConnection} from '../../port/connection/connection.interface'
+import {IActivateConsumerOptions} from '../../../application/port/queue.option.interface'
+import {Identifier} from '../../../di/identifier'
+import {ICustomLogger} from '../../../utils/custom.logger'
+import {DI} from '../../../di/di'
+import {IServerRegister} from '../../../application/port/server.register.interface'
+import {Queue} from '../bus/queue'
+import {IBusMessage} from '../../port/bus/bus.message.inteface'
 
 export class ServerRegisterRabbitmq implements IServerRegister {
 
@@ -126,7 +126,8 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                 if (routingKey.length > 0) for (const key of routingKey) await queue.bind(exchange, key)
                 else for (const value of this.resource_handlers.get(queueName)) await queue.bind(exchange, value.resource_name)
 
-                await this.routingKeyServerConsumer(queue, options.consumer)
+                await this.routingKeyServerConsumer(queue, options ? options.consumer : undefined)
+                return resolve(true)
             } catch (err) {
                 return reject(err)
             }
@@ -157,7 +158,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                         }
                     }
                     return new Error('Resource not registered in server')
-                }, { ...consumer, ...{ noAck: true } })
+                }, {...consumer, ...{noAck: true}})
                 this._logger.info('Server registered in' + queue.name + 'queue! ')
 
             } catch (err) {

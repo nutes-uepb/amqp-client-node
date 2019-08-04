@@ -1,16 +1,16 @@
-import { IBusConnection } from '../../port/connection/connection.interface'
-import { IConnectionOptions, IConnectionParams } from '../../../application/port/connection.config.inteface'
-import { inject, injectable } from 'inversify'
-import { Identifier } from '../../../di/identifier'
-import { IConnectionFactory } from '../../port/connection/connection.factory.interface'
-import { ICustomLogger } from '../../../utils/custom.logger'
+import {IBusConnection} from '../../port/connection/connection.interface'
+import {IConnectionOptions, IConnectionParams} from '../../../application/port/connection.config.inteface'
+import {inject, injectable} from 'inversify'
+import {Identifier} from '../../../di/identifier'
+import {IConnectionFactory} from '../../port/connection/connection.factory.interface'
+import {ICustomLogger} from '../../../utils/custom.logger'
 
-import { ConnectionFactoryRabbitMQ } from './connection.factory.rabbitmq'
-import { Queue } from '../bus/queue'
-import { Exchange } from '../bus/exchange'
-import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
-import { IExchangeOptions } from '../../../application/port/exchange.option.interface'
-import { IQueueOptions } from '../../../application/port/queue.option.interface'
+import {ConnectionFactoryRabbitMQ} from './connection.factory.rabbitmq'
+import {Queue} from '../bus/queue'
+import {Exchange} from '../bus/exchange'
+import {ICustomEventEmitter} from '../../../utils/custom.event.emitter'
+import {IExchangeOptions} from '../../../application/port/exchange.option.interface'
+import {IQueueOptions} from '../../../application/port/queue.option.interface'
 
 const defaultOptions: IConnectionOptions = {
     retries: 0,
@@ -148,7 +148,6 @@ export class ConnectionRabbitMQ implements IBusConnection {
 
     public getExchange(exchangeName: string,
                        options?: IExchangeOptions): Exchange {
-
         const exchange = this._connection.declareExchange(exchangeName, options ? options.type : undefined, options)
         if (!this._resourceBus.get(exchangeName)) {
             this._resourceBus.set(exchangeName, exchange)

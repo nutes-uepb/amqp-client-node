@@ -1,8 +1,8 @@
-import { log } from '../connection/connection.factory.rabbitmq'
-import { Exchange } from './exchange'
-import { Queue } from './queue'
+import {log} from '../connection/connection.factory.rabbitmq'
+import {Exchange} from './exchange'
+import {Queue} from './queue'
 import * as AmqpLib from 'amqplib/callback_api'
-import { IBusMessage } from '../../port/bus/bus.message.inteface'
+import {IBusMessage} from '../../port/bus/bus.message.inteface'
 
 export class BusMessage implements IBusMessage {
     private _contentBuffer: Buffer
@@ -10,7 +10,7 @@ export class BusMessage implements IBusMessage {
     private _properties: any
     private _content: any
 
-    private readonly _acked: boolean
+    private _acked: boolean
 
     private _channel: AmqpLib.Channel // for received messages only: the channel it has been received on
     private _message: AmqpLib.Message // received messages only: original amqplib message
@@ -85,12 +85,12 @@ export class BusMessage implements IBusMessage {
             try {
                 destination.channel.publish(exchange, routingKey, this._contentBuffer, this._properties)
             } catch (err) {
-                log.log('debug', 'Publish error11: ' + err.messageBus, { module: 'amqp-ts' })
+                log.log('debug', 'Publish error11: ' + err.messageBus, {module: 'amqp-ts'})
                 const destinationName = destination.name
                 const connection = destination.connection
-                log.log('debug', 'Try to rebuild connection, before Call.', { module: 'amqp-ts' })
+                log.log('debug', 'Try to rebuild connection, before Call.', {module: 'amqp-ts'})
                 connection._rebuildAll(err).then(() => {
-                    log.log('debug', 'Retransmitting message.', { module: 'amqp-ts' })
+                    log.log('debug', 'Retransmitting message.', {module: 'amqp-ts'})
                     if (destination instanceof Queue) {
                         connection.queues[destinationName].publish(this._contentBuffer, this._properties)
                     } else {
@@ -113,7 +113,8 @@ export class BusMessage implements IBusMessage {
     }
 
     public ack(allUpTo?: boolean): void {
-        if (this._channel !== undefined && this._acked) {
+        if (this._channel !== undefined && !this._acked) {
+            this._acked = true
             this._channel.ack(this._message, allUpTo)
         }
     }
