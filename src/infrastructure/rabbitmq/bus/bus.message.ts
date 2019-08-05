@@ -23,6 +23,10 @@ export class BusMessage implements IBusMessage {
         }
     }
 
+    set acked(value: boolean) {
+        this._acked = value
+    }
+
     set contentBuffer(content: any) {
         if (content instanceof Error) {
             this.properties.type = 'error'
@@ -30,7 +34,7 @@ export class BusMessage implements IBusMessage {
         }
 
         if (typeof content === 'string') {
-            this._contentBuffer = new Buffer(content)
+            this._contentBuffer = Buffer.from(content)
         } else if (!(content instanceof Buffer)) {
             this._contentBuffer = Buffer.from(JSON.stringify(content))
             this._properties.contentType = 'application/json'

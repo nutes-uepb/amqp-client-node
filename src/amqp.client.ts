@@ -5,7 +5,7 @@ import { ICustomLogger } from './utils/custom.logger'
 import { DI } from './di/di'
 import { IConnection } from './application/port/connection.interface'
 
-class PubSub {
+class AmqpClient {
 
     private _logger: ICustomLogger
 
@@ -23,4 +23,4 @@ class PubSub {
 
 }
 
-export const pubSub = new PubSub()
+export const amqpClient = new AmqpClient()

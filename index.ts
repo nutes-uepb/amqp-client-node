@@ -3,7 +3,7 @@ export { IExchangeOptions } from './src/application/port/exchange.option.interfa
 export { IQueueOptions, IActivateConsumerOptions } from './src/application/port/queue.option.interface'
 
 export { IConnection } from './src/application/port/connection.interface'
-export { pubSub } from './src/pub.sub'
+export { amqpClient } from './src/amqp.client'
 export {
     IMessage,
     IMessageProperty,

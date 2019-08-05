@@ -100,9 +100,9 @@ export class Exchange {
      */
     public publish(content: any, routingKey = '', options: any = {}): void {
         if (typeof content === 'string') {
-            content = new Buffer(content)
+            content = Buffer.from(content)
         } else if (!(content instanceof Buffer)) {
-            content = new Buffer(JSON.stringify(content))
+            content = Buffer.from(JSON.stringify(content))
             options.contentType = options.contentType || 'application/json'
         }
         this._initialized.then(() => {
