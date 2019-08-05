@@ -1,13 +1,13 @@
-import {IEventHandler} from '../../port/pubsub/event.handler.interface'
-import {Queue} from '../bus/queue'
-import {inject, injectable} from 'inversify'
-import {Identifier} from '../../../di/identifier'
-import {IBusConnection} from '../../port/connection/connection.interface'
-import {ICustomLogger} from '../../../utils/custom.logger'
-import {IMessageReceiver} from '../../port/pubsub/message.receiver.interface'
-import {IActivateConsumerOptions} from '../../../application/port/queue.option.interface'
-import {ISubExchangeOptions} from '../../../application/port/communication.option.interface'
-import {IBusMessage} from '../../port/bus/bus.message.inteface'
+import { IEventHandler } from '../../port/pubsub/event.handler.interface'
+import { Queue } from '../bus/queue'
+import { inject, injectable } from 'inversify'
+import { Identifier } from '../../../di/identifier'
+import { IBusConnection } from '../../port/connection/connection.interface'
+import { ICustomLogger } from '../../../utils/custom.logger'
+import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface'
+import { IActivateConsumerOptions } from '../../../application/port/queue.option.interface'
+import { ISubExchangeOptions } from '../../../application/port/communication.option.interface'
+import { IBusMessage } from '../../port/bus/bus.message.inteface'
 
 const defSubExchangeOptions: ISubExchangeOptions = {
     receiveFromYourself: false

@@ -1,13 +1,13 @@
-import {IClientRequest, IResourceHandler} from '../../port/rpc/resource.handler.interface'
-import {IServerOptions} from '../../../application/port/communication.option.interface'
-import {IBusConnection} from '../../port/connection/connection.interface'
-import {IActivateConsumerOptions} from '../../../application/port/queue.option.interface'
-import {Identifier} from '../../../di/identifier'
-import {ICustomLogger} from '../../../utils/custom.logger'
-import {DI} from '../../../di/di'
-import {IServerRegister} from '../../../application/port/server.register.interface'
-import {Queue} from '../bus/queue'
-import {IBusMessage} from '../../port/bus/bus.message.inteface'
+import { IClientRequest, IResourceHandler } from '../../port/rpc/resource.handler.interface'
+import { IServerOptions } from '../../../application/port/communication.option.interface'
+import { IBusConnection } from '../../port/connection/connection.interface'
+import { IActivateConsumerOptions } from '../../../application/port/queue.option.interface'
+import { Identifier } from '../../../di/identifier'
+import { ICustomLogger } from '../../../utils/custom.logger'
+import { DI } from '../../../di/di'
+import { IServerRegister } from '../../../application/port/server.register.interface'
+import { Queue } from '../bus/queue'
+import { IBusMessage } from '../../port/bus/bus.message.inteface'
 
 export class ServerRegisterRabbitmq implements IServerRegister {
 
@@ -80,7 +80,6 @@ export class ServerRegisterRabbitmq implements IServerRegister {
 
         this._logger.info('Resource ' + resource.resource_name + ' registered!')
         return true
-
     }
 
     private unregisterResource(queueName: string, resourceName: string): boolean {
@@ -110,8 +109,9 @@ export class ServerRegisterRabbitmq implements IServerRegister {
         return new Promise<boolean>(async (resolve, reject) => {
             try {
 
-                if (this._connection && !this._connection.isConnected)
+                if (this._connection && !this._connection.isConnected) {
                     return reject(new Error('Connection Failed'))
+                }
 
                 const exchange = await this._connection.getExchange(exchangeName, options ? options.exchange : undefined)
                 await exchange.initialized
@@ -158,14 +158,12 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                         }
                     }
                     return new Error('Resource not registered in server')
-                }, {...consumer, ...{noAck: true}})
+                }, { ...consumer, ...{ noAck: true } })
                 this._logger.info('Server registered in' + queue.name + 'queue! ')
-
             } catch (err) {
                 return Promise.reject(err)
             }
         }
         return Promise.resolve()
     }
-
 }

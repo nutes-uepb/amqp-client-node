@@ -1,7 +1,7 @@
-import {ConnectionFactoryRabbitMQ, log} from '../connection/connection.factory.rabbitmq'
-import {Binding} from './binding'
-import {BusMessage} from './bus.message'
-import {Exchange} from './exchange'
+import { ConnectionFactoryRabbitMQ, log } from '../connection/connection.factory.rabbitmq'
+import { Binding } from './binding'
+import { BusMessage } from './bus.message'
+import { Exchange } from './exchange'
 import * as AmqpLib from 'amqplib/callback_api'
 import {
     IActivateConsumerOptions,
@@ -11,7 +11,7 @@ import {
     IStartConsumerOptions,
     IStartConsumerResult
 } from '../../../application/port/queue.option.interface'
-import {IBinding} from '../../port/bus/binding.interface'
+import { IBinding } from '../../port/bus/binding.interface'
 
 const DIRECT_REPLY_TO_QUEUE = 'amq.rabbitmq.reply-to'
 
@@ -81,7 +81,7 @@ export class Queue {
                         const callback = (e, ok) => {
                             /* istanbul ignore if */
                             if (e) {
-                                log.log('error', 'Failed to create queue \'' + this._name + '\'.', {module: 'amqp-ts'})
+                                log.log('error', 'Failed to create queue \'' + this._name + '\'.', { module: 'amqp-ts' })
                                 delete this._connection.queues[this._name]
                                 reject(e)
                             } else {
@@ -100,7 +100,7 @@ export class Queue {
                     }
                 })
             }).catch((err) => {
-                log.log('warn', 'Channel failure, error caused during connection!', {module: 'amqp-ts'})
+                log.log('warn', 'Channel failure, error caused during connection!', { module: 'amqp-ts' })
             })
         })
     }
@@ -133,12 +133,12 @@ export class Queue {
             try {
                 this._channel.sendToQueue(this._name, content, options)
             } catch (err) {
-                log.log('debug', 'Queue publish error: ' + err.messageBus, {module: 'amqp-ts'})
+                log.log('debug', 'Queue publish error: ' + err.messageBus, { module: 'amqp-ts' })
                 const queueName = this._name
                 const connection = this._connection
-                log.log('debug', 'Try to rebuild connection, before Call.', {module: 'amqp-ts'})
+                log.log('debug', 'Try to rebuild connection, before Call.', { module: 'amqp-ts' })
                 connection._rebuildAll(err).then(() => {
-                    log.log('debug', 'Retransmitting message.', {module: 'amqp-ts'})
+                    log.log('debug', 'Retransmitting message.', { module: 'amqp-ts' })
                     connection.queues[queueName].publish(content, options)
                 })
             }
@@ -166,14 +166,14 @@ export class Queue {
                     const result = new BusMessage(resultMsg.content, resultMsg.fields)
                     result.fields = resultMsg.fields
                     resolve(result)
-                }, {noAck: true}, (err, ok) => {
+                }, { noAck: true }, (err, ok) => {
                     /* istanbul ignore if */
                     if (err) {
                         reject(new Error('amqp-ts: Queue.rpc error: ' + err.messageBus))
                     } else {
                         // send the rpc request
                         consumerTag = ok.consumerTag
-                        const message = new BusMessage(requestParameters, {replyTo: DIRECT_REPLY_TO_QUEUE})
+                        const message = new BusMessage(requestParameters, { replyTo: DIRECT_REPLY_TO_QUEUE })
                         message.sendTo(this)
                     }
                 })
@@ -269,7 +269,7 @@ export class Queue {
                             this._channel.sendToQueue(msg.properties.replyTo, resultValue, options)
                         }).catch((err) => {
                             log.log('error', 'Queue.onMessage RPC promise returned error: '
-                                + err.messageBus, {module: 'amqp-ts'})
+                                + err.messageBus, { module: 'amqp-ts' })
                         })
                     } else {
                         result = Queue._packMessageContent(result, options)
@@ -282,7 +282,7 @@ export class Queue {
                 }
             } catch (err) {
                 /* istanbul ignore next */
-                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.messageBus, {module: 'amqp-ts'})
+                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.messageBus, { module: 'amqp-ts' })
             }
         }
 
@@ -291,7 +291,7 @@ export class Queue {
                 this._consumer(msg, this._channel)
             } catch (err) {
                 /* istanbul ignore next */
-                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.messageBus, {module: 'amqp-ts'})
+                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.messageBus, { module: 'amqp-ts' })
             }
         }
 
@@ -314,7 +314,7 @@ export class Queue {
                             this._channel.sendToQueue(msg.properties.replyTo, resultValue.contentBuffer, resultValue.properties)
                         }).catch((err) => {
                             log.log('error', 'Queue.onMessage RPC promise returned error: '
-                                + err.messageBus, {module: 'amqp-ts'})
+                                + err.messageBus, { module: 'amqp-ts' })
                         })
                     } else {
                         if (!(result instanceof BusMessage)) {
@@ -326,7 +326,7 @@ export class Queue {
                 }
             } catch (err) {
                 /* istanbul ignore next */
-                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.messageBus, {module: 'amqp-ts'})
+                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.messageBus, { module: 'amqp-ts' })
             }
         }
 

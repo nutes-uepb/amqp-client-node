@@ -17,7 +17,6 @@ export class ClientRegisterRabbitmq implements IClientRegister {
     private _connection: IBusConnection
 
     constructor(@inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger) {
-
     }
 
     set connection(value: IBusConnection) {
@@ -29,7 +28,6 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                                     options: IClientOptions = defClientOptions): Promise<IMessage> {
         return new Promise<IMessage>(async (resolve, reject) => {
             try {
-
                 if (this._connection && !this._connection.isConnected) {
                     return reject(new Error('Connection Failed'))
                 }
@@ -50,18 +48,13 @@ export class ClientRegisterRabbitmq implements IClientRegister {
 
                 exchange.rpc(resource, resource.resource_name, (err, msg) => {
                     clearTimeout(time)
-
                     if (err) return reject(err)
-
                     return resolve(msg)
                 })
-
                 this._logger.info('Client registered in ' + exchangeName + ' exchange!')
-
             } catch (err) {
                 return reject(err)
             }
         })
     }
-
 }

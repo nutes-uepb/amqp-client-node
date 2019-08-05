@@ -165,7 +165,6 @@ export class ConnectionRabbitMQ implements IBusConnection {
     }
 
     public closeConnection(): Promise<boolean> {
-
         return new Promise<boolean | undefined>(async (resolve, reject) => {
             if (this.isConnected) {
                 this._connection.close().then(() => {
