@@ -7,11 +7,17 @@ import { IConnection } from './port/connection.interface'
 import { IClientRegister } from '../infrastructure/port/rpc/client.register.interface'
 import { IServerRegister } from './port/server.register.interface'
 import { Identifier } from '../di/identifier'
-import { IClientOptions, IPubExchangeOptions, IServerOptions, ISubExchangeOptions } from './port/communication.option.interface'
+import {
+    IClientOptions,
+    IPubExchangeOptions,
+    IServerOptions,
+    ISubExchangeOptions
+} from './port/communication.option.interface'
 import { IMessage } from './port/message.interface'
 import { DI } from '../di/di'
 import { IConnectionOptions, IConnectionParams } from './port/connection.config.inteface'
 import { IBusConnection } from '../infrastructure/port/connection/connection.interface'
+import { Message } from './message'
 
 export class Connection implements IConnection {
     private readonly _pub: IMessageSender
@@ -65,8 +71,14 @@ export class Connection implements IConnection {
 
     public pub(exchangeName: string,
                routingKey: string,
-               message: IMessage,
+               message: any,
                options?: IPubExchangeOptions): Promise<void> {
+
+        if (!(message instanceof Message)) {
+            console.log('asdasd')
+            message = new Message(message)
+        }
+
         return this._pub.sendRoutingKeyMessage(exchangeName, routingKey, message, options)
     }
 
@@ -99,18 +111,18 @@ export class Connection implements IConnection {
     public rpcClient(exchangeName: string,
                      resourceName: string,
                      parameters: any[],
-                     options?: IClientOptions): Promise<IMessage>
+                     options?: IClientOptions): Promise<any>
 
     public rpcClient(exchangeName: string,
                      resourceName: string,
                      parameters: any[],
-                     callback: (err, message: IMessage) => void,
+                     callback: (err, message: any) => void,
                      options?: IClientOptions): void
 
     public rpcClient(exchangeName: string,
                      resourceName: string,
                      parameters: any[],
-                     optOrCall?: IClientOptions | ((err, message: IMessage) => void),
+                     optOrCall?: IClientOptions | ((err, message: any) => void),
                      options?: IClientOptions): any {
         if (!(optOrCall instanceof Function)) {
             return this.rpcClientPromise(exchangeName, resourceName, parameters, options)

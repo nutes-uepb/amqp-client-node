@@ -7,6 +7,8 @@ import * as path from 'path'
 import { IExchangeInitializeResult, IExchangeOptions } from '../../../application/port/exchange.option.interface'
 import { IActivateConsumerOptions, IStartConsumerOptions } from '../../../application/port/queue.option.interface'
 import { IBinding } from '../../port/bus/binding.interface'
+import { DI } from '../../../di/di'
+import { Identifier } from '../../../di/identifier'
 
 const ApplicationName = process.env.AMQPTS_APPLICATIONNAME ||
     (path.parse ? path.parse(process.argv[1]).name : path.basename(process.argv[1]))
@@ -138,7 +140,9 @@ export class Exchange {
                 this._isConsumerInitializedRcp = true
                 this._channel.consume(DIRECT_REPLY_TO_QUEUE, (resultMsg) => {
 
-                    const result = new BusMessage(resultMsg.content, resultMsg.properties)
+                    const result: BusMessage = DI.get(Identifier.BUS_MESSAGE)
+                    result.content = resultMsg.content
+                    result.properties = resultMsg.properties
                     result.fields = resultMsg.fields
 
                     for (const handler of this._consumer_handlers) {
@@ -146,7 +150,7 @@ export class Exchange {
                             const func: (err, parameters) => void = handler[1]
 
                             if (result.properties.type === 'error') {
-                                func.apply('', [new Error(result.content()), undefined])
+                                func.apply('', [new Error(result.content), undefined])
                                 return
                             }
                             func.apply('', [undefined, result])
@@ -156,8 +160,9 @@ export class Exchange {
                 }, { noAck: true })
             }
             this._consumer_handlers.push([uuid, callback])
-            const message = new BusMessage(requestParameters,
-                { correlationId: uuid, replyTo: DIRECT_REPLY_TO_QUEUE })
+            const message: BusMessage = DI.get(Identifier.BUS_MESSAGE)
+            message.content = requestParameters
+            message.properties = { correlationId: uuid, replyTo: DIRECT_REPLY_TO_QUEUE }
             message.sendTo(this, routingKey)
         }
 

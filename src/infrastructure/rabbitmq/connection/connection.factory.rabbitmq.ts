@@ -307,7 +307,7 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
         return Promise.all(promises)
     }
 
-    public declareExchange(name: string, type?: string, options?: IExchangeOptions): Exchange {
+    public declareExchange(name: string, type?: string, options: IExchangeOptions = {}): Exchange {
         let exchange = this._exchanges[name]
         if (exchange === undefined || !this.isEqualOptions(exchange.options, options)) {
             exchange = new Exchange(this, name, type, options)
@@ -315,7 +315,7 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
         return exchange
     }
 
-    public declareQueue(name: string, options?: IQueueOptions): Queue {
+    public declareQueue(name: string, options: IQueueOptions = {}): Queue {
         let queue = this._queues[name]
         if (queue === undefined || !this.isEqualOptions(queue.options, options)) {
             queue = new Queue(this, name, options)
@@ -358,10 +358,6 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
 
     private isEqualOptions(firstOptions: IQueueOptions | IExchangeOptions,
                            secondOptions: IQueueOptions | IExchangeOptions): boolean {
-
-        if (!firstOptions && !secondOptions) return true
-
-        if (!firstOptions || !secondOptions) return false
 
         for (const key of Object.keys(firstOptions)) {
             if (firstOptions[key] !== secondOptions[key]) return false

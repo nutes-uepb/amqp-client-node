@@ -7,7 +7,8 @@ import { ICustomLogger } from '../../../utils/custom.logger'
 import { IMessageReceiver } from '../../port/pubsub/message.receiver.interface'
 import { IActivateConsumerOptions } from '../../../application/port/queue.option.interface'
 import { ISubExchangeOptions } from '../../../application/port/communication.option.interface'
-import { IBusMessage } from '../../port/bus/bus.message.inteface'
+import { IBusMessage } from '../../../application/port/bus.message.inteface'
+import { Message } from '../../../application/message'
 
 const defSubExchangeOptions: ISubExchangeOptions = {
     receiveFromYourself: false
@@ -58,7 +59,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
     }
 
     private async routingKeySubscriberConsumer(queue: Queue,
-                                               consumer: IActivateConsumerOptions,
+                                               consumer: IActivateConsumerOptions = {},
                                                receiveFromYourself: boolean = false): Promise<void> {
 
         if (!queue.consumerInitialized) {
@@ -73,16 +74,23 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                         return
                     }
 
+                    const msg: Message = new Message(message.content, message.properties)
+                    msg.fields.channel = message.channel
+                    msg.fields.noAck =  consumer.noAck
+                    for (const key of Object.keys(message.fields)) {
+                        msg.fields[key] = message.fields[key]
+                    }
+
                     this._logger.info(`Bus event message received with success!`)
 
-                    const routingKey: string = message.fields.routingKey
+                    const routingKey: string = msg.fields.routingKey
 
                     for (const entry of this.routing_key_handlers.keys()) {
                         if (this.regExpr(entry, routingKey)) {
                             const event_handler: IEventHandler<any> | undefined =
                                 this.routing_key_handlers.get(entry)
                             if (event_handler) {
-                                event_handler.handle(message)
+                                event_handler.handle(msg)
                             }
                         }
                     }

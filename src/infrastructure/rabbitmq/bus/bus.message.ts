@@ -1,9 +1,11 @@
-import {log} from '../connection/connection.factory.rabbitmq'
-import {Exchange} from './exchange'
-import {Queue} from './queue'
+import { log } from '../connection/connection.factory.rabbitmq'
+import { Exchange } from './exchange'
+import { Queue } from './queue'
 import * as AmqpLib from 'amqplib/callback_api'
-import {IBusMessage} from '../../port/bus/bus.message.inteface'
+import { injectable } from 'inversify'
+import { IBusMessage } from '../../../application/port/bus.message.inteface'
 
+@injectable()
 export class BusMessage implements IBusMessage {
     private _contentBuffer: Buffer
     private _fields: any
@@ -15,12 +17,9 @@ export class BusMessage implements IBusMessage {
     private _channel: AmqpLib.Channel // for received messages only: the channel it has been received on
     private _message: AmqpLib.Message // received messages only: original amqplib message
 
-    constructor(content?: any, options: any = {}) {
+    constructor() {
         this._acked = false
-        this._properties = options
-        if (content !== undefined) {
-            this.contentBuffer = content
-        }
+        this._properties = {}
     }
 
     set acked(value: boolean) {
@@ -56,7 +55,21 @@ export class BusMessage implements IBusMessage {
     }
 
     get content(): any {
+
+        let parseContent = this._contentBuffer.toString()
+
+        if (this._properties.contentType === 'application/json') {
+            parseContent = JSON.parse(parseContent)
+        }
+
+        this._content = parseContent
+
         return this._content
+    }
+
+    set content(value: any) {
+        this._content = value
+        this.contentBuffer = value
     }
 
     get fields() {
@@ -72,11 +85,15 @@ export class BusMessage implements IBusMessage {
     }
 
     set properties(value: any) {
-        this._properties = value
+        if (value) this._properties = { ...this._properties, ...value }
     }
 
     set channel(value: AmqpLib.Channel) {
         this._channel = value
+    }
+
+    get channel(): AmqpLib.Channel {
+        return this._channel
     }
 
     set message(value: AmqpLib.Message) {
@@ -89,12 +106,12 @@ export class BusMessage implements IBusMessage {
             try {
                 destination.channel.publish(exchange, routingKey, this._contentBuffer, this._properties)
             } catch (err) {
-                log.log('debug', 'Publish error11: ' + err.messageBus, {module: 'amqp-ts'})
+                log.log('debug', 'Publish error11: ' + err.messageBus, { module: 'amqp-ts' })
                 const destinationName = destination.name
                 const connection = destination.connection
-                log.log('debug', 'Try to rebuild connection, before Call.', {module: 'amqp-ts'})
+                log.log('debug', 'Try to rebuild connection, before Call.', { module: 'amqp-ts' })
                 connection._rebuildAll(err).then(() => {
-                    log.log('debug', 'Retransmitting message.', {module: 'amqp-ts'})
+                    log.log('debug', 'Retransmitting message.', { module: 'amqp-ts' })
                     if (destination instanceof Queue) {
                         connection.queues[destinationName].publish(this._contentBuffer, this._properties)
                     } else {
@@ -116,22 +133,53 @@ export class BusMessage implements IBusMessage {
         (destination.initialized as Promise<any>).then(sendMessage)
     }
 
-    public ack(allUpTo?: boolean): void {
-        if (this._channel !== undefined && !this._acked) {
-            this._acked = true
-            this._channel.ack(this._message, allUpTo)
+    public ack(allUpTo?: boolean): void
+
+    public ack(message: AmqpLib.Message, channel: AmqpLib.Channel, noAck: boolean, allUpTo?: boolean): void
+
+    public ack(message: AmqpLib.Message | boolean, channel?: AmqpLib.Channel, noAck?: boolean, allUpTo?: boolean): void {
+        if (typeof message === 'boolean') {
+            if (this._channel !== undefined && !this._acked) {
+                this._acked = true
+                this._channel.ack(this._message, allUpTo)
+            }
+            return
+        }
+
+        if (channel !== undefined && !noAck) {
+            channel.ack(message, allUpTo)
         }
     }
 
-    public nack(allUpTo?: boolean, requeue?: boolean): void {
-        if (this._channel !== undefined) {
-            this._channel.nack(this._message, allUpTo, requeue)
+    public nack(allUpTo?: boolean, requeue?: boolean): void
+
+    public nack(message: AmqpLib.Message, channel: AmqpLib.Channel, allUpTo?: boolean, requeue?: boolean): void
+
+    public nack(message: AmqpLib.Message | boolean, channel: AmqpLib.Channel, allUpTo?: boolean, requeue?: boolean): void {
+        if (typeof message === 'boolean') {
+            if (this._channel !== undefined) {
+                this._channel.nack(this._message, allUpTo, requeue)
+            }
+            return
+        }
+        if (channel !== undefined) {
+            channel.nack(message, allUpTo, requeue)
         }
     }
 
-    public reject(requeue = false): void {
-        if (this._channel !== undefined) {
-            this._channel.reject(this._message, requeue)
+    public reject(requeue: boolean): void
+
+    public reject(message: AmqpLib.Message, channel: AmqpLib.Channel, requeue: boolean): void
+
+    public reject(message: AmqpLib.Message | boolean, channel?: AmqpLib.Channel, requeue = false): void {
+        if (typeof message === 'boolean') {
+            if (this._channel !== undefined) {
+                this._channel.reject(this._message, requeue)
+            }
+            return
+        }
+        if (channel !== undefined) {
+            channel.reject(message, requeue)
         }
     }
 

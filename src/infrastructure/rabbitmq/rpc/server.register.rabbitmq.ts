@@ -7,7 +7,7 @@ import { ICustomLogger } from '../../../utils/custom.logger'
 import { DI } from '../../../di/di'
 import { IServerRegister } from '../../../application/port/server.register.interface'
 import { Queue } from '../bus/queue'
-import { IBusMessage } from '../../port/bus/bus.message.inteface'
+import { IBusMessage } from '../../../application/port/bus.message.inteface'
 
 export class ServerRegisterRabbitmq implements IServerRegister {
 

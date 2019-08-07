@@ -6,6 +6,7 @@ import { IMessageSender } from '../../port/pubsub/message.sender.interface'
 import { IPubExchangeOptions } from '../../../application/port/communication.option.interface'
 import { IMessage } from '../../../application/port/message.interface'
 import { BusMessage } from '../bus/bus.message'
+import { DI } from '../../../di/di'
 
 @injectable()
 export class MessageSenderRabbitmq implements IMessageSender {
@@ -40,7 +41,9 @@ export class MessageSenderRabbitmq implements IMessageSender {
 
             await exchange.initialized
 
-            const msg: BusMessage = new BusMessage(message.content, message.properties)
+            const msg: BusMessage = DI.get(Identifier.BUS_MESSAGE)
+            msg.content = message.content
+            msg.properties = message.properties
 
             msg.properties.correlationId = this._connection.idConnection
 
