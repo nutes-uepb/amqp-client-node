@@ -127,7 +127,8 @@ export class ConnectionRabbitMQ implements IBusConnection {
                     })
 
                     this._connection.on('trying_connect', () => {
-                        this._logger.warn('Trying re-established connection')
+                        if (!this._connection.connectedBefore) this._logger.warn('Trying established connection')
+                        else this._logger.warn('Trying re-established connection')
                         this._emitter.emit('trying_connect')
                     })
 

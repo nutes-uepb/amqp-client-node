@@ -45,7 +45,7 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
     private url: string
     private socketOptions: any
     private reconnectStrategy: IConnectionOptions
-    private connectedBefore = false
+    private _connectedBefore = false
 
     private _connection: AmqpLib.Connection
     private _retry: number
@@ -84,6 +84,10 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
         return Promise.resolve(this)
     }
 
+    get connectedBefore(): boolean {
+        return this._connectedBefore
+    }
+
     get connection(): AmqpLib.Connection {
         return this._connection
     }
@@ -119,13 +123,13 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
                     reject(err)
                 } else {
                     this._rebuilding = false
-                    if (this.connectedBefore) {
+                    if (this._connectedBefore) {
                         log.log('warn', 'ConnectionFactoryRabbitMQ re-established', {module: 'amqp-ts'})
                         this.emit('re_established_connection')
                     } else {
                         log.log('info', 'ConnectionFactoryRabbitMQ established.', {module: 'amqp-ts'})
                         this.emit('open_connection')
-                        this.connectedBefore = true
+                        this._connectedBefore = true
                     }
                     resolve(null)
                 }
