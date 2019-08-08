@@ -13,6 +13,8 @@ import { IClientRegister } from '../infrastructure/port/rpc/client.register.inte
 import { ClientRegisterRabbitmq } from '../infrastructure/rabbitmq/rpc/client.register.rabbitmq'
 import { CustomEventEmitter, ICustomEventEmitter } from '../utils/custom.event.emitter'
 import { ConnectionFactoryRabbitMQ } from '../infrastructure/rabbitmq/connection/connection.factory.rabbitmq'
+import { BusMessage } from '../infrastructure/rabbitmq/bus/bus.message'
+import { IBusMessage } from '../application/port/bus.message.inteface'
 
 class DependencyInject {
     private readonly container: Container
@@ -60,6 +62,11 @@ class DependencyInject {
             .to(CustomEventEmitter)
         this.container.bind<ICustomLogger>(Identifier.CUSTOM_LOGGER)
             .to(CustomLogger).inSingletonScope()
+
+        this.container.bind<IBusMessage>(Identifier.BUS_MESSAGE)
+            .to(BusMessage)
+        // this.container.bind<IMessage>(Identifier.MESSAGE)
+        //     .to(Message)
 
     }
 }

@@ -1,16 +1,16 @@
-import { IBusConnection } from '../../port/connection/connection.interface'
-import { IConnectionOptions, IConnectionParams } from '../../../application/port/connection.config.inteface'
-import { inject, injectable } from 'inversify'
-import { Identifier } from '../../../di/identifier'
-import { IConnectionFactory } from '../../port/connection/connection.factory.interface'
-import { ICustomLogger } from '../../../utils/custom.logger'
+import {IBusConnection} from '../../port/connection/connection.interface'
+import {IConnectionOptions, IConnectionParams} from '../../../application/port/connection.config.inteface'
+import {inject, injectable} from 'inversify'
+import {Identifier} from '../../../di/identifier'
+import {IConnectionFactory} from '../../port/connection/connection.factory.interface'
+import {ICustomLogger} from '../../../utils/custom.logger'
 
-import { ConnectionFactoryRabbitMQ } from './connection.factory.rabbitmq'
-import { Queue } from '../bus/queue'
-import { Exchange } from '../bus/exchange'
-import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
-import { IExchangeOptions } from '../../../application/port/exchange.option.interface'
-import { IQueueOptions } from '../../../application/port/queue.option.interface'
+import {ConnectionFactoryRabbitMQ} from './connection.factory.rabbitmq'
+import {Queue} from '../bus/queue'
+import {Exchange} from '../bus/exchange'
+import {ICustomEventEmitter} from '../../../utils/custom.event.emitter'
+import {IExchangeOptions} from '../../../application/port/exchange.option.interface'
+import {IQueueOptions} from '../../../application/port/queue.option.interface'
 
 const defaultOptions: IConnectionOptions = {
     retries: 0,
@@ -39,7 +39,7 @@ const defaultParams: IConnectionParams = {
 @injectable()
 export class ConnectionRabbitMQ implements IBusConnection {
 
-    private _idConnection: string
+    private _connectionId: string
     private _connection?: ConnectionFactoryRabbitMQ
     private _configuration: IConnectionParams | string
     private _options: IConnectionOptions
@@ -55,6 +55,8 @@ export class ConnectionRabbitMQ implements IBusConnection {
     set configurations(config: IConnectionParams | string) {
         this._configuration = config
 
+        this._connectionId = this._logger.loggerId
+
         if (typeof config === 'object') {
             for (const key of Object.keys(config)) {
                 if (!config[key]) this.configurations[key] = defaultParams[key]
@@ -69,12 +71,8 @@ export class ConnectionRabbitMQ implements IBusConnection {
         }
     }
 
-    set idConnection(idConnection) {
-        this._idConnection = idConnection
-    }
-
-    get idConnection(): string {
-        return this._idConnection
+    get connectionId(): string {
+        return this._connectionId
     }
 
     get isConnected(): boolean {
@@ -127,7 +125,8 @@ export class ConnectionRabbitMQ implements IBusConnection {
                     })
 
                     this._connection.on('trying_connect', () => {
-                        this._logger.warn('Trying re-established connection')
+                        if (!this._connection.connectedBefore) this._logger.warn('Trying established connection')
+                        else this._logger.warn('Trying re-established connection')
                         this._emitter.emit('trying_connect')
                     })
 
@@ -148,7 +147,6 @@ export class ConnectionRabbitMQ implements IBusConnection {
 
     public getExchange(exchangeName: string,
                        options?: IExchangeOptions): Exchange {
-
         const exchange = this._connection.declareExchange(exchangeName, options ? options.type : undefined, options)
         if (!this._resourceBus.get(exchangeName)) {
             this._resourceBus.set(exchangeName, exchange)
@@ -166,7 +164,6 @@ export class ConnectionRabbitMQ implements IBusConnection {
     }
 
     public closeConnection(): Promise<boolean> {
-
         return new Promise<boolean | undefined>(async (resolve, reject) => {
             if (this.isConnected) {
                 this._connection.close().then(() => {

@@ -12,6 +12,8 @@ import {
     IStartConsumerResult
 } from '../../../application/port/queue.option.interface'
 import { IBinding } from '../../port/bus/binding.interface'
+import { DI } from '../../../di/di'
+import { Identifier } from '../../../di/identifier'
 
 const DIRECT_REPLY_TO_QUEUE = 'amq.rabbitmq.reply-to'
 
@@ -107,9 +109,9 @@ export class Queue {
 
     private static _packMessageContent(content: any, options: any): Buffer {
         if (typeof content === 'string') {
-            content = new Buffer(content)
+            content = Buffer.from(content)
         } else if (!(content instanceof Buffer)) {
-            content = new Buffer(JSON.stringify(content))
+            content = Buffer.from(JSON.stringify(content))
             options.contentType = 'application/json'
         }
         return content
@@ -127,7 +129,6 @@ export class Queue {
      * deprecated, use 'queue.send(message: MessageBus)' instead
      */
     public publish(content: any, options: any = {}): void {
-        console.log('HERE0')
         // inline function to send the message
         const sendMessage = () => {
             try {
@@ -163,7 +164,9 @@ export class Queue {
                 let consumerTag: string
                 this._channel.consume(DIRECT_REPLY_TO_QUEUE, (resultMsg) => {
                     this._channel.cancel(consumerTag)
-                    const result = new BusMessage(resultMsg.content, resultMsg.fields)
+                    const result: BusMessage = DI.get(Identifier.BUS_MESSAGE)
+                    result.content = resultMsg.content
+                    result.properties = resultMsg.fields
                     result.fields = resultMsg.fields
                     resolve(result)
                 }, { noAck: true }, (err, ok) => {
@@ -173,7 +176,9 @@ export class Queue {
                     } else {
                         // send the rpc request
                         consumerTag = ok.consumerTag
-                        const message = new BusMessage(requestParameters, { replyTo: DIRECT_REPLY_TO_QUEUE })
+                        const message: BusMessage = DI.get(Identifier.BUS_MESSAGE)
+                        message.content = requestParameters
+                        message.properties = { replyTo: DIRECT_REPLY_TO_QUEUE }
                         message.sendTo(this)
                     }
                 })
@@ -297,30 +302,36 @@ export class Queue {
 
         const activateConsumerWrapper = (msg: AmqpLib.Message) => {
             try {
-                const message = new BusMessage(msg.content, msg.properties)
+                const message: BusMessage = DI.get(Identifier.BUS_MESSAGE)
+                message.content = msg.content
+                message.properties = msg.properties
                 message.fields = msg.fields
                 message.message = msg
                 message.channel = this._channel
-                let result = this._consumer(message)
+                message.acked = this._consumerOptions.noAck
+                const result = this._consumer(message)
+                let replyMessge: BusMessage = DI.get(Identifier.BUS_MESSAGE)
                 // check if there is a reply-to
                 if (msg.properties.replyTo) {
                     if (result instanceof Promise) {
                         result.then((resultValue) => {
                             if (!(resultValue instanceof BusMessage)) {
-                                resultValue = new BusMessage(resultValue, {})
-                            }
-                            resultValue.properties.correlationId = msg.properties.correlationId
-                            this._channel.sendToQueue(msg.properties.replyTo, resultValue.contentBuffer, resultValue.properties)
+                                replyMessge.content = result
+                                replyMessge.properties = {}
+                            } else replyMessge = resultValue
+                            replyMessge.properties.correlationId = msg.properties.correlationId
+                            this._channel.sendToQueue(msg.properties.replyTo, replyMessge.contentBuffer, replyMessge.properties)
                         }).catch((err) => {
                             log.log('error', 'Queue.onMessage RPC promise returned error: '
                                 + err.messageBus, { module: 'amqp-ts' })
                         })
                     } else {
                         if (!(result instanceof BusMessage)) {
-                            result = new BusMessage(result, {})
-                        }
-                        result.properties.correlationId = msg.properties.correlationId
-                        this._channel.sendToQueue(msg.properties.replyTo, result.contentBuffer, result.properties)
+                            replyMessge.content = result
+                            replyMessge.properties = {}
+                        } else replyMessge = result
+                        replyMessge.properties.correlationId = msg.properties.correlationId
+                        this._channel.sendToQueue(msg.properties.replyTo, replyMessge.contentBuffer, replyMessge.properties)
                     }
                 }
             } catch (err) {

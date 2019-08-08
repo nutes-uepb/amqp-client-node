@@ -62,6 +62,7 @@
     "no-unnecessary-initializer": true,
     "no-var-keyword": true,
     "no-console": false,
+//    "no-console": [true, "log", "error"],
     "object-literal-sort-keys": false,
     "radix": true,
     "trailing-comma": false,

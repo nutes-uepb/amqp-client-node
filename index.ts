@@ -1,9 +1,10 @@
+export { Message } from './src/application/message'
 export { IServerRegister } from './src/application/port/server.register.interface'
 export { IExchangeOptions } from './src/application/port/exchange.option.interface'
 export { IQueueOptions, IActivateConsumerOptions } from './src/application/port/queue.option.interface'
 
 export { IConnection } from './src/application/port/connection.interface'
-export { pubSub } from './src/pub.sub'
+export { amqpClient } from './src/amqp.client'
 export {
     IMessage,
     IMessageProperty,

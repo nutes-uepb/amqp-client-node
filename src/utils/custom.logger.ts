@@ -5,14 +5,20 @@ import { injectable } from 'inversify'
 export class CustomLogger implements ICustomLogger {
     private readonly _logger: Logger
     private _options: any = {}
+    private readonly _loggerId: string
 
     constructor() {
         this.initOptions() // initialize options logger
         this._logger = this.internalCreateLogger()
+        this._loggerId = 'id-' + Math.random().toString(36).substr(2, 16)
     }
 
     get logger(): Logger {
         return this._logger
+    }
+
+    get loggerId(): string {
+        return this._loggerId
     }
 
     private internalCreateLogger(): Logger {
@@ -97,6 +103,8 @@ export class CustomLogger implements ICustomLogger {
  */
 export interface ICustomLogger {
     logger: Logger
+
+    loggerId: string
 
     error(message: string): void
 

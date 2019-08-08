@@ -3,12 +3,11 @@ export interface IMessage {
     fields?: IMessageField
     properties?: IMessageProperty
 
-    ack?(allUpTo?: boolean): void
+    ack(allUpTo?: boolean): void
 
-    nack?(allUpTo?: boolean, requeue?: boolean): void
+    nack(allUpTo?: boolean, requeue?: boolean): void
 
-    reject?(requeue): void
-
+    reject(requeue): void
 }
 
 export interface IMessageProperty {
@@ -29,4 +28,6 @@ export interface IMessageField {
     redelivered?: boolean
     exchange?: string
     routingKey?: string
+    channel?: any
+    noAck?: boolean
 }

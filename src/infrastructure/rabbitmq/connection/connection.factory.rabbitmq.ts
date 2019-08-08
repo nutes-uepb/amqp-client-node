@@ -8,18 +8,18 @@
 
 // simplified use of amqp exchanges and queues, wrapper for amqplib
 
-import { Binding } from '../bus/binding'
-import { Queue } from '../bus/queue'
-import { Exchange } from '../bus/exchange'
+import {Binding} from '../bus/binding'
+import {Queue} from '../bus/queue'
+import {Exchange} from '../bus/exchange'
 
 import * as AmqpLib from 'amqplib/callback_api'
-import { createLogger, format, transports } from 'winston'
-import { injectable } from 'inversify'
-import { IConnectionFactory, ITopology } from '../../port/connection/connection.factory.interface'
-import { IExchangeOptions } from '../../../application/port/exchange.option.interface'
-import { IQueueOptions } from '../../../application/port/queue.option.interface'
-import { EventEmitter } from 'events'
-import { IConnectionOptions } from '../../../application/port/connection.config.inteface'
+import {createLogger, format, transports} from 'winston'
+import {injectable} from 'inversify'
+import {IConnectionFactory, ITopology} from '../../port/connection/connection.factory.interface'
+import {IExchangeOptions} from '../../../application/port/exchange.option.interface'
+import {IQueueOptions} from '../../../application/port/queue.option.interface'
+import {EventEmitter} from 'events'
+import {IConnectionOptions} from '../../../application/port/connection.config.inteface'
 
 // create a custom winston logger for amqp-ts
 const amqp_log = createLogger({
@@ -45,7 +45,7 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
     private url: string
     private socketOptions: any
     private reconnectStrategy: IConnectionOptions
-    private connectedBefore = false
+    private _connectedBefore = false
 
     private _connection: AmqpLib.Connection
     private _retry: number
@@ -84,6 +84,10 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
         return Promise.resolve(this)
     }
 
+    get connectedBefore(): boolean {
+        return this._connectedBefore
+    }
+
     get connection(): AmqpLib.Connection {
         return this._connection
     }
@@ -103,7 +107,7 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
     private rebuildConnection(): Promise<void> {
         if (this._rebuilding) { // only one rebuild process can be active at any time
             log.log('debug', 'ConnectionFactoryRabbitMQ rebuild already in progress, ' +
-                'joining active rebuild attempt.', { module: 'amqp-ts' })
+                'joining active rebuild attempt.', {module: 'amqp-ts'})
             return this.initialized
         }
         this._retry = -1
@@ -119,13 +123,13 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
                     reject(err)
                 } else {
                     this._rebuilding = false
-                    if (this.connectedBefore) {
-                        log.log('warn', 'ConnectionFactoryRabbitMQ re-established', { module: 'amqp-ts' })
+                    if (this._connectedBefore) {
+                        log.log('warn', 'ConnectionFactoryRabbitMQ re-established', {module: 'amqp-ts'})
                         this.emit('re_established_connection')
                     } else {
-                        log.log('info', 'ConnectionFactoryRabbitMQ established.', { module: 'amqp-ts' })
+                        log.log('info', 'ConnectionFactoryRabbitMQ established.', {module: 'amqp-ts'})
                         this.emit('open_connection')
-                        this.connectedBefore = true
+                        this._connectedBefore = true
                     }
                     resolve(null)
                 }
@@ -133,7 +137,7 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
         })
         /* istanbul ignore next */
         this.initialized.catch((err) => {
-            log.log('warn', 'Error creating connection!', { module: 'amqp-ts' })
+            log.log('warn', 'Error creating connection!', {module: 'amqp-ts'})
             this.emit('error_connection', err)
 
             // throw (err)
@@ -153,13 +157,13 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
                     return
                 }
 
-                log.log('warn', 'ConnectionFactoryRabbitMQ failed.', { module: 'amqp-ts' })
+                log.log('warn', 'ConnectionFactoryRabbitMQ failed.', {module: 'amqp-ts'})
 
                 this._retry = retry
                 if (thisConnection.reconnectStrategy.retries === 0 || thisConnection.reconnectStrategy.retries > retry) {
                     log.log('warn', 'ConnectionFactoryRabbitMQ retry ' + (retry + 1) +
                         ' in ' + thisConnection.reconnectStrategy.interval + 'ms',
-                        { module: 'amqp-ts' })
+                        {module: 'amqp-ts'})
                     thisConnection.emit('trying_connect')
 
                     setTimeout(thisConnection.tryToConnect,
@@ -170,12 +174,12 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
                     )
                 } else { // no reconnect strategy, or retries exhausted, so return the error
                     log.log('warn', 'ConnectionFactoryRabbitMQ failed, exiting: No connection ' +
-                        'retries left (retry ' + retry + ').', { module: 'amqp-ts' })
+                        'retries left (retry ' + retry + ').', {module: 'amqp-ts'})
                     callback(err)
                 }
             } else {
                 const restart = (e: Error) => {
-                    log.log('debug', 'ConnectionFactoryRabbitMQ error occurred.', { module: 'amqp-ts' })
+                    log.log('debug', 'ConnectionFactoryRabbitMQ error occurred.', {module: 'amqp-ts'})
                     connection.removeListener('error', restart)
 
                     // connection.removeListener("end", restart) // not sure this is needed
@@ -201,41 +205,41 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
     }
 
     public _rebuildAll(err: Error): Promise<void> {
-        log.log('warn', 'ConnectionFactoryRabbisssssstMQ error: ' + err.message, { module: 'amqp-ts' })
+        log.log('warn', 'ConnectionFactoryRabbisssssstMQ error: ' + err.message, {module: 'amqp-ts'})
 
-        log.log('debug', 'Rebuilding connection NOW.', { module: 'amqp-ts' })
+        log.log('debug', 'Rebuilding connection NOW.', {module: 'amqp-ts'})
         this.rebuildConnection()
 
         // re initialize exchanges, queues and bindings if they exist
         for (const exchangeId of Object.keys(this._exchanges)) {
             const exchange = this._exchanges[exchangeId]
-            log.log('debug', 'Re-initialize Exchange \'' + exchange.name + '\'.', { module: 'amqp-ts' })
+            log.log('debug', 'Re-initialize Exchange \'' + exchange.name + '\'.', {module: 'amqp-ts'})
             exchange._initialize()
         }
         for (const queueId of Object.keys(this._queues)) {
             const queue = this._queues[queueId]
             const consumer = queue.consumer
-            log.log('debug', 'Re-initialize queue \'' + queue.name + '\'.', { module: 'amqp-ts' })
+            log.log('debug', 'Re-initialize queue \'' + queue.name + '\'.', {module: 'amqp-ts'})
             queue._initialize()
             if (consumer) {
-                log.log('debug', 'Re-initialize consumer for queue \'' + queue.name + '\'.', { module: 'amqp-ts' })
+                log.log('debug', 'Re-initialize consumer for queue \'' + queue.name + '\'.', {module: 'amqp-ts'})
                 queue._initializeConsumer()
             }
         }
         for (const bindingId of Object.keys(this._bindings)) {
             const binding = this._bindings[bindingId]
             log.log('debug', 'Re-initialize binding from \'' + binding.source.name + '\' to \'' +
-                binding.destination.name + '\'.', { module: 'amqp-ts' })
+                binding.destination.name + '\'.', {module: 'amqp-ts'})
             binding.initialize()
         }
 
         return new Promise<void>((resolve, reject) => {
             this.completeConfiguration().then(() => {
-                    log.log('debug', 'Rebuild success.', { module: 'amqp-ts' })
+                    log.log('debug', 'Rebuild success.', {module: 'amqp-ts'})
                     resolve(null)
                 }, /* istanbul ignore next */
                 (rejectReason) => {
-                    log.log('debug', 'Rebuild failed.', { module: 'amqp-ts' })
+                    log.log('debug', 'Rebuild failed.', {module: 'amqp-ts'})
                     reject(rejectReason)
                 })
         })
@@ -307,7 +311,7 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
         return Promise.all(promises)
     }
 
-    public declareExchange(name: string, type?: string, options?: IExchangeOptions): Exchange {
+    public declareExchange(name: string, type?: string, options: IExchangeOptions = {}): Exchange {
         let exchange = this._exchanges[name]
         if (exchange === undefined || !this.isEqualOptions(exchange.options, options)) {
             exchange = new Exchange(this, name, type, options)
@@ -315,7 +319,7 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
         return exchange
     }
 
-    public declareQueue(name: string, options?: IQueueOptions): Queue {
+    public declareQueue(name: string, options: IQueueOptions = {}): Queue {
         let queue = this._queues[name]
         if (queue === undefined || !this.isEqualOptions(queue.options, options)) {
             queue = new Queue(this, name, options)
@@ -356,10 +360,11 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
         return Promise.all(promises)
     }
 
-    private isEqualOptions(oldOptions: IQueueOptions | IExchangeOptions,
-                           newOptions: IQueueOptions | IExchangeOptions): boolean {
-        for (const key of Object.keys(oldOptions)) {
-            if (oldOptions[key] !== newOptions[key]) return false
+    private isEqualOptions(firstOptions: IQueueOptions | IExchangeOptions,
+                           secondOptions: IQueueOptions | IExchangeOptions): boolean {
+
+        for (const key of Object.keys(firstOptions)) {
+            if (firstOptions[key] !== secondOptions[key]) return false
         }
 
         return true

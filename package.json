@@ -1,6 +1,6 @@
 {
   "name": "amqp-client-node",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0",
   "description": "Library for publish and subscribe events on message bus. In addition, it is possible to perform resource requests from the use of the standard commonly known as RPC.",
   "main": "lib/index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nutes-uepb/pubsubts.git"
+    "url": "git+https://github.com/nutes-uepb/amqp-client-node.git"
   },
   "keywords": [
     "amqp",
@@ -30,9 +30,9 @@
   "author": "NUTES/UEPB",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/nutes-uepb/pubsubts/issues"
+    "url": "https://github.com/nutes-uepb/amqp-client-node/issues"
   },
-  "homepage": "https://github.com/nutes-uepb/pubsubts#readme",
+  "homepage": "https://github.com/nutes-uepb/amqp-client-node#readme",
   "dependencies": {
     "winston": "^3.2.1",
     "inversify": "^5.0.1",

@@ -19,7 +19,7 @@ export interface IConnection {
 
     pub(exchangeName: string,
         routingKey: string,
-        message: IMessage,
+        message: any,
         options?: IPubExchangeOptions): Promise<void>
 
     sub(queueName: string,
@@ -36,7 +36,7 @@ export interface IConnection {
     rpcClient(exchangeName: string,
               resourceName: string,
               parameters: any[],
-              optOrCall?: IClientOptions | ((err, message: IMessage) => void),
+              optOrCall?: IClientOptions | ((err, message: any) => void),
               options?: IClientOptions): any
 
 }

@@ -17,6 +17,7 @@ import { IMessage } from './port/message.interface'
 import { DI } from '../di/di'
 import { IConnectionOptions, IConnectionParams } from './port/connection.config.inteface'
 import { IBusConnection } from '../infrastructure/port/connection/connection.interface'
+import { Message } from './message'
 
 export class Connection implements IConnection {
     private readonly _pub: IMessageSender
@@ -34,7 +35,6 @@ export class Connection implements IConnection {
         this._sub = DI.get(Identifier.RABBITMQ_MENSSAGE_RECEIVER)
         this._rpcClient = DI.get(Identifier.RABBITMQ_CLIENT_REGISTER)
         this._rpcServers = new Map<string, IServerRegister>()
-
     }
 
     get isOpen(): boolean {
@@ -71,8 +71,13 @@ export class Connection implements IConnection {
 
     public pub(exchangeName: string,
                routingKey: string,
-               message: IMessage,
+               message: any,
                options?: IPubExchangeOptions): Promise<void> {
+
+        if (!(message instanceof Message)) {
+            message = new Message(message)
+        }
+
         return this._pub.sendRoutingKeyMessage(exchangeName, routingKey, message, options)
     }
 
@@ -84,10 +89,8 @@ export class Connection implements IConnection {
         const eventCallback: IEventHandler<any> = {
             handle: callback
         }
-
         return this._sub.receiveRoutingKeyMessage(queueName, exchangeName, routingKey,
             eventCallback, options)
-
     }
 
     public createRpcServer(queueName: string,
@@ -101,33 +104,29 @@ export class Connection implements IConnection {
             server = new ServerRegisterRabbitmq(this._eventBusConnection, queueName, exchangeName, routingKeys, options)
             this._rpcServers.set(queueName, server)
         }
-
         return server
     }
 
     public rpcClient(exchangeName: string,
                      resourceName: string,
                      parameters: any[],
-                     options?: IClientOptions): Promise<IMessage>
+                     options?: IClientOptions): Promise<any>
 
     public rpcClient(exchangeName: string,
                      resourceName: string,
                      parameters: any[],
-                     callback: (err, message: IMessage) => void,
+                     callback: (err, message: any) => void,
                      options?: IClientOptions): void
 
     public rpcClient(exchangeName: string,
                      resourceName: string,
                      parameters: any[],
-                     optOrCall?: IClientOptions | ((err, message: IMessage) => void),
+                     optOrCall?: IClientOptions | ((err, message: any) => void),
                      options?: IClientOptions): any {
-
         if (!(optOrCall instanceof Function)) {
             return this.rpcClientPromise(exchangeName, resourceName, parameters, options)
         }
-
         this.rpcClientCallback(exchangeName, resourceName, parameters, optOrCall, options)
-
     }
 
     private rpcClientCallback(
@@ -156,21 +155,10 @@ export class Connection implements IConnection {
         resourceName: string,
         parameters: any[],
         options?: IClientOptions): Promise<IMessage> {
-        return new Promise<any>(async (resolve, reject) => {
-            const clientRequest: IClientRequest = {
-                resource_name: resourceName,
-                handle: parameters
-            }
-
-            this._rpcClient
-                .registerRoutingKeyClient(exchangeName, clientRequest, options)
-                .then((result: IMessage) => {
-                    return resolve(result)
-                })
-                .catch(err => {
-                    return reject(err)
-                })
-        })
+        const clientRequest: IClientRequest = {
+            resource_name: resourceName,
+            handle: parameters
+        }
+        return this._rpcClient.registerRoutingKeyClient(exchangeName, clientRequest, options)
     }
-
 }
