@@ -6,7 +6,7 @@ import { IQueueOptions } from '../../../application/port/queue.option.interface'
 
 export interface IBusConnection {
 
-    idConnection: string
+    connectionId: string
 
     isConnected: boolean
 

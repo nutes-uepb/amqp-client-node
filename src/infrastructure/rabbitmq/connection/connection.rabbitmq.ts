@@ -39,7 +39,7 @@ const defaultParams: IConnectionParams = {
 @injectable()
 export class ConnectionRabbitMQ implements IBusConnection {
 
-    private _idConnection: string
+    private _connectionId: string
     private _connection?: ConnectionFactoryRabbitMQ
     private _configuration: IConnectionParams | string
     private _options: IConnectionOptions
@@ -55,6 +55,8 @@ export class ConnectionRabbitMQ implements IBusConnection {
     set configurations(config: IConnectionParams | string) {
         this._configuration = config
 
+        this._connectionId = this._logger.loggerId
+
         if (typeof config === 'object') {
             for (const key of Object.keys(config)) {
                 if (!config[key]) this.configurations[key] = defaultParams[key]
@@ -69,12 +71,8 @@ export class ConnectionRabbitMQ implements IBusConnection {
         }
     }
 
-    set idConnection(idConnection) {
-        this._idConnection = idConnection
-    }
-
-    get idConnection(): string {
-        return this._idConnection
+    get connectionId(): string {
+        return this._connectionId
     }
 
     get isConnected(): boolean {

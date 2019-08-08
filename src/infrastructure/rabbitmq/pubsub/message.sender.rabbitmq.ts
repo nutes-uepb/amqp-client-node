@@ -34,9 +34,6 @@ export class MessageSenderRabbitmq implements IMessageSender {
 
             if (options) exchangeOptions = options.exchange
 
-            if (!this._connection.idConnection)
-                this._connection.idConnection = 'id-' + Math.random().toString(36).substr(2, 16)
-
             const exchange = this._connection.getExchange(exchangeName, exchangeOptions)
 
             await exchange.initialized
@@ -45,7 +42,7 @@ export class MessageSenderRabbitmq implements IMessageSender {
             msg.content = message.content
             msg.properties = message.properties
 
-            msg.properties.correlationId = this._connection.idConnection
+            msg.properties.correlationId = this._connection.connectionId
 
             exchange.send(msg, routingKey)
             this._logger.info('Bus event message sent with success!')

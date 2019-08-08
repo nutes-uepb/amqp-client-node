@@ -69,7 +69,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                 await queue.activateConsumer((message: IBusMessage) => {
                     // acknowledge that the message has been received (and processed)
 
-                    if (message.properties.correlationId === this._connection.idConnection &&
+                    if (message.properties.correlationId === this._connection.connectionId &&
                         !receiveFromYourself) {
                         return
                     }
