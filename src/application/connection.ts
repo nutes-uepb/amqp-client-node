@@ -75,7 +75,6 @@ export class Connection implements IConnection {
                options?: IPubExchangeOptions): Promise<void> {
 
         if (!(message instanceof Message)) {
-            console.log('asdasd')
             message = new Message(message)
         }
 
