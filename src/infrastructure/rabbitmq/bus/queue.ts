@@ -316,7 +316,7 @@ export class Queue {
                     if (result instanceof Promise) {
                         result.then((resultValue) => {
                             if (!(resultValue instanceof BusMessage)) {
-                                replyMessge.content = result
+                                replyMessge.content = resultValue
                                 replyMessge.properties = {}
                             } else replyMessge = resultValue
                             replyMessge.properties.correlationId = msg.properties.correlationId
