@@ -76,7 +76,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
 
                     const msg: Message = new Message(message.content, message.properties)
                     msg.fields.channel = message.channel
-                    msg.fields.noAck =  consumer.noAck
+                    msg.fields.noAck = consumer.noAck
                     for (const key of Object.keys(message.fields)) {
                         msg.fields[key] = message.fields[key]
                     }
@@ -117,5 +117,4 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
             throw e
         }
     }
-
 }

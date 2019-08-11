@@ -45,7 +45,6 @@ class DependencyInject {
      * @return void
      */
     private initDependencies(): void {
-
         this.container.bind<IMessageSender>(Identifier.RABBITMQ_MENSSAGE_SENDER)
             .to(MessageSenderRabbitmq)
         this.container.bind<IMessageReceiver>(Identifier.RABBITMQ_MENSSAGE_RECEIVER)
@@ -65,9 +64,6 @@ class DependencyInject {
 
         this.container.bind<IBusMessage>(Identifier.BUS_MESSAGE)
             .to(BusMessage)
-        // this.container.bind<IMessage>(Identifier.MESSAGE)
-        //     .to(Message)
-
     }
 }
 

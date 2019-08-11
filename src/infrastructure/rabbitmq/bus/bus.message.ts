@@ -27,12 +27,14 @@ export class BusMessage implements IBusMessage {
     }
 
     set contentBuffer(content: any) {
+        if (!content) content = ''
+
+        if (!this._properties.contentType) this._properties.contentType = 'text/plain'
+
         if (content instanceof Error) {
             this.properties.type = 'error'
-            content = content.message
-        }
-
-        if (typeof content === 'string') {
+            this._contentBuffer = Buffer.from(content.message ? content.toString() : 'Error')
+        } else if (typeof content === 'string') {
             this._contentBuffer = Buffer.from(content)
         } else if (!(content instanceof Buffer)) {
             this._contentBuffer = Buffer.from(JSON.stringify(content))
@@ -42,11 +44,9 @@ export class BusMessage implements IBusMessage {
         }
 
         let parseContent = this._contentBuffer.toString()
-
         if (this._properties.contentType === 'application/json') {
             parseContent = JSON.parse(parseContent)
         }
-
         this._content = parseContent
     }
 
@@ -55,15 +55,11 @@ export class BusMessage implements IBusMessage {
     }
 
     get content(): any {
-
         let parseContent = this._contentBuffer.toString()
-
         if (this._properties.contentType === 'application/json') {
             parseContent = JSON.parse(parseContent)
         }
-
         this._content = parseContent
-
         return this._content
     }
 

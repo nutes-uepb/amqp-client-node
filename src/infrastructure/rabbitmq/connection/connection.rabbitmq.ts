@@ -178,7 +178,6 @@ export class ConnectionRabbitMQ implements IBusConnection {
     }
 
     public disposeConnection(): Promise<boolean> {
-
         return new Promise<boolean | undefined>(async (resolve, reject) => {
             if (this.isConnected) {
                 try {
@@ -198,5 +197,4 @@ export class ConnectionRabbitMQ implements IBusConnection {
     public on(event: string | symbol, listener: (...args: any[]) => void): void {
         this._emitter.on(event, listener)
     }
-
 }

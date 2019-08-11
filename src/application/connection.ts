@@ -7,12 +7,7 @@ import { IConnection } from './port/connection.interface'
 import { IClientRegister } from '../infrastructure/port/rpc/client.register.interface'
 import { IServerRegister } from './port/server.register.interface'
 import { Identifier } from '../di/identifier'
-import {
-    IClientOptions,
-    IPubExchangeOptions,
-    IServerOptions,
-    ISubExchangeOptions
-} from './port/communication.option.interface'
+import { IClientOptions, IPubExchangeOptions, IServerOptions, ISubExchangeOptions } from './port/communication.option.interface'
 import { IMessage } from './port/message.interface'
 import { DI } from '../di/di'
 import { IConnectionOptions, IConnectionParams } from './port/connection.config.inteface'
@@ -75,9 +70,11 @@ export class Connection implements IConnection {
                options?: IPubExchangeOptions): Promise<void> {
 
         if (!(message instanceof Message)) {
-            message = new Message(message)
+            message = new Message(
+                (message && message.content) ? message.content : undefined,
+                (message && message.properties) ? message.properties : undefined
+            )
         }
-
         return this._pub.sendRoutingKeyMessage(exchangeName, routingKey, message, options)
     }
 

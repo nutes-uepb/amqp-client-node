@@ -52,5 +52,4 @@ export class MessageSenderRabbitmq implements IMessageSender {
             return Promise.reject(err)
         }
     }
-
 }
