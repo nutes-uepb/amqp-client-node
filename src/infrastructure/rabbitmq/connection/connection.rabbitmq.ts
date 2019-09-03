@@ -1,16 +1,16 @@
-import {IBusConnection} from '../../port/connection/connection.interface'
-import {IConnectionOptions, IConnectionParams} from '../../../application/port/connection.config.inteface'
-import {inject, injectable} from 'inversify'
-import {Identifier} from '../../../di/identifier'
-import {IConnectionFactory} from '../../port/connection/connection.factory.interface'
-import {ICustomLogger} from '../../../utils/custom.logger'
+import { IBusConnection } from '../../port/connection/connection.interface'
+import { IConnectionOptions, IConnectionParams } from '../../../application/port/connection.config.inteface'
+import { inject, injectable } from 'inversify'
+import { Identifier } from '../../../di/identifier'
+import { IConnectionFactory } from '../../port/connection/connection.factory.interface'
+import { ICustomLogger } from '../../../utils/custom.logger'
 
-import {ConnectionFactoryRabbitMQ} from './connection.factory.rabbitmq'
-import {Queue} from '../bus/queue'
-import {Exchange} from '../bus/exchange'
-import {ICustomEventEmitter} from '../../../utils/custom.event.emitter'
-import {IExchangeOptions} from '../../../application/port/exchange.option.interface'
-import {IQueueOptions} from '../../../application/port/queue.option.interface'
+import { ConnectionFactoryRabbitMQ } from './connection.factory.rabbitmq'
+import { Queue } from '../bus/queue'
+import { Exchange } from '../bus/exchange'
+import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
+import { IExchangeOptions } from '../../../application/port/exchange.option.interface'
+import { IQueueOptions } from '../../../application/port/queue.option.interface'
 
 const defaultOptions: IConnectionOptions = {
     retries: 0,
@@ -105,13 +105,8 @@ export class ConnectionRabbitMQ implements IBusConnection {
                 .then(async (connection: ConnectionFactoryRabbitMQ) => {
                     this._connection = connection
                     this._connection.on('error_connection', (err: Error) => {
-                        this._logger.error('Error during connection ')
-                        this._emitter.emit('error_connection', err)
-                    })
-
-                    this._connection.on('close_connection', () => {
-                        this._logger.info('Close connection with success! ')
-                        this._emitter.emit('close_connection')
+                        this._logger.error('Connection error.')
+                        this._emitter.emit('error', err)
                     })
 
                     this._connection.on('open_connection', () => {
@@ -119,24 +114,28 @@ export class ConnectionRabbitMQ implements IBusConnection {
                         this._emitter.emit('connected')
                     })
 
+                    this._connection.on('close_connection', () => {
+                        this._logger.info('The connection has been closed. ')
+                        this._emitter.emit('disconnected')
+                    })
+
                     this._connection.on('lost_connection', () => {
-                        this._logger.warn('Lost connection ')
+                        this._logger.warn('Connection has been lost.')
                         this._emitter.emit('disconnected')
                     })
 
                     this._connection.on('trying_connect', () => {
-                        if (!this._connection.connectedBefore) this._logger.warn('Trying established connection')
-                        else this._logger.warn('Trying re-established connection')
-                        this._emitter.emit('trying_connect')
+                        if (!this._connection.connectedBefore) this._logger.warn('Trying to establish connection.')
+                        else this._logger.warn('Trying to reestablish connection.')
+                        this._emitter.emit('trying')
                     })
 
                     this._connection.on('re_established_connection', () => {
-                        this._logger.warn('Re-established connection')
-                        this._emitter.emit('re_established_connection')
+                        this._logger.warn('Connection reestablished.')
+                        this._emitter.emit('reestablished')
                     })
 
                     await this._connection.initialized
-
                     return resolve()
                 })
                 .catch(err => {
@@ -172,7 +171,6 @@ export class ConnectionRabbitMQ implements IBusConnection {
                     return reject(err)
                 })
             }
-
             return resolve(false)
         })
     }
