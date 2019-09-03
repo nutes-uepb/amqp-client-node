@@ -1,6 +1,6 @@
 {
   "name": "amqp-client-node",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Library for publish and subscribe events on message bus. In addition, it is possible to perform resource requests from the use of the standard commonly known as RPC.",
   "main": "lib/index.js",
   "scripts": {
