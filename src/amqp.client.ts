@@ -4,8 +4,9 @@ import { Identifier } from './di/identifier'
 import { ICustomLogger } from './utils/custom.logger'
 import { DI } from './di/di'
 import { IConnection } from './application/port/connection.interface'
+import { IAmqpClient } from './application/port/amqp.client.interface'
 
-class AmqpClient {
+class AmqpClient implements IAmqpClient {
 
     private _logger: ICustomLogger
 
@@ -20,7 +21,6 @@ class AmqpClient {
     public createConnection(params?: IConnectionParams | string, options?: IConnectionOptions): Promise<IConnection> {
         return new Connection(params, options).open()
     }
-
 }
 
-export const amqpClient = new AmqpClient()
+export const amqpClient: IAmqpClient = new AmqpClient()
