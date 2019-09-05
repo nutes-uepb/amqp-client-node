@@ -1,4 +1,26 @@
-import { ConnectionFactoryRabbitMQ, log } from '../connection/connection.factory.rabbitmq'
+// The MIT License (MIT)
+//
+// Copyright (c) 2015 abreits
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+//     The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+//     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+import { ConnectionFactoryRabbitMQ } from '../connection/connection.factory.rabbitmq'
 import { Binding } from './binding'
 import { BusMessage } from './bus.message'
 import { Exchange } from './exchange'
@@ -75,15 +97,13 @@ export class Queue {
         this._initialized = new Promise<IQueueInitializeResult>((resolve, reject) => {
             this._connection.initialized.then(() => {
                 this._connection.connection.createChannel((err, channel) => {
-                    /* istanbul ignore if */
                     if (err) {
                         reject(err)
                     } else {
                         this._channel = channel
                         const callback = (e, ok) => {
-                            /* istanbul ignore if */
                             if (e) {
-                                log.log('error', 'Failed to create queue \'' + this._name + '\'.', { module: 'amqp-ts' })
+                                // Failed to create queue.
                                 delete this._connection.queues[this._name]
                                 reject(e)
                             } else {
@@ -102,7 +122,7 @@ export class Queue {
                     }
                 })
             }).catch((err) => {
-                log.log('warn', 'Channel failure, error caused during connection!', { module: 'amqp-ts' })
+                // Channel failure, error caused during connection!
             })
         })
     }
@@ -134,24 +154,18 @@ export class Queue {
             try {
                 this._channel.sendToQueue(this._name, content, options)
             } catch (err) {
-                log.log('debug', 'Queue publish error: ' + err.messageBus, { module: 'amqp-ts' })
+                // Queue publish error
                 const queueName = this._name
                 const connection = this._connection
-                log.log('debug', 'Try to rebuild connection, before Call.', { module: 'amqp-ts' })
+                // Try to rebuild connection, before Call.
                 connection._rebuildAll(err).then(() => {
-                    log.log('debug', 'Retransmitting message.', { module: 'amqp-ts' })
+                    // Retransmitting message.
                     connection.queues[queueName].publish(content, options)
                 })
             }
         }
-
         content = Queue._packMessageContent(content, options)
-        // execute sync when possible
-        // if (this.initialized.isFulfilled()) {
-        //   sendMessage()
-        // } else {
         this._initialized.then(sendMessage)
-        // }
     }
 
     public send(message: BusMessage, routingKey = ''): void {
@@ -170,9 +184,8 @@ export class Queue {
                     result.fields = resultMsg.fields
                     resolve(result)
                 }, { noAck: true }, (err, ok) => {
-                    /* istanbul ignore if */
                     if (err) {
-                        reject(new Error('amqp-ts: Queue.rpc error: ' + err.messageBus))
+                        reject(new Error('Queue.rpc error: ' + err.messageBus))
                     } else {
                         // send the rpc request
                         consumerTag = ok.consumerTag
@@ -187,13 +200,7 @@ export class Queue {
             const sync: boolean = false
 
             this._initialized.then(() => sync)
-
-            // execute sync when possible
-            // if (this.initialized.isFulfilled()) {
-            //   processRpc()
-            // } else {
             this._initialized.then(processRpc)
-            // }
         })
     }
 
@@ -226,7 +233,7 @@ export class Queue {
         : Promise<IStartConsumerResult> {
         if (this._consumerInitialized) {
             return new Promise<IStartConsumerResult>((_, reject) => {
-                reject(new Error('amqp-ts Queue.startConsumer error: consumer already defined'))
+                reject(new Error('Queue.startConsumer error: consumer already defined'))
             })
         }
 
@@ -245,7 +252,7 @@ export class Queue {
         : Promise<IStartConsumerResult> {
         if (this._consumerInitialized) {
             return new Promise<IStartConsumerResult>((_, reject) => {
-                reject(new Error('amqp-ts Queue.activateConsumer error: consumer already defined'))
+                reject(new Error('Queue.activateConsumer error: consumer already defined'))
             })
         }
 
@@ -259,7 +266,6 @@ export class Queue {
     public _initializeConsumer(): void {
         const processedMsgConsumer = (msg: AmqpLib.Message) => {
             try {
-                /* istanbul ignore if */
                 if (!msg) {
                     return // ignore empty messages (for now)
                 }
@@ -273,8 +279,7 @@ export class Queue {
                             resultValue = Queue._packMessageContent(result, options)
                             this._channel.sendToQueue(msg.properties.replyTo, resultValue, options)
                         }).catch((err) => {
-                            log.log('error', 'Queue.onMessage RPC promise returned error: '
-                                + err.messageBus, { module: 'amqp-ts' })
+                            // Queue.onMessage RPC promise returned error.
                         })
                     } else {
                         result = Queue._packMessageContent(result, options)
@@ -286,8 +291,7 @@ export class Queue {
                     this._channel.ack(msg)
                 }
             } catch (err) {
-                /* istanbul ignore next */
-                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.messageBus, { module: 'amqp-ts' })
+                // Queue.onMessage consumer function returned error.
             }
         }
 
@@ -295,8 +299,7 @@ export class Queue {
             try {
                 this._consumer(msg, this._channel)
             } catch (err) {
-                /* istanbul ignore next */
-                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.messageBus, { module: 'amqp-ts' })
+                // Queue.onMessage consumer function returned error.
             }
         }
 
@@ -322,8 +325,7 @@ export class Queue {
                             replyMessge.properties.correlationId = msg.properties.correlationId
                             this._channel.sendToQueue(msg.properties.replyTo, replyMessge.contentBuffer, replyMessge.properties)
                         }).catch((err) => {
-                            log.log('error', 'Queue.onMessage RPC promise returned error: '
-                                + err.messageBus, { module: 'amqp-ts' })
+                            // Queue.onMessage RPC promise returned error.
                         })
                     } else {
                         if (!(result instanceof BusMessage)) {
@@ -335,8 +337,7 @@ export class Queue {
                     }
                 }
             } catch (err) {
-                /* istanbul ignore next */
-                log.log('error', 'Queue.onMessage consumer function returned error: ' + err.messageBus, { module: 'amqp-ts' })
+                // Queue.onMessage consumer function returned error.
             }
         }
 
@@ -348,7 +349,6 @@ export class Queue {
                 }
                 this._channel.consume(this._name, consumerFunction,
                     this._consumerOptions as AmqpLib.Options.Consume, (err, ok) => {
-                        /* istanbul ignore if */
                         if (err) {
                             reject(err)
                         } else {
@@ -368,7 +368,6 @@ export class Queue {
         return new Promise<void>((resolve, reject) => {
             this._consumerInitialized.then(() => {
                 this._channel.cancel(this._consumerTag, (err, ok) => {
-                    /* istanbul ignore if */
                     if (err) {
                         reject(err)
                     } else {
@@ -392,14 +391,12 @@ export class Queue {
                     return this.stopConsumer()
                 }).then(() => {
                     return this._channel.deleteQueue(this._name, {}, (err, ok) => {
-                        /* istanbul ignore if */
                         if (err) {
                             reject(err)
                         } else {
                             delete this._initialized // invalidate queue
                             delete this._connection.queues[this._name] // remove the queue from our administration
                             this._channel.close((e) => {
-                                /* istanbul ignore if */
                                 if (e) {
                                     reject(e)
                                 } else {
@@ -429,7 +426,6 @@ export class Queue {
                     delete this._initialized // invalidate queue
                     delete this._connection.queues[this._name] // remove the queue from our administration
                     this._channel.close((err) => {
-                        /* istanbul ignore if */
                         if (err) {
                             reject(err)
                         } else {

@@ -1,5 +1,27 @@
+// The MIT License (MIT)
+//
+// Copyright (c) 2015 abreits
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+//     The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+//     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 import * as os from 'os'
-import { ConnectionFactoryRabbitMQ, log } from '../connection/connection.factory.rabbitmq'
+import { ConnectionFactoryRabbitMQ } from '../connection/connection.factory.rabbitmq'
 import { Binding } from './binding'
 import * as AmqpLib from 'amqplib/callback_api'
 import { BusMessage } from './bus.message'
@@ -66,16 +88,14 @@ export class Exchange {
         this._initialized = new Promise<IExchangeInitializeResult>((resolve, reject) => {
             this._connection.initialized.then(() => {
                 this._connection.connection.createChannel((err, channel) => {
-                    /* istanbul ignore if */
                     if (err) {
                         reject(err)
                     } else {
                         this._channel = channel
                         this._isConsumerInitializedRcp = false
                         const callback = (e, ok) => {
-                            /* istanbul ignore if */
                             if (e) {
-                                log.log('error', 'Failed to create exchange \'' + this._name + '\'.', { module: 'amqp-ts' })
+                                // Failed to create exchange.
                                 delete this._connection.exchanges[this._name]
                                 reject(e)
                             } else {
@@ -91,7 +111,7 @@ export class Exchange {
                     }
                 })
             }).catch((err) => {
-                log.log('warn', 'Channel failure, error caused during connection!', { module: 'amqp-ts' })
+                // Channel failure, error caused during connection!
             })
         })
         this._connection.exchanges[this._name] = this
@@ -111,11 +131,11 @@ export class Exchange {
             try {
                 this._channel.publish(this._name, routingKey, content, options)
             } catch (err) {
-                log.log('warn', 'Exchange publish error: ' + err.messageBus, { module: 'amqp-ts' })
+                // Exchange publish error!
                 const exchangeName = this._name
                 const connection = this._connection
                 connection._rebuildAll(err).then(() => {
-                    log.log('debug', 'Retransmitting message.', { module: 'amqp-ts' })
+                    // Retransmitting message.
                     connection.exchanges[exchangeName].publish(content, routingKey, options)
                 })
             }
@@ -176,14 +196,12 @@ export class Exchange {
                     return Binding.removeBindingsContaining(this)
                 }).then(() => {
                     this._channel.deleteExchange(this._name, {}, (err, ok) => {
-                        /* istanbul ignore if */
                         if (err) {
                             reject(err)
                         } else {
                             this._channel.close((e) => {
                                 delete this._initialized // invalidate exchange
                                 delete this._connection.exchanges[this._name] // remove the exchange from our administration
-                                /* istanbul ignore if */
                                 if (e) {
                                     reject(e)
                                 } else {
@@ -211,7 +229,6 @@ export class Exchange {
                     delete this._initialized // invalidate exchange
                     delete this._connection.exchanges[this._name] // remove the exchange from our administration
                     this._channel.close((err) => {
-                        /* istanbul ignore if */
                         if (err) {
                             reject(err)
                         } else {
@@ -249,7 +266,7 @@ export class Exchange {
         const queueName = this.consumerQueueName()
         if (this._connection.queues[queueName]) {
             return new Promise<void>((_, reject) => {
-                reject(new Error('amqp-ts Exchange.startConsumer error: consumer already defined'))
+                reject(new Error('Exchange.startConsumer error: consumer already defined'))
             })
         } else {
             const promises: Promise<any>[] = []
@@ -268,7 +285,7 @@ export class Exchange {
         const queueName = this.consumerQueueName()
         if (this._connection.queues[queueName]) {
             return new Promise<void>((_, reject) => {
-                reject(new Error('amqp-ts Exchange.activateConsumer error: consumer already defined'))
+                reject(new Error('Exchange.activateConsumer error: consumer already defined'))
             })
         } else {
             const promises: Promise<any>[] = []

@@ -105,7 +105,7 @@ export class ConnectionRabbitMQ implements IBusConnection {
                 .then(async (connection: ConnectionFactoryRabbitMQ) => {
                     this._connection = connection
                     this._connection.on('error_connection', (err: Error) => {
-                        this._logger.error('Connection error.')
+                        this._logger.error('Connection error: ' + err.message)
                         this._emitter.emit('error', err)
                     })
 
@@ -115,7 +115,7 @@ export class ConnectionRabbitMQ implements IBusConnection {
                     })
 
                     this._connection.on('close_connection', () => {
-                        this._logger.info('The connection has been closed. ')
+                        this._logger.info('The connection has been closed.')
                         this._emitter.emit('disconnected')
                     })
 

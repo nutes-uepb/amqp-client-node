@@ -45,7 +45,7 @@ export class MessageSenderRabbitmq implements IMessageSender {
             msg.properties.correlationId = this._connection.connectionId
 
             exchange.send(msg, routingKey)
-            this._logger.info('Bus event message sent with success!')
+            this._logger.info('Message sent successfully!')
 
             return Promise.resolve()
         } catch (err) {

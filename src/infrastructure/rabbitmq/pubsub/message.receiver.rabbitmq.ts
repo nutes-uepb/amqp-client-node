@@ -81,7 +81,7 @@ export class MessageReceiverRabbitmq implements IMessageReceiver {
                         msg.fields[key] = message.fields[key]
                     }
 
-                    this._logger.info(`Bus event message received with success!`)
+                    this._logger.info('Message received successfully!')
 
                     const routingKey: string = msg.fields.routingKey
 

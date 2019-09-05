@@ -1,4 +1,25 @@
-import { log } from '../connection/connection.factory.rabbitmq'
+// The MIT License (MIT)
+//
+// Copyright (c) 2015 abreits
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+//     The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+//     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 import { Queue } from './queue'
 import { Exchange } from './exchange'
 import { IBinding } from '../../port/bus/binding.interface'
@@ -39,12 +60,8 @@ export class Binding implements IBinding {
                 queue.initialized.then(() => {
                     queue.channel.bindQueue(this._destination.name,
                         this._source.name, this._pattern, this._args, (err, ok) => {
-                            /* istanbul ignore if */
                             if (err) {
-                                log.log('error',
-                                    'Failed to create queue binding (' +
-                                    this._source.name + '->' + this._destination.name + ')',
-                                    { module: 'amqp-ts' })
+                                // Failed to create queue binding.
                                 delete this._destination.connection
                                     .bindings[Binding.id(this._destination, this._source, this._pattern)]
                                 reject(err)
@@ -58,12 +75,8 @@ export class Binding implements IBinding {
                 exchange.initialized.then(() => {
                     exchange.channel.bindExchange(this._destination.name,
                         this._source.name, this._pattern, this._args, (err, ok) => {
-                            /* istanbul ignore if */
                             if (err) {
-                                log.log('error',
-                                    'Failed to create exchange binding (' +
-                                    this._source.name + '->' + this._destination.name + ')',
-                                    { module: 'amqp-ts' })
+                                // Failed to create exchange binding.
                                 delete this._destination.connection
                                     .bindings[Binding.id(this._destination, this._source, this._pattern)]
                                 reject(err)
@@ -83,7 +96,6 @@ export class Binding implements IBinding {
                 queue.initialized.then(() => {
                     queue.channel.unbindQueue(this._destination.name,
                         this._source.name, this._pattern, this._args, (err, ok) => {
-                            /* istanbul ignore if */
                             if (err) {
                                 reject(err)
                             } else {
@@ -98,7 +110,6 @@ export class Binding implements IBinding {
                 exchange.initialized.then(() => {
                     exchange.channel.unbindExchange(this._destination.name,
                         this._source.name, this._pattern, this._args, (err, ok) => {
-                            /* istanbul ignore if */
                             if (err) {
                                 reject(err)
                             } else {
@@ -130,5 +141,4 @@ export class Binding implements IBinding {
         }
         return Promise.all(promises)
     }
-
 }

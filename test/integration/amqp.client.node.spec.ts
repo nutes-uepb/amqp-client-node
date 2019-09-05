@@ -5,18 +5,9 @@ import { IConnection } from '../../src/application/port/connection.interface'
 
 describe('AMQP CLIENT NODE', () => {
     describe('CONNECTION', () => {
-        it('should return an error when unable to connect.', () => {
-            return amqpClient
-                .createConnetion('amqp://test:test@host-test',
-                    { retries: 1, interval: 100 })
-                .catch(e => {
-                    expect(e).to.be.an('error')
-                })
-        })
-
         it('should return instance of connection when connecting.', () => {
             return amqpClient
-                .createConnetion('amqp://guest:guest@localhost',
+                .createConnection('amqp://guest:guest@localhost',
                     { retries: 1, interval: 1000 })
                 .then(conn => {
                     expect(conn).to.be.an.instanceof(Connection)
@@ -32,8 +23,9 @@ describe('AMQP CLIENT NODE', () => {
             })
 
             after(async () => {
-                await conn.dispose()
+                if (conn) await conn.dispose()
             })
+
             it('should return error when trying to publish without connection', async () => {
                 const noConn = await getConnection()
                 await noConn.close()
@@ -51,38 +43,6 @@ describe('AMQP CLIENT NODE', () => {
                         expect(err).to.be.an('error')
                     })
             })
-
-            // it('should return error when trying to publish with different exchange options already created', async () => {
-            //     try {
-            //         await conn
-            //             .pub(
-            //                 'test.queue1',
-            //                 'test.exchange1',
-            //                 'log.info',
-            //                 {
-            //                     exchange: {
-            //                         type: 'direct',
-            //                         durable: false
-            //                     }
-            //                 }
-            //             )
-            //
-            //         await conn
-            //             .pub(
-            //                 'test.queue1',
-            //                 'test.exchange1',
-            //                 'log.info',
-            //                 {
-            //                     exchange: {
-            //                         type: 'topic',
-            //                         durable: true
-            //                     }
-            //                 }
-            //             )
-            //     } catch (e) {
-            //         expect(e).to.be.an('error')
-            //     }
-            // })
         })
 
         context('Publish Successfully', async () => {
@@ -92,7 +52,7 @@ describe('AMQP CLIENT NODE', () => {
             })
 
             after(async () => {
-                await conn.dispose()
+                if (conn) await conn.dispose()
             })
             it('should return a successful promise to publish using default options', async () => {
                 return conn
@@ -139,7 +99,7 @@ describe('AMQP CLIENT NODE', () => {
             })
 
             after(async () => {
-                await conn.dispose()
+                if (conn) await conn.dispose()
             })
 
             it('should return Promise void to successfully subscribe', async () => {
@@ -167,7 +127,7 @@ describe('AMQP CLIENT NODE', () => {
 })
 
 async function getConnection(): Promise<IConnection> {
-    return amqpClient.createConnetion(
+    return amqpClient.createConnection(
         'amqp://guest:guest@localhost',
         { retries: 1, interval: 1000 }
     )

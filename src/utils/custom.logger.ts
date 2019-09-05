@@ -6,11 +6,13 @@ export class CustomLogger implements ICustomLogger {
     private readonly _logger: Logger
     private _options: any = {}
     private readonly _loggerId: string
+    private _moduleName: string
 
     constructor() {
         this.initOptions() // initialize options logger
         this._logger = this.internalCreateLogger()
         this._loggerId = 'id-' + Math.random().toString(36).substr(2, 16)
+        this._moduleName = 'amqp-client-node'
     }
 
     get logger(): Logger {
@@ -43,9 +45,7 @@ export class CustomLogger implements ICustomLogger {
                 format.colorize(),
                 format.splat(),
                 format.timestamp(),
-                format.printf(
-                    info => `${info.timestamp} ${info.level}: ${info.message}`
-                )
+                format.printf(log => `${log.module} @ ${log.timestamp} ${log.level}: ${log.message}`)
             )
         }
     }
@@ -55,37 +55,25 @@ export class CustomLogger implements ICustomLogger {
     }
 
     public error(message: string): void {
-        this._logger.error(message)
+        this._logger.error(message, { module: this._moduleName })
     }
 
     public warn(message: string): void {
-        this._logger.warn(message)
+        this._logger.warn(message, { module: this._moduleName })
     }
 
     public info(message: string): void {
-        this._logger.info(message)
+        this._logger.info(message, { module: this._moduleName })
     }
 
-    public verbose(message: string): void {
-        this._logger.verbose(message)
-    }
-
-    public debug(message: string): void {
-        this._logger.debug(message)
-    }
-
-    public silly(message: string): void {
-        this._logger.silly(message)
-    }
-
-    public changeLoggerConfiguration(level: string): void {
-
+    public changeConfiguration(level: string, moduleName?: string): void {
+        if (moduleName) this._moduleName = moduleName
         this._options.silent = false
+        this._options.level = level
         this._options.level = level
 
         this._logger.clear()
         this._logger.add(new transports.Console(this._options))
-
     }
 }
 
@@ -95,9 +83,6 @@ export class CustomLogger implements ICustomLogger {
  *   error: 0,
  *   warn: 1,
  *   info: 2,
- *   verbose: 3,
- *   debug: 4,
- *   silly: 5
  *
  * @see {@link https://github.com/winstonjs/winston#using-logging-levels} for further information.
  */
@@ -112,13 +97,7 @@ export interface ICustomLogger {
 
     info(message: string): void
 
-    verbose(message: string): void
-
-    debug(message: string): void
-
-    silly(message: string): void
-
     addTransport(transport: any): Logger
 
-    changeLoggerConfiguration(level: string): void
+    changeConfiguration(level: string, moduleName?: string): void
 }

@@ -1,4 +1,25 @@
-import { log } from '../connection/connection.factory.rabbitmq'
+// The MIT License (MIT)
+//
+// Copyright (c) 2015 abreits
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+//     The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+//     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 import { Exchange } from './exchange'
 import { Queue } from './queue'
 import * as AmqpLib from 'amqplib/callback_api'
@@ -102,12 +123,12 @@ export class BusMessage implements IBusMessage {
             try {
                 destination.channel.publish(exchange, routingKey, this._contentBuffer, this._properties)
             } catch (err) {
-                log.log('debug', 'Publish error11: ' + err.messageBus, { module: 'amqp-ts' })
+                // Publish error
                 const destinationName = destination.name
                 const connection = destination.connection
-                log.log('debug', 'Try to rebuild connection, before Call.', { module: 'amqp-ts' })
+                // Try to rebuild connection, before Call.
                 connection._rebuildAll(err).then(() => {
-                    log.log('debug', 'Retransmitting message.', { module: 'amqp-ts' })
+                    // Retransmitting message.
                     if (destination instanceof Queue) {
                         connection.queues[destinationName].publish(this._contentBuffer, this._properties)
                     } else {
@@ -178,5 +199,4 @@ export class BusMessage implements IBusMessage {
             channel.reject(message, requeue)
         }
     }
-
 }
