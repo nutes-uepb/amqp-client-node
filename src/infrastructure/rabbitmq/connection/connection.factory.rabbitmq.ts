@@ -25,15 +25,17 @@ import { Queue } from '../bus/queue'
 import { Exchange } from '../bus/exchange'
 
 import * as AmqpLib from 'amqplib/callback_api'
-import { injectable } from 'inversify'
+import { inject, injectable } from 'inversify'
 import { IConnectionFactory, ITopology } from '../../port/connection/connection.factory.interface'
 import { IExchangeOptions } from '../../../application/port/exchange.option.interface'
 import { IQueueOptions } from '../../../application/port/queue.option.interface'
-import { EventEmitter } from 'events'
 import { IConnectionOptions } from '../../../application/port/connection.config.inteface'
+import { Identifier } from '../../../di/identifier'
+import { ICustomLogger } from '../../../utils/custom.logger'
+import { ICustomEventEmitter } from '../../../utils/custom.event.emitter'
 
 @injectable()
-export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnectionFactory {
+export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
     public initialized: Promise<void>
     public isConnected: boolean = false
 
@@ -51,8 +53,8 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
     private _queues: { [id: string]: Queue }
     private _bindings: { [id: string]: Binding }
 
-    constructor() {
-        super()
+    constructor(@inject(Identifier.CUSTOM_LOGGER) private readonly _logger: ICustomLogger,
+                @inject(Identifier.CUSTOM_EVENT_EMITTER) private readonly _emitter: ICustomEventEmitter) {
     }
 
     /**
@@ -63,9 +65,8 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
      * @param socketOptions
      * @param reconnectStrategy
      */
-    public async createConnection(url,
-                                  socketOptions: any = {},
-                                  reconnectStrategy: IConnectionOptions): Promise<ConnectionFactoryRabbitMQ> {
+    public async createConnection(url, socketOptions: any = {},
+                                  reconnectStrategy: IConnectionOptions): Promise<this> {
         this.url = url
         this.socketOptions = socketOptions
         this.reconnectStrategy = reconnectStrategy
@@ -73,8 +74,7 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
         this._queues = {}
         this._bindings = {}
 
-        this.rebuildConnection()
-
+        await this.rebuildConnection()
         return Promise.resolve(this)
     }
 
@@ -98,7 +98,7 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
         return this._bindings
     }
 
-    private async rebuildConnection(): Promise<void> {
+    private async rebuildConnection(): Promise<any> {
         if (this._rebuilding) { // only one rebuild process can be active at any time
             // ConnectionFactoryRabbitMQ rebuild already in progress, joining active rebuild attempt.
             return this.initialized
@@ -111,28 +111,24 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
         this.initialized = new Promise<void>((resolve, reject) => {
             this.tryToConnect(this, 0, (err) => {
                 if (err) {
-                    this.emit('error_connection', err)
+                    this._logger.error('Connection error: ' + err.message)
+                    this._emitter.emit('_error', err)
                     this._rebuilding = false
                     return reject(err)
-                } else {
-                    this._rebuilding = false
-                    if (this._connectedBefore) {
-                        this.emit('re_established_connection')
-                    } else {
-                        // ConnectionFactoryRabbitMQ established.
-                        this.emit('open_connection')
-                        this._connectedBefore = true
-                    }
-                    return resolve(null)
                 }
+                this._rebuilding = false
+                if (this._connectedBefore) {
+                    this._logger.warn('Connection reestablished.')
+                    this._emitter.emit('reestablished')
+                } else {
+                    // ConnectionFactoryRabbitMQ established.
+                    this._logger.warn('Connection established.')
+                    this._emitter.emit('connected')
+                    this._connectedBefore = true
+                }
+                return resolve(null)
             })
         })
-        /* istanbul ignore next */
-        this.initialized
-            .catch((err) => {
-                this.emit('error_connection', err)
-            })
-
         return this.initialized
     }
 
@@ -146,7 +142,9 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
                 // ConnectionFactoryRabbitMQ failed.
                 this._retry = retry
                 if (thisConnection.reconnectStrategy.retries === 0 || thisConnection.reconnectStrategy.retries > retry) {
-                    thisConnection.emit('trying_connect')
+                    if (!thisConnection.connectedBefore) thisConnection._logger.warn('Trying to establish connection.')
+                    else thisConnection._logger.warn('Trying to reestablish connection.')
+                    thisConnection._emitter.emit('trying')
 
                     setTimeout(thisConnection.tryToConnect,
                         thisConnection.reconnectStrategy.interval,
@@ -168,7 +166,8 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
                 const onClose = () => {
                     connection.removeListener('close', onClose)
                     if (!this._isClosing) {
-                        thisConnection.emit('lost_connection')
+                        thisConnection._logger.warn('Connection lost.')
+                        thisConnection._emitter.emit('disconnected')
                         restart(new Error('ConnectionFactoryRabbitMQ closed by remote host'))
                     }
 
@@ -227,7 +226,8 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
                         reject(err)
                     } else {
                         this.isConnected = false
-                        this.emit('close_connection')
+                        this._logger.warn('Connection has been closed.')
+                        this._emitter.emit('disconnected')
                         resolve(null)
                     }
                 })
@@ -338,5 +338,9 @@ export class ConnectionFactoryRabbitMQ extends EventEmitter implements IConnecti
             if (firstOptions[key] !== secondOptions[key]) return false
         }
         return true
+    }
+
+    public on(event: string | symbol, listener: (...args: any[]) => void): void {
+        this._emitter.on(event, listener)
     }
 }

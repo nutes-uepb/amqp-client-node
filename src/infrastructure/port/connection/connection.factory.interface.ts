@@ -1,5 +1,7 @@
 export interface IConnectionFactory {
     createConnection(url: string | object, socketOptions: any, reconnectStrategy: any): Promise<any>
+
+    on(event: string | symbol, listener: (...args: any[]) => void): void
 }
 
 export interface ITopology {

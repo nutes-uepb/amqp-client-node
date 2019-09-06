@@ -151,7 +151,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                                 try {
                                     return resource.handle.apply('', clientRequest.handle)
                                 } catch (err) {
-                                    this._logger.error(`Consumer function returned error: ${err.messageBus}`)
+                                    this._logger.error(`Consumer function returned error: ${err.message}`)
                                     return err
                                 }
                             }

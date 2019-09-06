@@ -2,10 +2,21 @@ import { expect } from 'chai'
 import { amqpClient } from '../../src/amqp.client'
 import { Connection } from '../../src/application/connection'
 import { IConnection } from '../../src/application/port/connection.interface'
+import { IServerRegister } from '../../src/application/port/server.register.interface'
 
 describe('AMQP CLIENT NODE', () => {
     describe('CONNECTION', () => {
-        it('should return instance of connection when connecting.', () => {
+        it('should return an error when unable to connect', (done) => {
+            amqpClient
+                .createConnection('amqp://test:test@localhost',
+                    { retries: 1, interval: 500 })
+                .then(() => done(new Error('Didn\'t expect to connect')))
+                .catch(e => {
+                    done()
+                })
+        })
+
+        it('should return instance of connection when connecting', () => {
             return amqpClient
                 .createConnection('amqp://guest:guest@localhost',
                     { retries: 1, interval: 1000 })
@@ -115,6 +126,62 @@ describe('AMQP CLIENT NODE', () => {
                     .catch(e => {
                         expect.fail('should not return error!')
                     })
+            })
+        })
+    })
+
+    describe('RPC SERVER', () => {
+        context('Successfully', async () => {
+            let conn: IConnection
+            before(async () => {
+                conn = await getConnection()
+            })
+
+            after(async () => {
+                if (conn) await conn.dispose()
+            })
+
+            it('should return Promise void when booting server with resources', (done) => {
+                const server: IServerRegister = conn.createRpcServer('test.server',
+                    'test.server', ['logs.find'])
+                server.addResource('logs.find', () => {
+                    return {}
+                })
+
+                server
+                    .start()
+                    .then(() => done())
+                    .catch(err => done(err))
+            })
+        })
+    })
+
+    describe('RPC CLIENT', () => {
+        context('Successfully', async () => {
+            let conn: IConnection
+            before(async () => {
+                conn = await getConnection()
+
+                const server: IServerRegister = conn.createRpcServer('test.server',
+                    'test.server', ['logs.find'])
+                server.addResource('logs.find', () => {
+                    return { test: 'rpc server and client!' }
+                })
+                await server.start()
+            })
+
+            after(async () => {
+                if (conn) await conn.dispose()
+            })
+
+            it('should return Promise with requested resource', (done) => {
+                conn
+                    .rpcClient('test.server', 'logs.find', [])
+                    .then(value => {
+                        expect(value).to.deep.equal({ test: 'rpc server and client!' })
+                        done()
+                    })
+                    .catch(done)
             })
         })
     })

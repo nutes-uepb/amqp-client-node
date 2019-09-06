@@ -48,7 +48,9 @@ export class Connection implements IConnection {
                     this._rpcClient.connection = this._eventBusConnection
                     return resolve(this)
                 })
-                .catch(reject)
+                .catch(err => {
+                    reject(err)
+                })
         })
     }
 

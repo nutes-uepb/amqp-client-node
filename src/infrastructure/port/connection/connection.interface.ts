@@ -24,8 +24,7 @@ export interface IBusConnection {
 
     getExchange(exchangeName: string, option?: IExchangeOptions): Exchange
 
-    getQueue(queueName: string,  option?: IQueueOptions): Queue
+    getQueue(queueName: string, option?: IQueueOptions): Queue
 
     on(event: string | symbol, listener: (...args: any[]) => void): void
-
 }
