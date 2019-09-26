@@ -141,6 +141,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
 
                 // ConnectionFactoryRabbitMQ failed.
                 this._retry = retry
+                this._isClosing = thisConnection._isClosing
                 if (thisConnection.reconnectStrategy.retries === 0 || thisConnection.reconnectStrategy.retries > retry) {
                     if (!thisConnection.connectedBefore) thisConnection._logger.warn('Trying to establish connection.')
                     else thisConnection._logger.warn('Trying to reestablish connection.')
@@ -164,17 +165,16 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
                     thisConnection._rebuildAll(e) // try to rebuild the topology when the connection  unexpectedly closes
                 }
                 const onClose = () => {
-                    connection.removeListener('close', onClose)
-                    if (!this._isClosing) {
+                    thisConnection._connection.removeListener('close', onClose)
+                    if (!thisConnection._isClosing) {
                         thisConnection._logger.warn('Connection lost.')
                         thisConnection._emitter.emit('disconnected')
                         restart(new Error('ConnectionFactoryRabbitMQ closed by remote host'))
                     }
-
                 }
-                connection.on('error', restart)
-                connection.on('close', onClose)
                 thisConnection._connection = connection
+                thisConnection._connection.on('error', restart)
+                thisConnection._connection.on('close', onClose)
                 thisConnection.isConnected = true
 
                 callback(null)
@@ -228,6 +228,7 @@ export class ConnectionFactoryRabbitMQ implements IConnectionFactory {
                         this.isConnected = false
                         this._logger.warn('Connection has been closed.')
                         this._emitter.emit('disconnected')
+                        this._emitter.removeAllListeners()
                         resolve(null)
                     }
                 })

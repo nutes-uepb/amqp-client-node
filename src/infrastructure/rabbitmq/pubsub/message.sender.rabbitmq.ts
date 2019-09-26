@@ -25,7 +25,6 @@ export class MessageSenderRabbitmq implements IMessageSender {
                                        message: IMessage,
                                        options?: IPubExchangeOptions): Promise<void> {
         try {
-
             if (this._connection && !this._connection.isConnected) {
                 return Promise.reject(new Error('Connection Failed'))
             }

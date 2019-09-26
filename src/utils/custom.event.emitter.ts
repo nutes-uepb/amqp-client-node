@@ -17,10 +17,16 @@ export class CustomEventEmitter extends EventEmitter implements ICustomEventEmit
     public emit(event: string | symbol, ...args): boolean {
         return super.emit(event, ...args)
     }
+
+    public removeAllListeners(): this {
+        return super.removeAllListeners()
+    }
 }
 
 export interface ICustomEventEmitter {
     on(event: string | symbol, listener: (...args: any[]) => void): this
 
     emit(event: string | symbol, ...args: any[]): boolean
+
+    removeAllListeners(): this
 }
