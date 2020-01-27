@@ -122,6 +122,22 @@ describe('AMQP CLIENT NODE', () => {
                     })
             })
 
+            it('should return an error when type option is previously setup', async () => {
+                return conn
+                    .pub(
+                        'test.exchange1',
+                        'test.key1',
+                        'log.info',
+                        {exchange: {
+                            type: 'topic',
+                            durable: true
+                        }}
+                    )
+                    .catch(e => {
+                        expect(e).to.be.an.instanceof(Error)
+                    })
+            })
+            
             it('should return an error when durable option is previously true', async () => {
                 return conn
                     .pub(
@@ -136,6 +152,8 @@ describe('AMQP CLIENT NODE', () => {
                         expect(e).to.be.an.instanceof(Error)
                     })
             })
+
+           
         })
 
         context('Publish Successfully', async () => {
