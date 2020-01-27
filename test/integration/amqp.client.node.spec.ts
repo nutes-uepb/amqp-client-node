@@ -105,13 +105,13 @@ describe('AMQP CLIENT NODE', () => {
             })
 
             it('should return error when trying to publish without connection', async () => {
-                const noConn = await getConnection()
-                await noConn.close()
+                const conn = await getConnection()
+                await conn.close()
 
-                return noConn
+                return conn
                     .pub(
-                        'test.queue',
-                        'test.exchange',
+                        'test.exchange1',
+                        'test.key',
                         'log.info'
                     )
                     .then(() => {
@@ -119,6 +119,21 @@ describe('AMQP CLIENT NODE', () => {
                     })
                     .catch(err => {
                         expect(err).to.be.an('error')
+                    })
+            })
+
+            it('should return an error when durable option is previously true', async () => {
+                return conn
+                    .pub(
+                        'test.exchange1',
+                        'test.key1',
+                        'log.info',
+                        {exchange: {
+                            durable: false
+                        }}
+                    )
+                    .catch(e => {
+                        expect(e).to.be.an.instanceof(Error)
                     })
             })
         })
