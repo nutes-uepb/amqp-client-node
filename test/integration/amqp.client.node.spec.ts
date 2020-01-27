@@ -452,6 +452,38 @@ describe('AMQP CLIENT NODE', () => {
                     })
 
             })
+
+            it('should return the result of a call RPC whith params on 100ms',  async () => {
+                conn
+                .rpcClient('test.server', 'calc', [2, 6], (err, result) => {
+                    if(err){
+                        console.error('Error: ' + err)
+                    }else{
+                        expect(result).to.deep.equal(8)
+                    }
+                }, {
+                    rcpTimeout: 100
+                    })
+            })
+
+            it('should return the result of a call RPC using custom options',  async () => {
+                conn
+                .rpcClient('test.server', 'calc', [2, 6], (err, result) => {
+                    if(err){
+                        console.error('Error: ' + err)
+                    }else{
+                        expect(result).to.deep.equal(8)
+                    }
+                }, 
+                {
+                rcpTimeout: 3000,
+                exchange:
+                {
+                    type: 'topic',
+                    durable: true
+                }
+                })
+            })
         })
     })
 
