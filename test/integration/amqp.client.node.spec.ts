@@ -3,7 +3,8 @@ import { amqpClient } from '../../src/amqp.client'
 import { Connection } from '../../src/application/connection'
 import { IConnection } from '../../src/application/port/connection.interface'
 import { IServerRegister } from '../../src/application/port/server.register.interface'
-import { IConnectionParams, IConnectionOptions } from '../../src/application/port/connection.config.inteface'
+import { IConnectionParams, IConnectionOptions, ISSLOptions } from '../../src/application/port/connection.config.inteface'
+import { readFileSync } from 'fs'
 
 describe('AMQP CLIENT NODE', () => {
     describe('CONNECTION', () => {
@@ -79,6 +80,14 @@ describe('AMQP CLIENT NODE', () => {
                 params, IConOptions)
                 .catch(err => {
                     expect.fail('connection fail on port 1883', err)
+                })
+
+        })
+
+        it('should return instance of connection whith security SSL', () => {
+            return getConnectionSSL()
+                .then(conn => {
+                    expect(conn).to.be.an.instanceof(Connection)
                 })
 
         })
@@ -255,5 +264,29 @@ async function getConnection(): Promise<IConnection> {
     return amqpClient.createConnection(
         'amqp://guest:guest@localhost',
         { retries: 1, interval: 1000 }
+    )
+}
+
+
+async function getConnectionSSL(): Promise<IConnection> {
+
+    const sslOptions: ISSLOptions = {
+        ca: [readFileSync('.certs/ca.crt')]
+    }
+    const IconOptions: IConnectionOptions = {
+          retries: 2,
+          interval: 1000,
+          sslOptions }
+
+    const params: IConnectionParams = {
+        hostname: '127.0.0.1',
+        protocol: 'amqps',
+        port: 5671,
+        username: 'guest',
+        password: 'guest',
+        vhost: '/'
+    }
+    return amqpClient.createConnection(
+        params, IconOptions
     )
 }
