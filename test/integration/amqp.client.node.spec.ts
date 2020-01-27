@@ -3,7 +3,7 @@ import { amqpClient } from '../../src/amqp.client'
 import { Connection } from '../../src/application/connection'
 import { IConnection } from '../../src/application/port/connection.interface'
 import { IServerRegister } from '../../src/application/port/server.register.interface'
-import { IConnectionParams } from '../../src/application/port/connection.config.inteface'
+import { IConnectionParams, IConnectionOptions } from '../../src/application/port/connection.config.inteface'
 
 describe('AMQP CLIENT NODE', () => {
     describe('CONNECTION', () => {
@@ -38,6 +38,28 @@ describe('AMQP CLIENT NODE', () => {
                 params)
                .then(conn => {
                     expect(conn).to.be.an.instanceof(Connection)
+                })
+        })
+
+        it('should reject connection amqp when requesting on a protocol mqtt', () => { //1883 
+            const params: IConnectionParams = {
+                hostname: '127.0.0.1',
+                protocol: 'mqtt',
+                port: 1883,
+                username: 'guest',
+                password: 'guest'
+            }
+            const IConOptions: IConnectionOptions = {
+                interval: 1000,
+                retries: 1
+            }
+            return amqpClient.createConnection(
+                params, IConOptions)
+                .then(() => {
+                    expect.fail('should not return promise with no error!')
+                })
+                .catch(err => {
+                    expect(err).to.be.an('error')
                 })
         })
     })
