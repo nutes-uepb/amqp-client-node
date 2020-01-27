@@ -278,6 +278,40 @@ describe('AMQP CLIENT NODE', () => {
                     })
 
             })
+
+            it('should return a message if the type of exchage : topic', (done) => {
+
+                conn
+                    .sub(
+                        'queueTestTopic', 'exchangeTestTopic', '*.topic.*',
+                        (result) => {
+                            result.ack()
+                            try {
+                                expect(result.content).to.equal(message.content)
+                                done()
+                            } catch (e) {
+                                done(e)
+                            }
+
+                        }, {
+                        exchange: {
+                            type: 'topic'
+                        }, receiveFromYourself: true
+                    })
+                    .then(async () => {
+
+                        await conn.pub('exchangeTestTopic', 'test.topic.test', message,
+                            {
+                                exchange: {
+                                    type: 'topic',
+                                    durable: true
+                                }
+                            })
+                    })
+                    .catch((err) => {
+                        done(err)
+                    })
+            })
         })
     })
 
