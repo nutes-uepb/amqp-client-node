@@ -5,6 +5,7 @@ import { IConnection } from '../../src/application/port/connection.interface'
 import { IServerRegister } from '../../src/application/port/server.register.interface'
 import { IConnectionParams, IConnectionOptions, ISSLOptions } from '../../src/application/port/connection.config.inteface'
 import { readFileSync } from 'fs'
+import { ISubExchangeOptions } from '../../src/application/port/communication.option.interface'
 
 describe('AMQP CLIENT NODE', () => {
     describe('CONNECTION', () => {
@@ -137,7 +138,7 @@ describe('AMQP CLIENT NODE', () => {
                         expect(e).to.be.an.instanceof(Error)
                     })
             })
-            
+
             it('should return an error when durable option is previously true', async () => {
                 return conn
                     .pub(
@@ -223,11 +224,16 @@ describe('AMQP CLIENT NODE', () => {
         })
 
         context('Successfully', async () => {
-            let conn: IConnection
+             let conn: IConnection
+            let message: any
+            let options: ISubExchangeOptions
+
             before(async () => {
                 conn = await getConnection()
+                const data = new Date().getTime()
+                message = { content: data }
+                options = { receiveFromYourself: true }
             })
-
             after(async () => {
                 if (conn) await conn.dispose()
             })
@@ -245,6 +251,32 @@ describe('AMQP CLIENT NODE', () => {
                     .catch(e => {
                         expect.fail('should not return error!')
                     })
+            })
+
+            it('should return exactly the same message | PUBLISH AND SUBSCRIBE', (done) => {
+                conn
+                    .sub(
+                        'queueTest', 'exchangeTest', 'routingTest',
+                        (result) => {
+                            result.ack()
+                            try {
+                                expect(result.content).to.equal(message.content)
+                                done()
+                            } catch (e) {
+                                done(e)
+                            }
+                        }, options)
+                    .then(async () => {
+                        await conn.pub(
+                            'exchangeTest',
+                            'routingTest',
+                            message
+                        )
+                    })
+                    .catch((err) => {
+                        done(err)
+                    })
+
             })
         })
     })
