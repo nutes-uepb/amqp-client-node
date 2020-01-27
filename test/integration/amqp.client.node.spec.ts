@@ -485,6 +485,76 @@ describe('AMQP CLIENT NODE', () => {
                 })
             })
         })
+
+        context('Unsuccessfully', async () => {
+            let conn: IConnection
+            before(async () => {
+                conn = await getConnection()
+
+                const server: IServerRegister = conn.createRpcServer('queue.server',
+                    'exchange.server', ['calc'],
+                    {
+                        exchange:
+                        {
+                            type: 'topic',
+                            durable: true
+                        }
+                    })
+                server.addResource('logs.find', () => {
+                    return { test: 'rpc server and client!' }
+                })
+                server.addResource('calc', (num1, num2) => {
+                    return num1 + num2
+                })
+                await server.start()
+            })
+
+            after(async () => {
+                if (conn) await conn.dispose()
+            })
+
+            it('should return a error if the resource not exist', (done) => {
+                conn
+                    .rpcClient('exchange.server', 'logs.f', [],
+                    { rcpTimeout: 100,
+                        exchange:
+                        {
+                          
+                        }}
+                    )
+
+                    .then(() => {
+                        console.error('Error: not error returned then() passed')
+                        done()
+                    })
+                    .catch(err => {
+                        console.error(err)
+                        expect(err).to.be.an.instanceof(Error)
+                        done()
+                    })
+            })
+            
+            it('should return an error if routingKey were not passed on the RPCserver ',  (done) => {
+                conn
+                    .rpcClient('exchange.server', 'logs.find', [], (err, result) => {
+                        if (result) {
+                            console.error('Not returned error')
+                            done()
+                        } else {
+                            console.error(err)
+                            expect(err).to.be.an.instanceof(Error)
+                            done()
+                        }
+                    }, {
+                        rcpTimeout: 2000,
+                        exchange:
+                        {
+                            type: 'topic'
+                        }
+                    })
+
+            })
+        })
     })
 
     describe('LOGGER', () => {
