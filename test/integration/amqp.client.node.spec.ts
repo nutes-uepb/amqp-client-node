@@ -312,6 +312,38 @@ describe('AMQP CLIENT NODE', () => {
                         done(err)
                     })
             })
+
+            it('should return a message if the type of exchage : fanout', (done) => {
+                conn
+                    .sub(
+                        'queueTestFanout', 'exchangeTestFanout', '',
+                        (result) => {
+                            try {
+                                expect(result.content).to.equal(message.content)
+                                done()
+                            } catch (e) {
+                                done(e)
+                            }
+
+                        }, {
+                        exchange: {
+                            type: 'fanout'
+
+                        }, receiveFromYourself: true
+                    })
+                    .then(async () => {
+
+                        await conn.pub('exchangeTestFanout', '', message,
+                            {
+                                exchange: {
+                                    type: 'fanout'
+                                }
+                            })
+                    })
+                    .catch((err) => {
+                        done(err)
+                    })
+            })
         })
     })
 
