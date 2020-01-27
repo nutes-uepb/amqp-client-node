@@ -412,9 +412,16 @@ describe('AMQP CLIENT NODE', () => {
                 conn = await getConnection()
 
                 const server: IServerRegister = conn.createRpcServer('test.server',
-                    'test.server', ['logs.find'])
+                    'test.server', ['logs.find', 'calc'],
+                    {
+                        consumer: { noAck: true}
+                    }
+                    )
                 server.addResource('logs.find', () => {
                     return { test: 'rpc server and client!' }
+                })
+                server.addResource('calc', (num1, num2) => {
+                    return num1 + num2
                 })
                 await server.start()
             })
@@ -431,6 +438,19 @@ describe('AMQP CLIENT NODE', () => {
                         done()
                     })
                     .catch(done)
+            })
+
+            it('should return the RPC result using callback', (done) => {
+                conn
+                    .rpcClient('test.server', 'logs.find', [], async (err, result) => {
+                        if (err) {
+                            done(err)
+                        } else {
+                            await expect(result).to.deep.equal({ test: 'rpc server and client!' })
+                            done()
+                        }
+                    })
+
             })
         })
     })
