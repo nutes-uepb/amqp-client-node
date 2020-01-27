@@ -3,6 +3,7 @@ import { amqpClient } from '../../src/amqp.client'
 import { Connection } from '../../src/application/connection'
 import { IConnection } from '../../src/application/port/connection.interface'
 import { IServerRegister } from '../../src/application/port/server.register.interface'
+import { IConnectionParams } from '../../src/application/port/connection.config.inteface'
 
 describe('AMQP CLIENT NODE', () => {
     describe('CONNECTION', () => {
@@ -21,6 +22,21 @@ describe('AMQP CLIENT NODE', () => {
                 .createConnection('amqp://guest:guest@localhost',
                     { retries: 1, interval: 1000 })
                 .then(conn => {
+                    expect(conn).to.be.an.instanceof(Connection)
+                })
+        })
+
+        it('should return instance of connection when the parameters are objects of connection', () => {
+            const params: IConnectionParams = {
+                hostname: '127.0.0.1',
+                protocol: 'amqp',
+                port: 5672,
+                username: 'guest',
+                password: 'guest'
+            }
+            return amqpClient.createConnection(
+                params)
+               .then(conn => {
                     expect(conn).to.be.an.instanceof(Connection)
                 })
         })
