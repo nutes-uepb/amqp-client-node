@@ -344,6 +344,38 @@ describe('AMQP CLIENT NODE', () => {
                         done(err)
                     })
             })
+
+            it('should return a message whith ack', (done) => {
+                conn
+                    .sub(
+                        'queueTest', 'exchangeTest', 'routingTest',
+                        (result) => {
+                            try {
+                                result.ack()
+                                expect(result.content).to.equal(message.content)
+                                done()
+                            } catch (e) {
+                                done(e)
+                            }
+                        }, {
+                            receiveFromYourself: true,
+                             consumer: 
+                             {
+                                noAck: true
+                             }
+                        })
+                    .then(async () => {
+                        await conn.pub(
+                            'exchangeTest',
+                            'routingTest',
+                            message
+                        )
+                    })
+                    .catch((err) => {
+                        done(err)
+                    })
+
+            })
         })
     })
 
