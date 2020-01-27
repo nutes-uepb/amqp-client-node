@@ -62,6 +62,26 @@ describe('AMQP CLIENT NODE', () => {
                     expect(err).to.be.an('error')
                 })
         })
+
+        it('should reject connection amqp when requesting on a port mqtt', () => { //1883 
+            const params: IConnectionParams = {
+                hostname: '127.0.0.1',
+                protocol: 'amqp',
+                port: 1883,
+                username: 'guest',
+                password: 'guest'
+            }
+            const IConOptions: IConnectionOptions = {
+                interval: 1000,
+                retries: 1
+            }
+            return amqpClient.createConnection(
+                params, IConOptions)
+                .catch(err => {
+                    expect.fail('connection fail on port 1883', err)
+                })
+
+        })
     })
 
     describe('PUBLISH', () => {
