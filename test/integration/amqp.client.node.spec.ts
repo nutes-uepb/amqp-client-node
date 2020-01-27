@@ -148,16 +148,35 @@ describe('AMQP CLIENT NODE', () => {
                 if (conn) await conn.dispose()
             })
             it('should return a successful promise to publish using default options', async () => {
+                if (conn.isOpen) {
+                    return conn
+                        .pub(
+                            'test.exchange2',
+                            'test.key2',
+                            'log.info'
+                        )
+                        .catch(e => {
+                            expect.fail('should not return error!', e)
+                        })
+                }
+            })
+
+            it('should return a successful promise to publish using custom options', async () => {
                 return conn
                     .pub(
-                        'test.queue2',
-                        'test.exchange2',
-                        'log.info'
+                        'test.exchange1',
+                        'test.key1',
+                        'log.info',
+                        {exchange: {
+                            type: 'direct',
+                            durable: true,
+                            internal: false
+                        }}
                     )
                     .catch(e => {
                         expect.fail('should not return error!', e)
                     })
-            })
+        })
         })
     })
 
