@@ -1,13 +1,13 @@
 import { EventEmitter } from 'events'
-import { decorate, injectable } from 'inversify'
+import { decorate, inject, injectable, named } from 'inversify'
+import { Identifier } from '../di/identifier'
 
 decorate(injectable(), EventEmitter)
 
 @injectable()
 export class CustomEventEmitter extends EventEmitter implements ICustomEventEmitter {
-
-    constructor() {
-        super()
+    constructor(@inject(Identifier.CUSTOM_EVENT_EMITTER_OPTIONS) @named('options') options?: any) {
+        super(options)
     }
 
     public on(event: string | symbol, listener: (...args: any[]) => void): this {
