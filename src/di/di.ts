@@ -59,6 +59,9 @@ class DependencyInject {
 
         this.container.bind<ICustomEventEmitter>(Identifier.CUSTOM_EVENT_EMITTER)
             .to(CustomEventEmitter)
+        this.container.bind<string>(Identifier.CUSTOM_EVENT_EMITTER_OPTIONS)
+            .toConstantValue('options')
+            .whenTargetNamed('options')
         this.container.bind<ICustomLogger>(Identifier.CUSTOM_LOGGER)
             .to(CustomLogger).inSingletonScope()
 
