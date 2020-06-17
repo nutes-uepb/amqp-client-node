@@ -158,31 +158,22 @@ describe('AMQP CLIENT NODE', () => {
 
     describe('RPC CLIENT', () => {
         context('Successfully', async () => {
-            let conn: IConnection
-            before(async () => {
-                conn = await getConnection()
+            // before(async () => {
+            //     conn = await getConnection()
+            //
+            //     const server: IServerRegister = conn.createRpcServer('test.server',
+            //         'test.server', ['logs.find'])
+            //     server.addResource('logs.find', () => {
+            //         return { test: 'rpc server and client!' }
+            //     })
+            //     await server.start()
+            // })
+            //
+            // after(async () => {
+            //     if (conn) await conn.dispose()
+            // })
 
-                const server: IServerRegister = conn.createRpcServer('test.server',
-                    'test.server', ['logs.find'])
-                server.addResource('logs.find', () => {
-                    return { test: 'rpc server and client!' }
-                })
-                await server.start()
-            })
 
-            after(async () => {
-                if (conn) await conn.dispose()
-            })
-
-            it('should return Promise with requested resource', (done) => {
-                conn
-                    .rpcClient('test.server', 'logs.find', [])
-                    .then(value => {
-                        expect(value).to.deep.equal({ test: 'rpc server and client!' })
-                        done()
-                    })
-                    .catch(done)
-            })
         })
     })
 
