@@ -8,7 +8,7 @@ import { IClientOptions } from '../../../application/port/communication.option.i
 import { IMessage } from '../../../application/port/message.interface'
 
 const defClientOptions: IClientOptions = {
-    rcpTimeout: 5000
+    rpcTimeout: 5000
 }
 
 @injectable()
@@ -35,8 +35,10 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                 const exchange = this._connection.getExchange(exchangeName, options ? options.exchange : undefined)
                 await exchange.initialized
 
+                if (!options.rpcTimeout) options.rpcTimeout = defClientOptions.rpcTimeout
+
                 let time
-                const timeout = options.rcpTimeout
+                const timeout = options.rpcTimeout
 
                 if (timeout > 0) {
                     new Promise<any>((res) => {
