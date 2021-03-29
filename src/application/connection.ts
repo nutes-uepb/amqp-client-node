@@ -123,7 +123,7 @@ export class Connection implements IConnection {
                      optOrCall?: IClientOptions | ((err, message: any) => void),
                      options?: IClientOptions): any {
         if (!(optOrCall instanceof Function)) {
-            return this.rpcClientPromise(exchangeName, resourceName, parameters, options)
+            return this.rpcClientPromise(exchangeName, resourceName, parameters, optOrCall)
         }
         this.rpcClientCallback(exchangeName, resourceName, parameters, optOrCall, options)
     }
