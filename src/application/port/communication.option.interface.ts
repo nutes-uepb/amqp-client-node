@@ -14,7 +14,7 @@ export interface ISubExchangeOptions {
 
 export interface IClientOptions {
     exchange?: IExchangeOptions,
-    rcpTimeout?: number
+    rpcTimeout?: number
 }
 
 export interface IServerOptions {
