@@ -1,6 +1,13 @@
 import { createLogger, format, Logger, transports } from 'winston'
 import { injectable } from 'inversify'
 
+interface CustomLogObject {
+    module?: string;
+    timestamp?: string;
+    level: string;
+    message: string;
+}
+
 @injectable()
 export class CustomLogger implements ICustomLogger {
     private readonly _logger: Logger
@@ -45,7 +52,7 @@ export class CustomLogger implements ICustomLogger {
                 format.colorize(),
                 format.splat(),
                 format.timestamp(),
-                format.printf(log => `${log.module} @ ${log.timestamp} ${log.level}: ${log.message}`)
+                format.printf((log: CustomLogObject) => `${log.module} @ ${log.timestamp} ${log.level}: ${log.message}`)
             )
         }
     }
