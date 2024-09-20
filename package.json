@@ -59,7 +59,7 @@
     "amqplib": "^0.5.6",
     "inversify": "^5.0.1",
     "reflect-metadata": "^0.1.13",
-    "winston": "^3.2.1"
+    "winston": "^3.10.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
