@@ -11,7 +11,7 @@ import { IBusMessage } from '../../../application/port/bus.message.inteface'
 
 export class ServerRegisterRabbitmq implements IServerRegister {
 
-    private resource_handlers: Map<string, IResourceHandler[]> = new Map<string, IResourceHandler[]>()
+    private resource_handlers: Map<string, Map<string, (...any: any)=> any>> = new Map<string, Map<string, (...any: any)=> any>>()
 
     private readonly _logger: ICustomLogger
 
@@ -35,12 +35,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
 
     public addResource(resourceName: string, resource: (...any: any) => any): boolean {
 
-        const resourceHandler: IResourceHandler = {
-            resource_name: resourceName,
-            handle: resource
-        }
-
-        return this.registerResource(this._queueName, resourceHandler)
+        return this.registerResource(this._queueName, resourceName, resource)
     }
 
     public removeResource(resourceName: string): boolean {
@@ -58,47 +53,39 @@ export class ServerRegisterRabbitmq implements IServerRegister {
             return {}
     }
 
-    private registerResource(queueName: string,
-                             resource: IResourceHandler): boolean {
+    private registerResource(queueName: string, resourceName: string,
+                             resource: (...any: any) => any): boolean {
 
-        const resources_handler: IResourceHandler[] | undefined = this.resource_handlers.get(queueName)
+        const resourcesHandler: Map<string, (...any: any) => any> | undefined = this.resource_handlers.get(queueName)
 
-        if (!resources_handler) {
-            this.resource_handlers.set(queueName, [resource])
-            this._logger.info('Resource ' + resource.resource_name + ' registered!')
+        if (!resourcesHandler) {
+            let routingKeyHandler: Map<string, (...any: any) => any> = new Map();
+            routingKeyHandler.set(resourceName, resource)
+            this.resource_handlers.set(queueName, routingKeyHandler)
+            this._logger.info('Resource ' + resourceName + ' registered!')
             return true
-        }
-
-        for (const actualResource of resources_handler) {
-            if (actualResource.resource_name === resource.resource_name) {
+        } else {
+            if (resourcesHandler.has(resourceName)) {
                 return false
             }
+            resourcesHandler.set(resourceName, resource)
+            this.resource_handlers.set(queueName, resourcesHandler)
+            this._logger.info('Resource ' + resourceName + ' registered!')
+            return true
         }
-
-        resources_handler.push(resource)
-        this.resource_handlers.set(queueName, resources_handler)
-
-        this._logger.info('Resource ' + resource.resource_name + ' registered!')
-        return true
     }
 
     private unregisterResource(queueName: string, resourceName: string): boolean {
-        const resources_handler: IResourceHandler[] | undefined = this.resource_handlers.get(queueName)
+        const resourcesHandler: Map<string, (...any: any) => any> | undefined = this.resource_handlers.get(queueName)
 
-        if (!resources_handler) {
+        if (!resourcesHandler) {
             return false
         }
 
-        for (const index in resources_handler) {
-            if (resources_handler[index].resource_name === resourceName) {
-                resources_handler.splice(Number(index), 1)
-                this.resource_handlers.set(queueName, resources_handler)
-                return true
-            }
-        }
+        return resourcesHandler.delete(resourceName)
     }
 
-    private getResource(): Map<string, any> {
+    private getResource(): Map<string, Map<string, (...any)=>any> | undefined> {
         return this.resource_handlers
     }
 
@@ -124,7 +111,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                 this._logger.info('RoutingKey ' + routingKey + ' registered!')
 
                 if (routingKey.length > 0) for (const key of routingKey) await queue.bind(exchange, key)
-                else for (const value of this.resource_handlers.get(queueName)) await queue.bind(exchange, value.resource_name)
+                else for (const value of this.resource_handlers.get(queueName)) await queue.bind(exchange, value[0])
 
                 await this.routingKeyServerConsumer(queue, options ? options.consumer : undefined)
                 return resolve(true)
@@ -142,19 +129,15 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                     // acknowledge that the message has been received (and processed)
                     const clientRequest: IClientRequest = message.content
 
-                    const resources_handler: IResourceHandler[] | undefined =
+                    const resourcesHandler: Map<string, (...any: any) => any> | undefined =
                         this.resource_handlers.get(queue.name)
-
-                    if (resources_handler) {
-                        for (const resource of resources_handler) {
-                            if (resource.resource_name === clientRequest.resource_name) {
-                                try {
-                                    return resource.handle.apply('', clientRequest.handle)
-                                } catch (err) {
-                                    this._logger.error(`Consumer function returned error: ${err.message}`)
-                                    return err
-                                }
-                            }
+                    const handler = resourcesHandler.get(clientRequest.resource_name)
+                    if (handler) {
+                        try {
+                            return handler.apply('', clientRequest.handle)
+                        } catch (err) {
+                            this._logger.error(`Consumer function returned error: ${err.message}`)
+                            return err
                         }
                     }
                     return new Error('Resource not registered in server')
