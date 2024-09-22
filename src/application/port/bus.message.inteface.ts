@@ -2,9 +2,19 @@ import { Exchange } from '../../infrastructure/rabbitmq/bus/exchange'
 import { Queue } from '../../infrastructure/rabbitmq/bus/queue'
 import { Channel, Message } from 'amqplib/callback_api'
 
+
+export interface IField {
+    consumerTag?: string
+    deliveryTag?: string
+    redelivered?: boolean
+    exchange?: string
+    routingKey?: string
+}
+
+
 export interface IBusMessage {
     contentBuffer: any
-    fields: any
+    fields: IField
     properties: any
     channel: Channel
     message: Message
