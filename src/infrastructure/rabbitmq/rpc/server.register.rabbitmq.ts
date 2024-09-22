@@ -1,4 +1,4 @@
-import { IClientRequest, IResourceHandler } from '../../port/rpc/resource.handler.interface'
+import { IResourceHandler } from '../../port/rpc/resource.handler.interface'
 import { IServerOptions } from '../../../application/port/communication.option.interface'
 import { IBusConnection } from '../../port/connection/connection.interface'
 import { IActivateConsumerOptions } from '../../../application/port/queue.option.interface'
@@ -140,16 +140,14 @@ export class ServerRegisterRabbitmq implements IServerRegister {
             try {
                 await queue.activateConsumer((message: IBusMessage) => {
                     // acknowledge that the message has been received (and processed)
-                    const clientRequest: IClientRequest = message.content
-
                     const resources_handler: IResourceHandler[] | undefined =
                         this.resource_handlers.get(queue.name)
 
                     if (resources_handler) {
                         for (const resource of resources_handler) {
-                            if (resource.resource_name === clientRequest.resource_name) {
+                            if (resource.resource_name === message.fields.routingKey) {
                                 try {
-                                    return resource.handle.apply('', clientRequest.handle)
+                                    return resource.handle.apply('', message.content)
                                 } catch (err) {
                                     this._logger.error(`Consumer function returned error: ${err.message}`)
                                     return err

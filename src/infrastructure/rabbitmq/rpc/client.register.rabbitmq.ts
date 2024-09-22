@@ -48,7 +48,7 @@ export class ClientRegisterRabbitmq implements IClientRegister {
                     })
                 }
 
-                exchange.rpc(resource, resource.resource_name, (err, msg) => {
+                exchange.rpc(resource.handle, resource.resource_name, (err, msg) => {
                     clearTimeout(time)
                     if (err) return reject(err)
                     return resolve(msg.content)
