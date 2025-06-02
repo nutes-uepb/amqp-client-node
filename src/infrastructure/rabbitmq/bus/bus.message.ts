@@ -122,7 +122,7 @@ export class BusMessage implements IBusMessage {
         const sendMessage = () => {
             try {
                 destination.channel.publish(exchange, routingKey, this._contentBuffer, this._properties)
-            } catch (err) {
+            } catch (err: any) {
                 // Publish error
                 const destinationName = destination.name
                 const connection = destination.connection

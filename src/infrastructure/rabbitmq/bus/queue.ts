@@ -153,7 +153,7 @@ export class Queue {
         const sendMessage = () => {
             try {
                 this._channel.sendToQueue(this._name, content, options)
-            } catch (err) {
+            } catch (err: any) {
                 // Queue publish error
                 const queueName = this._name
                 const connection = this._connection

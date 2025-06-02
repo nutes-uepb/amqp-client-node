@@ -28,7 +28,8 @@ export class CustomLogger implements ICustomLogger {
             level: 'silly', // Used by transports that do not have this configuration defined
             silent: false,
             format: format.combine(
-                format.timestamp(),
+                format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+                format.printf(log => `${log.module} @ ${log.timestamp} ${log.level}: ${log.message}`),
                 format.json()
             ),
             transports: new transports.Console(this._options),
@@ -44,7 +45,7 @@ export class CustomLogger implements ICustomLogger {
             format: format.combine(
                 format.colorize(),
                 format.splat(),
-                format.timestamp(),
+                format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
                 format.printf(log => `${log.module} @ ${log.timestamp} ${log.level}: ${log.message}`)
             )
         }
