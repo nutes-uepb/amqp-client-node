@@ -6,6 +6,7 @@
   "typings": "lib/index.d.ts",
   "scripts": {
     "start": "npm run build",
+    "prepare": "npm run build",
     "build": "tsc",
     "prebuild": "tslint -c tslint.json -p tsconfig.json",
     "test": "nyc --clean --all --reporter=text-summary mocha test/**/*.spec.ts",
