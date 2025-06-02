@@ -11,6 +11,13 @@
     "test": "nyc --clean --all --reporter=text-summary mocha test/**/*.spec.ts",
     "test:cov": "nyc --clean --all --reporter=html --reporter=text mocha test/**/*.spec.ts"
   },
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "require": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nutes-uepb/amqp-client-node.git"
