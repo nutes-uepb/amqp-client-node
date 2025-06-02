@@ -150,7 +150,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
                             if (resource.resource_name === clientRequest.resource_name) {
                                 try {
                                     return resource.handle.apply('', clientRequest.handle)
-                                } catch (err) {
+                                } catch (err: any) {
                                     this._logger.error(`Consumer function returned error: ${err.message}`)
                                     return err
                                 }

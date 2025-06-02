@@ -1,0 +1,20 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: lib-rabbitmq
+    restart: always
+    ports:
+      - 15672:15672 # Management UI
+      - 5672:5672 # AMQP Protocol
+      - 5671:5671 # AMQPS Protocol
+    networks: 
+      - amqp-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+
+networks:
+  amqp-network:
+    name: amqp-network
+    driver: bridge

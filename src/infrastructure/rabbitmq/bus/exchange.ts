@@ -130,7 +130,7 @@ export class Exchange {
         this._initialized.then(() => {
             try {
                 this._channel.publish(this._name, routingKey, content, options)
-            } catch (err) {
+            } catch (err: any) {
                 // Exchange publish error!
                 const exchangeName = this._name
                 const connection = this._connection
