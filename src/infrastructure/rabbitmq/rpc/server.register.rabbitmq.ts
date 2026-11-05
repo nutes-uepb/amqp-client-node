@@ -1,4 +1,4 @@
-import { IClientRequest, IResourceHandler } from '../../port/rpc/resource.handler.interface'
+import { IClientRequest } from '../../port/rpc/resource.handler.interface'
 import { IServerOptions } from '../../../application/port/communication.option.interface'
 import { IBusConnection } from '../../port/connection/connection.interface'
 import { IActivateConsumerOptions } from '../../../application/port/queue.option.interface'
@@ -11,7 +11,8 @@ import { IBusMessage } from '../../../application/port/bus.message.inteface'
 
 export class ServerRegisterRabbitmq implements IServerRegister {
 
-    private resource_handlers: Map<string, Map<string, (...any: any)=> any>> = new Map<string, Map<string, (...any: any)=> any>>()
+    private resource_handlers: Map<string, Map<string, (...any: any) => any>> =
+        new Map<string, Map<string, (...any: any) => any>>()
 
     private readonly _logger: ICustomLogger
 
@@ -59,7 +60,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
         const resourcesHandler: Map<string, (...any: any) => any> | undefined = this.resource_handlers.get(queueName)
 
         if (!resourcesHandler) {
-            let routingKeyHandler: Map<string, (...any: any) => any> = new Map();
+            const routingKeyHandler: Map<string, (...any: any) => any> = new Map()
             routingKeyHandler.set(resourceName, resource)
             this.resource_handlers.set(queueName, routingKeyHandler)
             this._logger.info('Resource ' + resourceName + ' registered!')
@@ -85,7 +86,7 @@ export class ServerRegisterRabbitmq implements IServerRegister {
         return resourcesHandler.delete(resourceName)
     }
 
-    private getResource(): Map<string, Map<string, (...any)=>any> | undefined> {
+    private getResource(): Map<string, Map<string, (...any: any) => any> | undefined> {
         return this.resource_handlers
     }
 
@@ -110,8 +111,14 @@ export class ServerRegisterRabbitmq implements IServerRegister {
 
                 this._logger.info('RoutingKey ' + routingKey + ' registered!')
 
-                if (routingKey.length > 0) for (const key of routingKey) await queue.bind(exchange, key)
-                else for (const value of this.resource_handlers.get(queueName)) await queue.bind(exchange, value[0])
+                if (routingKey.length > 0) {
+                    for (const key of routingKey) await queue.bind(exchange, key)
+                } else {
+                    const handlers = this.resource_handlers.get(queueName)
+                    if (handlers) {
+                        for (const value of handlers) await queue.bind(exchange, value[0])
+                    }
+                }
 
                 await this.routingKeyServerConsumer(queue, options ? options.consumer : undefined)
                 return resolve(true)
@@ -131,13 +138,15 @@ export class ServerRegisterRabbitmq implements IServerRegister {
 
                     const resourcesHandler: Map<string, (...any: any) => any> | undefined =
                         this.resource_handlers.get(queue.name)
-                    const handler = resourcesHandler.get(clientRequest.resource_name)
-                    if (handler) {
-                        try {
-                            return handler.apply('', clientRequest.handle)
-                        } catch (err) {
-                            this._logger.error(`Consumer function returned error: ${err.message}`)
-                            return err
+                    if (resourcesHandler) {
+                        const handler = resourcesHandler.get(clientRequest.resource_name)
+                        if (handler) {
+                            try {
+                                return handler.apply('', clientRequest.handle)
+                            } catch (err) {
+                                this._logger.error(`Consumer function returned error: ${err.message}`)
+                                return err
+                            }
                         }
                     }
                     return new Error('Resource not registered in server')
