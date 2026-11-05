@@ -40,7 +40,7 @@ const DIRECT_REPLY_TO_QUEUE = 'amq.rabbitmq.reply-to'
 export class Exchange {
     private _initialized: Promise<IExchangeInitializeResult>
 
-    private _consumer_handlers: Array<[string, any]> = new Array<[string, any]>()
+    private _consumer_handlers: { [key: string]: any } = {}
     private _isConsumerInitializedRcp: boolean = false
 
     private _connection: ConnectionFactoryRabbitMQ
@@ -165,21 +165,19 @@ export class Exchange {
                     result.properties = resultMsg.properties
                     result.fields = resultMsg.fields
 
-                    for (const handler of this._consumer_handlers) {
-                        if (handler[0] === resultMsg.properties.correlationId) {
-                            const func: (err, parameters) => void = handler[1]
+                    const handler = this._consumer_handlers[resultMsg.properties.correlationId]
 
-                            if (result.properties.type === 'error') {
-                                func.apply('', [new Error(result.content), undefined])
-                                return
-                            }
-                            func.apply('', [undefined, result])
-                        }
+                    if (result.properties.type === 'error') {
+                        handler(new Error(result.content), undefined)
+                        return
+                    } else {
+                        handler(undefined, result)
                     }
+                    delete this._consumer_handlers[resultMsg.properties.correlationId]
 
                 }, { noAck: true })
             }
-            this._consumer_handlers.push([uuid, callback])
+            this._consumer_handlers[uuid] = callback
             const message: BusMessage = DI.get(Identifier.BUS_MESSAGE)
             message.content = requestParameters
             message.properties = { correlationId: uuid, replyTo: DIRECT_REPLY_TO_QUEUE }
