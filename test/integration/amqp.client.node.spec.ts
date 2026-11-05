@@ -158,22 +158,52 @@ describe('AMQP CLIENT NODE', () => {
 
     describe('RPC CLIENT', () => {
         context('Successfully', async () => {
-            // before(async () => {
-            //     conn = await getConnection()
-            //
-            //     const server: IServerRegister = conn.createRpcServer('test.server',
-            //         'test.server', ['logs.find'])
-            //     server.addResource('logs.find', () => {
-            //         return { test: 'rpc server and client!' }
-            //     })
-            //     await server.start()
-            // })
-            //
-            // after(async () => {
-            //     if (conn) await conn.dispose()
-            // })
+            let conn: IConnection
+            let server: IServerRegister
 
+            before(async () => {
+                conn = await getConnection()
+                server = conn.createRpcServer('test.rpc.client.queue', 'test.rpc.client.exchange', ['math.sum', 'math.echo'])
+                server.addResource('math.sum', (a: number, b: number) => {
+                    return { sum: a + b }
+                })
+                server.addResource('math.echo', (text: string) => {
+                    return { echo: text }
+                })
+                await server.start()
+            })
 
+            after(async () => {
+                if (conn) await conn.dispose()
+            })
+
+            it('should call RPC server and return expected response with single argument', async () => {
+                const result = await conn.rpcClient('test.rpc.client.exchange', 'math.echo', ['hello rpc'])
+                expect(result).to.deep.equal({ echo: 'hello rpc' })
+            })
+
+            it('should call RPC server and calculate sum with multiple arguments', async () => {
+                const result = await conn.rpcClient('test.rpc.client.exchange', 'math.sum', [15, 30])
+                expect(result).to.deep.equal({ sum: 45 })
+            })
+
+            it('should support legacy envelope format { resource_name, handle } with backward compatibility', async () => {
+                // Simula mensagem enviada por cliente antigo com envelope legado
+                const legacyExchange: any = await (conn as any)._eventBusConnection.getExchange('test.rpc.client.exchange')
+                const legacyPayload = {
+                    resource_name: 'math.echo',
+                    handle: ['legacy test']
+                }
+
+                const result: any = await new Promise((resolve, reject) => {
+                    legacyExchange.rpc(legacyPayload, 'math.echo', (err, msg) => {
+                        if (err) return reject(err)
+                        resolve(msg.content)
+                    })
+                })
+
+                expect(result).to.deep.equal({ echo: 'legacy test' })
+            })
         })
     })
 

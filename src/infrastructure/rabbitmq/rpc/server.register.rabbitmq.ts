@@ -140,14 +140,30 @@ export class ServerRegisterRabbitmq implements IServerRegister {
             try {
                 await queue.activateConsumer((message: IBusMessage) => {
                     // acknowledge that the message has been received (and processed)
+                    let targetResourceName: string | undefined
+                    if (message.fields && message.fields.routingKey) {
+                        targetResourceName = message.fields.routingKey
+                    } else if (message.content && message.content.resource_name) {
+                        targetResourceName = message.content.resource_name
+                    }
+
+                    let args: any[] = []
+                    if (Array.isArray(message.content)) {
+                        // Formato novo otimizado: [arg1, arg2, ...]
+                        args = message.content
+                    } else if (message.content && Array.isArray(message.content.handle)) {
+                        // Formato legado: { resource_name, handle: [...] }
+                        args = message.content.handle
+                    }
+
                     const resources_handler: IResourceHandler[] | undefined =
                         this.resource_handlers.get(queue.name)
 
                     if (resources_handler) {
                         for (const resource of resources_handler) {
-                            if (resource.resource_name === message.fields.routingKey) {
+                            if (resource.resource_name === targetResourceName) {
                                 try {
-                                    return resource.handle.apply('', message.content)
+                                    return resource.handle.apply('', args)
                                 } catch (err) {
                                     this._logger.error(`Consumer function returned error: ${err.message}`)
                                     return err
