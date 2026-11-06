@@ -157,23 +157,86 @@ describe('AMQP CLIENT NODE', () => {
     })
 
     describe('RPC CLIENT', () => {
-        context('Successfully', async () => {
-            // before(async () => {
-            //     conn = await getConnection()
-            //
-            //     const server: IServerRegister = conn.createRpcServer('test.server',
-            //         'test.server', ['logs.find'])
-            //     server.addResource('logs.find', () => {
-            //         return { test: 'rpc server and client!' }
-            //     })
-            //     await server.start()
-            // })
-            //
-            // after(async () => {
-            //     if (conn) await conn.dispose()
-            // })
+        context('Handler Cleanup and Error Safety', async () => {
+            let conn: IConnection
+            let server: IServerRegister
 
+            before(async () => {
+                conn = await getConnection()
+                server = conn.createRpcServer('test.cleanup.queue', 'test.cleanup.exchange', ['logs.find'])
+                server.addResource('logs.find', () => {
+                    return { test: 'rpc server and client!' }
+                })
+                await server.start()
+            })
 
+            after(async () => {
+                if (conn) await conn.dispose()
+            })
+
+            it('should remove handler from _consumer_handlers after successful RPC call', async () => {
+                const result = await conn.rpcClient('test.cleanup.exchange', 'logs.find', [])
+                expect(result).to.deep.equal({ test: 'rpc server and client!' })
+
+                const exchange: any = await (conn as any)._eventBusConnection.getExchange('test.cleanup.exchange')
+                expect(Object.keys(exchange._consumer_handlers).length).to.equal(0)
+            })
+
+            it('should remove handler from _consumer_handlers even when RPC response is of type error', () => {
+                return new Promise<void>(async (resolve, reject) => {
+                    try {
+                        const exchange: any = await (conn as any)._eventBusConnection.getExchange('test.cleanup.exchange')
+                        const correlationId = 'error-correlation-id-test'
+                        let errorReceived: any
+
+                        exchange._consumer_handlers[correlationId] = (err: any) => {
+                            errorReceived = err
+                        }
+
+                        // Simula entrega de resposta com type === 'error' pelo consumidor da reply-to
+                        const rawConsumers = exchange._channel.consumers
+                        const consumerCallbacks = rawConsumers instanceof Map
+                            ? Array.from(rawConsumers.values())
+                            : Object.keys(rawConsumers).map(key => rawConsumers[key])
+                        expect(consumerCallbacks.length).to.be.greaterThan(0)
+
+                        consumerCallbacks[0]({
+                            content: Buffer.from(JSON.stringify('Simulated RPC Error')),
+                            properties: {
+                                correlationId,
+                                type: 'error',
+                                contentType: 'application/json'
+                            },
+                            fields: {}
+                        })
+
+                        expect(errorReceived).to.be.an('error')
+                        expect(exchange._consumer_handlers[correlationId]).to.be.undefined
+                        resolve()
+                    } catch (err) {
+                        reject(err)
+                    }
+                })
+            })
+
+            it('should safely ignore RPC responses with unknown correlationId without throwing', async () => {
+                const exchange: any = await (conn as any)._eventBusConnection.getExchange('test.cleanup.exchange')
+                const rawConsumers = exchange._channel.consumers
+                const consumerCallbacks = rawConsumers instanceof Map
+                    ? Array.from(rawConsumers.values())
+                    : Object.keys(rawConsumers).map(key => rawConsumers[key])
+
+                expect(() => {
+                    consumerCallbacks[0]({
+                        content: Buffer.from(JSON.stringify({ orphan: true })),
+                        properties: {
+                            correlationId: 'non-existent-correlation-id',
+                            contentType: 'application/json'
+                        },
+                        fields: {}
+                    })
+                }).to.not.throw()
+            })
         })
     })
 
