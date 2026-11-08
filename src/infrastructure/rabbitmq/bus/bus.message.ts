@@ -25,6 +25,7 @@ import { Queue } from './queue'
 import * as AmqpLib from 'amqplib/callback_api'
 import { injectable } from 'inversify'
 import { IBusMessage } from '../../../application/port/bus.message.inteface'
+import { IMessage } from '../../../application/port/message.interface'
 
 @injectable()
 export class BusMessage implements IBusMessage {
@@ -152,9 +153,10 @@ export class BusMessage implements IBusMessage {
 
     public ack(allUpTo?: boolean): void
 
-    public ack(message: AmqpLib.Message, channel: AmqpLib.Channel, noAck: boolean, allUpTo?: boolean): void
+    public ack(message: AmqpLib.Message | IMessage, channel: AmqpLib.Channel, noAck: boolean, allUpTo?: boolean): void
 
-    public ack(message: AmqpLib.Message | boolean, channel?: AmqpLib.Channel, noAck?: boolean, allUpTo?: boolean): void {
+    public ack(message: AmqpLib.Message | IMessage | boolean, channel?: AmqpLib.Channel,
+         noAck?: boolean, allUpTo?: boolean): void {
         if (typeof message === 'boolean') {
             if (this._channel !== undefined && !this._acked) {
                 this._acked = true
@@ -164,39 +166,41 @@ export class BusMessage implements IBusMessage {
         }
 
         if (channel !== undefined && !noAck) {
-            channel.ack(message, allUpTo)
+            // IMessage carries the fields of the message delivered by amqplib; only fields.deliveryTag is used here
+            channel.ack(message as unknown as AmqpLib.Message, allUpTo)
         }
     }
 
     public nack(allUpTo?: boolean, requeue?: boolean): void
 
-    public nack(message: AmqpLib.Message, channel: AmqpLib.Channel, allUpTo?: boolean, requeue?: boolean): void
+    public nack(message: AmqpLib.Message | IMessage, channel: AmqpLib.Channel, allUpTo?: boolean, requeue?: boolean): void
 
-    public nack(message: AmqpLib.Message | boolean, channel: AmqpLib.Channel, allUpTo?: boolean, requeue?: boolean): void {
+    public nack(message: AmqpLib.Message | IMessage | boolean, channel?: AmqpLib.Channel | boolean, allUpTo?: boolean,
+         requeue?: boolean): void {
         if (typeof message === 'boolean') {
             if (this._channel !== undefined) {
-                this._channel.nack(this._message, allUpTo, requeue)
+                (channel as AmqpLib.Channel).nack(message as unknown as AmqpLib.Message, allUpTo, requeue)
             }
             return
         }
         if (channel !== undefined) {
-            channel.nack(message, allUpTo, requeue)
+            (channel as AmqpLib.Channel).nack(message as unknown as AmqpLib.Message, allUpTo, requeue)
         }
     }
 
     public reject(requeue: boolean): void
 
-    public reject(message: AmqpLib.Message, channel: AmqpLib.Channel, requeue: boolean): void
+    public reject(message: AmqpLib.Message | IMessage, channel: AmqpLib.Channel, requeue: boolean): void
 
-    public reject(message: AmqpLib.Message | boolean, channel?: AmqpLib.Channel, requeue = false): void {
+    public reject(message: AmqpLib.Message | IMessage | boolean, channel?: AmqpLib.Channel, requeue = false): void {
         if (typeof message === 'boolean') {
             if (this._channel !== undefined) {
-                this._channel.reject(this._message, requeue)
+                channel.reject(message as unknown as AmqpLib.Message, requeue)
             }
             return
         }
         if (channel !== undefined) {
-            channel.reject(message, requeue)
+            channel.reject(message as unknown as AmqpLib.Message, requeue)
         }
     }
 }

@@ -156,7 +156,7 @@ export class Exchange {
 
         const processRpc = () => {
             const uuid: string = generateUuid()
-            if (Object.keys(this._channel.consumers).length === 0 && !this._isConsumerInitializedRcp) {
+            if (!this._isConsumerInitializedRcp) {
                 this._isConsumerInitializedRcp = true
                 this._channel.consume(DIRECT_REPLY_TO_QUEUE, (resultMsg) => {
 
