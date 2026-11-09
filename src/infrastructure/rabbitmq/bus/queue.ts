@@ -185,7 +185,7 @@ export class Queue {
                     resolve(result)
                 }, { noAck: true }, (err, ok) => {
                     if (err) {
-                        reject(new Error('Queue.rpc error: ' + err.messageBus))
+                        reject(new Error('Queue.rpc error: ' + err.message))
                     } else {
                         // send the rpc request
                         consumerTag = ok.consumerTag

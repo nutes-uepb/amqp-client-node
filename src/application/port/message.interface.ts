@@ -24,7 +24,7 @@ export interface IMessageProperty {
 
 export interface IMessageField {
     consumerTag?: string
-    deliveryTag?: string
+    deliveryTag?: number
     redelivered?: boolean
     exchange?: string
     routingKey?: string
