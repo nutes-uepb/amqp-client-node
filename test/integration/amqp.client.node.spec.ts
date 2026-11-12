@@ -157,23 +157,53 @@ describe('AMQP CLIENT NODE', () => {
     })
 
     describe('RPC CLIENT', () => {
-        context('Successfully', async () => {
-            // before(async () => {
-            //     conn = await getConnection()
-            //
-            //     const server: IServerRegister = conn.createRpcServer('test.server',
-            //         'test.server', ['logs.find'])
-            //     server.addResource('logs.find', () => {
-            //         return { test: 'rpc server and client!' }
-            //     })
-            //     await server.start()
-            // })
-            //
-            // after(async () => {
-            //     if (conn) await conn.dispose()
-            // })
+        context('Timeout and Handler Cleanup', async () => {
+            let conn: IConnection
+            let server: IServerRegister
 
+            before(async () => {
+                conn = await getConnection()
+                server = conn.createRpcServer('test.timeout.queue', 'test.timeout.exchange', ['fast.call', 'slow.call'])
+                server.addResource('fast.call', () => {
+                    return { ok: true }
+                })
+                server.addResource('slow.call', () => {
+                    // Simula processamento lento de 500ms
+                    return new Promise((resolve) => setTimeout(() => resolve({ ok: true }), 500))
+                })
+                await server.start()
+            })
 
+            after(async () => {
+                if (conn) await conn.dispose()
+            })
+
+            it('should execute fast RPC call and clean up handler after response', async () => {
+                const result = await conn.rpcClient('test.timeout.exchange', 'fast.call', [])
+                expect(result).to.deep.equal({ ok: true })
+
+                const exchange: any = await (conn as any)._eventBusConnection.getExchange('test.timeout.exchange')
+                expect(Object.keys(exchange._consumer_handlers).length).to.equal(0)
+            })
+
+            it('should clean up handler from _consumer_handlers when rpcTimeout expires', async () => {
+                const exchange: any = await (conn as any)._eventBusConnection.getExchange('test.timeout.exchange')
+
+                try {
+                    // Executa chamada com timeout de 100ms em rota lenta (500ms)
+                    await conn.rpcClient('test.timeout.exchange', 'slow.call', [], { rpcTimeout: 100 })
+                    expect.fail('should have thrown timeout error')
+                } catch (err) {
+                    expect((err as any).message).to.equal('rpc timed out')
+                }
+
+                // Verifica que o handler registrado foi removido da exchange imediatamente após o timeout
+                expect(Object.keys(exchange._consumer_handlers).length).to.equal(0)
+
+                // Aguarda a resposta tardia do servidor lento e valida que ela é descartada sem estourar exceção
+                await new Promise((resolve) => setTimeout(resolve, 600))
+                expect(Object.keys(exchange._consumer_handlers).length).to.equal(0)
+            })
         })
     })
 

@@ -39,16 +39,20 @@ export class ClientRegisterRabbitmq implements IClientRegister {
 
                 let time
                 const timeout = options.rpcTimeout
+                let cancelRpc: (() => void) | undefined
 
                 if (timeout > 0) {
                     new Promise<any>((res) => {
                         time = setTimeout(res, timeout)
                     }).then(() => {
+                        if (cancelRpc) {
+                            cancelRpc()
+                        }
                         reject(new Error('rpc timed out'))
                     })
                 }
 
-                exchange.rpc(resource, resource.resource_name, (err, msg) => {
+                cancelRpc = exchange.rpc(resource, resource.resource_name, (err, msg) => {
                     clearTimeout(time)
                     if (err) return reject(err)
                     return resolve(msg.content)

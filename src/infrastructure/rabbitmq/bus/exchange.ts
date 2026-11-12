@@ -146,7 +146,7 @@ export class Exchange {
         message.sendTo(this, routingKey)
     }
 
-    public rpc(requestParameters: any, routingKey = '', callback: (err, message: BusMessage) => void): void {
+    public rpc(requestParameters: any, routingKey = '', callback: (err, message: BusMessage) => void): () => void {
 
         function generateUuid(): string {
             return Math.random().toString() +
@@ -154,18 +154,27 @@ export class Exchange {
                 Math.random().toString()
         }
 
+        const uuid: string = generateUuid()
+        let cancelled: boolean = false
+
         const processRpc = () => {
-            const uuid: string = generateUuid()
+            if (cancelled) {
+                return
+            }
             if (!this._isConsumerInitializedRcp) {
                 this._isConsumerInitializedRcp = true
                 this._channel.consume(DIRECT_REPLY_TO_QUEUE, (resultMsg) => {
+
+                    const handler = this._consumer_handlers[resultMsg.properties.correlationId]
+                    if (!handler) {
+                        return
+                    }
+                    delete this._consumer_handlers[resultMsg.properties.correlationId]
 
                     const result: BusMessage = DI.get(Identifier.BUS_MESSAGE)
                     result.content = resultMsg.content
                     result.properties = resultMsg.properties
                     result.fields = resultMsg.fields
-
-                    const handler = this._consumer_handlers[resultMsg.properties.correlationId]
 
                     if (result.properties.type === 'error') {
                         handler(new Error(result.content), undefined)
@@ -173,7 +182,6 @@ export class Exchange {
                     } else {
                         handler(undefined, result)
                     }
-                    delete this._consumer_handlers[resultMsg.properties.correlationId]
 
                 }, { noAck: true })
             }
@@ -185,6 +193,11 @@ export class Exchange {
         }
 
         this._initialized.then(processRpc)
+
+        return () => {
+            cancelled = true
+            delete this._consumer_handlers[uuid]
+        }
     }
 
     public delete(): Promise<void> {
